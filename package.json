@@ -1,0 +1,26 @@
+{
+  "name": "asd123-ai-website",
+  "version": "1.0.0",
+  "description": "ASD123.ai - Privacy-First AI Text Processing Tools",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --env production"
+  },
+  "devDependencies": {
+    "html-minifier-terser": "^7.2.0",
+    "terser": "^5.24.0",
+    "clean-css": "^5.3.2"
+  },
+  "keywords": [
+    "AI",
+    "text processing",
+    "privacy",
+    "Swiss",
+    "optimizer",
+    "cloudflare workers"
+  ],
+  "author": "ASD123.ai",
+  "license": "MIT"
+}

@@ -1,0 +1,17 @@
+name = "asd123-ai"
+main = "src/index.js"
+compatibility_date = "2023-12-01"
+
+[env.production]
+name = "asd123-ai"
+route = "asd123.ai/*"
+
+[env.development]
+name = "asd123-ai-dev"
+
+[[env.production.routes]]
+pattern = "asd123.ai/*"
+zone_name = "asd123.ai"
+
+[build]
+command = "npm run build"
