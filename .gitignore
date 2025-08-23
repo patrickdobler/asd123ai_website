@@ -1,0 +1,28 @@
+# Node.js dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+build.js
+
+# Logs
+*.log
+
+# dotenv environment variables file
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+
+# Python cache (for update_mappings.py)
+__pycache__/
+*.pyc
+
+# Cloudflare Wrangler cache
+.wrangler/

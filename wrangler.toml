@@ -2,6 +2,11 @@ name = "asd123-ai"
 main = "src/index.js"
 compatibility_date = "2023-12-01"
 
+[assets]
+binding = "ASSETS"
+directory = "dist"
+html_handling = "auto-trailing-slash"
+
 [env.production]
 name = "asd123-ai"
 route = "asd123.ai/*"
