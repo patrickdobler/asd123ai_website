@@ -1,4 +1,4 @@
-// ASD123 AI Text Tools - Shared JavaScript
+// ASD123.ai AI Text Tools - Shared JavaScript
 
 // Navigation Manager
 class NavigationManager {

@@ -1,5 +1,5 @@
 /**
- * ASD123 AI Text Tools - Optimizer Engine
+ * ASD123.ai AI Text Tools - Optimizer Engine
  * Privacy-focused text processing with client-side execution
  */
 
@@ -141,11 +141,6 @@ class TextOptimizer {
         let processedText = inputText;
         const originalText = inputText;
 
-        // Apply language mapping first if enabled
-        if (this.settings.applyLanguageMapping) {
-            processedText = this.applyLanguageCharacterMapping(processedText);
-        }
-
         // Apply processing steps in order
         if (this.settings.removeDiacritics) {
             processedText = this.removeDiacritics(processedText);
@@ -163,8 +158,14 @@ class TextOptimizer {
             processedText = this.removeFancyFont(processedText);
         }
 
+        // Apply em dash replacement BEFORE language mapping
         if (this.settings.replaceEmDash) {
             processedText = this.replaceEmDash(processedText);
+        }
+
+        // Apply language mapping AFTER em dash replacement
+        if (this.settings.applyLanguageMapping) {
+            processedText = this.applyLanguageCharacterMapping(processedText);
         }
 
         return {

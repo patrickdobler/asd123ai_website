@@ -9,6 +9,7 @@ The script:
 - clones the repo into a temporary directory
 - searches for all .json files
 - copies them into the destination directory preserving relative paths
+- updates the EMBEDDED_MAPPINGS in scripts/optimizer.js with the new JSON content
 - cleans up the temporary clone (unless --keep-tmp is passed)
 """
 from __future__ import annotations
@@ -18,6 +19,8 @@ import subprocess
 import shutil
 import os
 import sys
+import json
+import re
 
 def run(cmd: str) -> None:
     subprocess.check_call(cmd, shell=True)
@@ -27,6 +30,54 @@ def find_json_files(root: str):
         for f in files:
             if f.lower().endswith('.json'):
                 yield os.path.join(dirpath, f)
+
+def update_embedded_mappings(mappings_dir: str, optimizer_js_path: str = 'scripts/optimizer.js'):
+    """Update the EMBEDDED_MAPPINGS constant in optimizer.js with the content of JSON files."""
+    if not os.path.exists(optimizer_js_path):
+        print(f'Warning: {optimizer_js_path} not found, skipping EMBEDDED_MAPPINGS update')
+        return
+    
+    # Read all JSON mapping files
+    mappings = {}
+    mapping_files_dir = os.path.join(mappings_dir, 'mappings')
+    
+    if os.path.exists(mapping_files_dir):
+        for filename in os.listdir(mapping_files_dir):
+            if filename.endswith('.json'):
+                filepath = os.path.join(mapping_files_dir, filename)
+                try:
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        content = json.load(f)
+                        # Extract language name from filename (e.g., 'swiss-german.json' -> 'swiss-german')
+                        lang_key = filename[:-5]  # Remove .json extension
+                        mappings[lang_key] = content
+                        print(f'Loaded mapping: {lang_key}')
+                except Exception as e:
+                    print(f'Warning: Failed to load {filepath}: {e}')
+    
+    if not mappings:
+        print('No mapping files found, skipping EMBEDDED_MAPPINGS update')
+        return
+    
+    # Read the current optimizer.js file
+    with open(optimizer_js_path, 'r', encoding='utf-8') as f:
+        js_content = f.read()
+    
+    # Generate the new EMBEDDED_MAPPINGS constant
+    mappings_js = 'const EMBEDDED_MAPPINGS = ' + json.dumps(mappings, indent=2, ensure_ascii=False) + ';'
+    
+    # Replace the existing EMBEDDED_MAPPINGS constant
+    pattern = r'const EMBEDDED_MAPPINGS = \{[^}]*(?:\{[^}]*\}[^}]*)*\};'
+    if re.search(pattern, js_content, re.DOTALL):
+        new_js_content = re.sub(pattern, mappings_js, js_content, flags=re.DOTALL)
+        
+        # Write the updated content back
+        with open(optimizer_js_path, 'w', encoding='utf-8') as f:
+            f.write(new_js_content)
+        
+        print(f'Updated EMBEDDED_MAPPINGS in {optimizer_js_path} with {len(mappings)} language mappings')
+    else:
+        print(f'Warning: Could not find EMBEDDED_MAPPINGS constant in {optimizer_js_path}')
 
 def main() -> int:
     p = argparse.ArgumentParser(
@@ -77,6 +128,12 @@ def main() -> int:
             print(f'Copied: {rel} -> {dst}')
 
         print(f'Done. Copied {copied} JSON files into {args.dest}')
+        
+        # Update EMBEDDED_MAPPINGS in optimizer.js
+        if copied > 0:
+            print('Updating EMBEDDED_MAPPINGS in optimizer.js...')
+            update_embedded_mappings(args.dest)
+        
         if args.keep_tmp:
             print(f'Temporary clone retained at {tmp}')
     finally:
