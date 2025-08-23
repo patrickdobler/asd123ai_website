@@ -8,11 +8,11 @@ directory = "dist"
 html_handling = "auto-trailing-slash"
 
 [env.production]
-name = "asd123-ai"
+name = "asd123-website"
 
 
 [env.development]
-name = "asd123-ai-dev"
+name = "asd123-website-dev"
 
 routes = [{ pattern = "asd123.ai/*", zone_name = "asd123.ai" }]
 
