@@ -1,0 +1,190 @@
+/* ASD123 AI Text Tools - Main Styles */
+
+:root {
+    --bg-color: #1a202c;
+    --glass-bg: rgba(45, 55, 72, 0.5);
+    --border-color: rgba(255, 255, 255, 0.15);
+    --primary-color: #4299e1;
+    --secondary-color: #63b3ed;
+    --text-primary: #edf2f7;
+    --text-secondary: #a0aec0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+}
+
+/* Aurora Background - Fixed to prevent edge visibility */
+.aurora-bg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200vw;
+    height: 200vh;
+    z-index: 0;
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(66, 153, 225, 0.25) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(129, 140, 248, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(244, 114, 182, 0.15) 0%, transparent 40%);
+    animation: aurora 20s infinite linear;
+    overflow: hidden;
+}
+
+@keyframes aurora {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* Glassmorphism Components */
+.liquid-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: all 0.3s ease-in-out;
+}
+
+.liquid-glass:hover {
+    /* Removed transform to prevent annoying movement */
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Typography */
+.text-gradient {
+    background: linear-gradient(135deg, var(--secondary-color), white);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.main-title {
+    line-height: 1.1;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem !important;
+    overflow: visible;
+    display: block;
+}
+
+.text-primary {
+    color: var(--text-primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
+    border: none;
+    cursor: pointer;
+}
+
+.btn--primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
+.btn--primary:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    /* Removed transform for better UX */
+    box-shadow: 0 6px 16px rgba(66, 153, 225, 0.4);
+}
+
+/* Navigation */
+.nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link--active {
+    color: var(--text-primary);
+}
+
+/* Form Controls */
+.form-control {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Utility Classes */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.container--narrow {
+    max-width: 800px;
+}
+
+.container--wide {
+    max-width: 1400px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .aurora-bg {
+        width: 300vw;
+        height: 300vh;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .aurora-bg {
+        animation: none;
+    }
+    
+    .liquid-glass,
+    .btn,
+    .nav-link {
+        transition: none;
+    }
+}

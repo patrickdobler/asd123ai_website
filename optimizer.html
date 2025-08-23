@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ASD123 - Optimizer</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="styles/main.css" rel="stylesheet"/>
+<link href="styles/components.css" rel="stylesheet"/>
+<script src="scripts/shared.js"></script>
+<script src="scripts/optimizer.js"></script>
+</head>
+<body class="bg-[var(--bg-color)] text-[var(--text-primary)] min-h-screen">
+<div class="relative overflow-hidden">
+<div class="aurora-bg"></div>
+<div class="relative z-10 flex flex-col min-h-screen">
+<header class="container mx-auto px-6 py-5">
+<nav class="flex items-center justify-between">
+<a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+<svg class="h-8 w-8 text-[var(--primary-color)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+<h1 class="text-2xl font-bold text-[var(--text-primary)]">ASD123</h1>
+</a>
+<div class="hidden md:flex items-center gap-8 text-sm font-medium text-[var(--text-secondary)]">
+<a class="hover:text-[var(--text-primary)] transition-colors" href="documentation.html">Documentation</a>
+<a class="hover:text-[var(--text-primary)] transition-colors" href="about.html">About</a>
+<a class="hover:text-[var(--text-primary)] transition-colors" href="#" target="_blank" rel="noopener">GitHub</a>
+</div>
+<div class="flex items-center gap-4">
+<a class="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors" href="index.html">← Back to Home</a>
+</div>
+</nav>
+</header>
+
+<main class="flex-grow container mx-auto px-6 py-8 md:py-12">
+<!-- Page Title Section -->
+<div class="w-full text-center mb-12">
+<h2 class="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-300 mb-4">
+                        Optimizer
+                    </h2>
+<p class="text-lg md:text-xl text-[var(--text-secondary)] max-w-4xl mx-auto">
+                        Clean up and standardize AI-generated text, fix encoding or character issues, and ensure smooth integration for any region or workflow. All processing happens <strong class="text-[var(--text-primary)]">securely in your browser</strong> — no text ever leaves your device.
+                    </p>
+</div>
+
+<!-- Text Input Area -->
+<div class="max-w-4xl mx-auto mb-8">
+    <div class="liquid-glass p-6 md:p-8">
+        <label class="block text-lg font-bold text-[var(--text-primary)] mb-4" for="optimizer-textarea">
+                    Input Text
+                </label>
+        <textarea class="text-area-expandable w-full px-4 py-3 bg-[var(--glass-bg)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:border-[var(--primary-color)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-opacity-50 font-mono text-sm leading-relaxed" id="optimizer-textarea" placeholder="Paste your AI-generated text here to clean and optimize it...
+
+Example text with issues:
+• Text with diacrítics and spëcial characters
+• **Bold markdown** and *italic* formatting
+• Citation references [1] and (Source: Example.com)
+• Fancy 𝐔𝐧𝐢𝐜𝐨𝐝𝐞 text styles
+• Long sentences with em dashes — that could be split into separate sentences
+
+All processing happens entirely in your browser for complete privacy." rows="12"></textarea>
+        <div class="flex justify-between items-center mt-4">
+            <p class="text-sm text-[var(--text-secondary)]">
+                        <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        Privacy-protected: Text never leaves your device
+                    </p>
+            <p class="text-sm text-[var(--text-secondary)]" id="char-count">
+                        0 characters
+                    </p>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="max-w-4xl mx-auto mb-8">
+    <div class="flex flex-wrap gap-4 justify-center">
+        <button class="px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-[var(--primary-color)] to-[var(--secondary-color)] rounded-lg hover:from-[var(--secondary-color)] hover:to-[var(--primary-color)] transition-all duration-300 shadow-lg shadow-[var(--primary-color)]/20" id="clean-text-btn">
+            Clean Text Now
+        </button>
+        <button class="px-8 py-3 text-lg font-semibold text-[var(--text-primary)] bg-[var(--glass-bg)] border border-[var(--border-color)] rounded-lg hover:bg-[var(--glass-bg)]/80 hover:border-[var(--primary-color)] transition-all duration-300" id="copy-text-btn">
+            Copy to Clipboard
+        </button>
+        <button class="px-8 py-3 text-lg font-semibold text-[var(--text-secondary)] bg-[var(--glass-bg)] border border-[var(--border-color)] rounded-lg hover:bg-[var(--glass-bg)]/80 hover:border-red-500 hover:text-red-400 transition-all duration-300" id="clear-text-btn">
+            Clear Input
+        </button>
+    </div>
+</div>
+
+<!-- Controls Panel -->
+<div class="max-w-4xl mx-auto mb-8">
+    <div class="liquid-glass p-6 md:p-8">
+        <h3 class="text-xl font-bold text-[var(--text-primary)] mb-6">Processing Options</h3>
+
+        <!-- Language Mapping Dropdown -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-[var(--text-primary)] mb-2" for="language-select">
+                        Language Mapping
+                    </label>
+            <select class="w-full md:w-64 px-4 py-2 bg-[var(--glass-bg)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:border-[var(--primary-color)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-opacity-50" id="language-select">
+                <option value="swiss-german">Swiss German</option>
+                <option value="german">German</option>
+                <option value="french">French</option>
+                <option value="italian">Italian</option>
+                <option value="english-international">English (International)</option>
+                <option value="english-us">English (US)</option>
+            </select>
+        </div>
+
+<!-- Toggle Options -->
+<div class="space-y-4 mb-8">
+    <!-- Apply Language Character Mapping -->
+    <div class="flex items-center justify-between p-3 rounded-lg border border-[var(--border-color)] bg-[var(--glass-bg)]/50">
+        <div class="flex items-center gap-3">
+            <label class="toggle-switch">
+                <input type="checkbox" data-toggle="apply-language-mapping">
+                <span class="toggle-slider"></span>
+            </label>
+            <span class="text-[var(--text-primary)] font-medium">Apply Language Character Mapping</span>
+            <div class="tooltip">
+                <svg class="h-4 w-4 text-[var(--text-secondary)] cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="tooltip-text">Replaces special characters like quotes, dashes, and spaces according to the selected language mapping. Useful for normalizing text from different sources.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove Diacritics -->
+    <div class="flex items-center justify-between p-3 rounded-lg border border-[var(--border-color)] bg-[var(--glass-bg)]/50">
+<div class="flex items-center gap-3">
+<label class="toggle-switch">
+<input type="checkbox" data-toggle="remove-diacritics">
+<span class="toggle-slider"></span>
+</label>
+<span class="text-[var(--text-primary)] font-medium">Remove Diacritics</span>
+<div class="tooltip">
+<svg class="h-4 w-4 text-[var(--text-secondary)] cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+</svg>
+<span class="tooltip-text">Converts accented characters to their basic equivalents (e.g., è → e, ä → ae, ñ → n). Useful for Swiss German and international text compatibility.</span>
+</div>
+</div>
+</div>
+
+<!-- Remove Citation References -->
+<div class="flex items-center justify-between p-3 rounded-lg border border-[var(--border-color)] bg-[var(--glass-bg)]/50">
+<div class="flex items-center gap-3">
+<label class="toggle-switch">
+<input type="checkbox" data-toggle="remove-citations">
+<span class="toggle-slider"></span>
+</label>
+<span class="text-[var(--text-primary)] font-medium">Remove Citation References</span>
+<div class="tooltip">
+<svg class="h-4 w-4 text-[var(--text-secondary)] cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+</svg>
+<span class="tooltip-text">Removes source and citation references commonly found in AI outputs, such as [1], [2], (Source: XYZ), etc. Perfect for cleaning up Perplexity or research-based AI responses.</span>
+</div>
+</div>
+</div>
+
+<!-- Convert MD to Normal Text -->
+<div class="flex items-center justify-between p-3 rounded-lg border border-[var(--border-color)] bg-[var(--glass-bg)]/50">
+<div class="flex items-center gap-3">
+<label class="toggle-switch">
+<input type="checkbox" data-toggle="convert-markdown">
+<span class="toggle-slider"></span>
+</label>
+<span class="text-[var(--text-primary)] font-medium">Convert MD to Normal Text</span>
+<div class="tooltip">
+<svg class="h-4 w-4 text-[var(--text-secondary)] cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+</svg>
+<span class="tooltip-text">Converts Markdown formatting to plain text by removing **bold**, *italic*, # headers, and other Markdown syntax commonly used in AI responses.</span>
+</div>
+</div>
+</div>
+
+<!-- Remove Fancy Text Font -->
+<div class="flex items-center justify-between p-3 rounded-lg border border-[var(--border-color)] bg-[var(--glass-bg)]/50">
+<div class="flex items-center gap-3">
+<label class="toggle-switch">
+<input type="checkbox" data-toggle="remove-fancy-font">
+<span class="toggle-slider"></span>
+</label>
+<span class="text-[var(--text-primary)] font-medium">Remove Fancy Text Font</span>
+<div class="tooltip">
+<svg class="h-4 w-4 text-[var(--text-secondary)] cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+</svg>
+<span class="tooltip-text">Converts fancy Unicode text styles (𝐛𝐨𝐥𝐝, 𝑖𝑡𝑎𝑙𝑖𝑐, 𝖒𝖔𝖓𝖔𝖘𝖕𝖆𝖈𝖊, etc.) back to plain characters. Useful for normalizing text copied from social media or formatted documents.</span>
+</div>
+</div>
+</div>
+
+<!-- Replace em dash with new sentence -->
+<div class="flex items-center justify-between p-3 rounded-lg border border-[var(--border-color)] bg-[var(--glass-bg)]/50">
+<div class="flex items-center gap-3">
+<label class="toggle-switch">
+<input type="checkbox" data-toggle="replace-em-dash">
+<span class="toggle-slider"></span>
+</label>
+<span class="text-[var(--text-primary)] font-medium">Replace em dash with new sentence</span>
+<span class="experimental-badge">EXPERIMENTAL</span>
+<div class="tooltip">
+<svg class="h-4 w-4 text-[var(--text-secondary)] cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+</svg>
+<span class="tooltip-text">Experimental: Replaces em dashes ("—") with a full stop and starts a new sentence. This feature attempts to extract coherent sentences from em-dash-separated clauses commonly found in AI outputs.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+        </main>
+
+<footer class="container mx-auto px-6 py-8">
+<div class="flex flex-col md:flex-row justify-between items-center text-sm text-[var(--text-secondary)] border-t border-[var(--border-color)] pt-6">
+<p>© 2025 ASD123. All rights reserved.</p>
+<div class="flex gap-6 mt-4 md:mt-0">
+<a class="hover:text-[var(--text-primary)] transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-[var(--text-primary)] transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-[var(--text-primary)] transition-colors" href="#">Contact Us</a>
+<div class="flex gap-4 ml-6">
+<a class="hover:text-[var(--text-primary)] transition-colors" href="#" target="_blank" rel="noopener" aria-label="GitHub">
+<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z"/>
+</svg>
+</a>
+<a class="hover:text-[var(--text-primary)] transition-colors" href="#" target="_blank" rel="noopener" aria-label="X (Twitter)">
+<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+</svg>
+</a>
+<a class="hover:text-[var(--text-primary)] transition-colors" href="#" target="_blank" rel="noopener" aria-label="Bluesky">
+<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 2.5c-2.5 3.5-7.5 7-7.5 12s2.5 7.5 7.5 7.5 7.5-3 7.5-7.5-5-8.5-7.5-12z"/>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+</div>
+
+<script>
+// Optimizer functionality is handled by scripts/optimizer.js
+// The OptimizerUI class is automatically initialized when the page loads
+console.log('Optimizer page loaded - functionality ready');
+</script>
+
+</body></html>
