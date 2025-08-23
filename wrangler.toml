@@ -8,7 +8,7 @@ directory = "dist"
 html_handling = "auto-trailing-slash"
 
 [env.production]
-name = "asd123-ai"
+name = "asd123-website"
 
 
 [env.development]
