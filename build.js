@@ -70,7 +70,7 @@ async function minifyFile(inputFile, outputFile, type) {
 
 async function copyAndMinifyFiles() {
     // HTML files
-    const htmlFiles = ['index.html', 'optimizer.html', 'documentation.html', 'test-optimizer.html'];
+    const htmlFiles = ['index.html', 'optimizer.html', 'documentation.html', 'about.html', 'contact.html', 'privacy.html', 'test-optimizer.html'];
     for (const file of htmlFiles) {
         if (fs.existsSync(file)) {
             await minifyFile(file, path.join(distDir, file), 'html');
