@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymizer - Privacy-First Text Protection | ASD123.ai</title>
+    <meta name="description" content="Advanced PII anonymizer for protecting sensitive information. Detect and anonymize personally identifiable information locally in your browser. 100% privacy-focused processing.">
+    <meta name="keywords" content="PII anonymizer, text anonymization, privacy protection, data anonymization, GDPR compliance, local processing">
+    <meta name="author" content="ASD123.ai">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Anonymizer - Privacy-First Text Protection | ASD123.ai">
+    <meta property="og:description" content="Advanced PII anonymizer for protecting sensitive information. Detect and anonymize personally identifiable information locally in your browser.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://asd123.ai/anonymizer">
+    <meta property="og:site_name" content="ASD123.ai">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Anonymizer - Privacy-First Text Protection | ASD123.ai">
+    <meta name="twitter:description" content="Advanced PII anonymizer for protecting sensitive information. Detect and anonymize personally identifiable information locally in your browser.">
+    <link rel="canonical" href="https://asd123.ai/anonymizer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="styles/main.css" rel="stylesheet">
+    <link href="styles/components.css" rel="stylesheet">
+    <link href="anonymizer/css/anonymizer.css" rel="stylesheet">
+    <script src="scripts/shared.js"></script>
+</head>
+<body class="bg-[var(--bg-color)] text-[var(--text-primary)] min-h-screen">
+    <div class="relative overflow-hidden">
+        <div class="aurora-bg"></div>
+        <div class="relative z-10 flex flex-col min-h-screen">
+            <!-- Header -->
+            <header class="container mx-auto px-6 py-5">
+                <nav class="flex items-center justify-between">
+                    <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                        <svg class="h-8 w-8 text-[var(--primary-color)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+                        </svg>
+                        <h1 class="text-2xl font-bold text-[var(--text-primary)]">ASD123.ai</h1>
+                    </a>
+                    <div class="flex items-center justify-center flex-1">
+                        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-[var(--text-secondary)]">
+                            <a class="hover:text-[var(--text-primary)] transition-colors" href="documentation.html">Documentation</a>
+                            <a class="hover:text-[var(--text-primary)] transition-colors" href="about.html">About</a>
+                        </div>
+                    </div>
+                    <div class="w-[200px]"></div>
+                </nav>
+            </header>
+
+            <main class="flex-grow container mx-auto px-6 py-8 md:py-12">
+                <!-- Page Title Section -->
+                <div class="w-full text-center mb-12">
+                    <h2 class="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-300 mb-4">
+                        Anonymizer
+                    </h2>
+                    <p class="text-lg md:text-xl text-[var(--text-secondary)] max-w-4xl mx-auto">
+                        Safeguard sensitive information locally in your browser. Detect and anonymize PII with pattern matching or AI models. All processing happens <strong class="text-[var(--text-primary)]">securely in your browser</strong> — no data ever leaves your device.
+                    </p>
+                    <div class="privacy-badge">
+                        <span class="badge-icon">🔒</span>
+                        <span>All processing happens locally - No data leaves your device</span>
+                    </div>
+                </div>
+
+                <!-- Model Selection -->
+                <div class="max-w-4xl mx-auto mb-8">
+                    <div class="model-selection">
+                        <label for="modelSelect" class="text-[var(--text-primary)] font-medium">Processing Mode:</label>
+                        <select id="modelSelect" class="model-dropdown">
+                            <option value="regex">Quick Scan (Pattern Matching)</option>
+                            <option value="ai-english">AI English (Advanced Detection)</option>
+                            <option value="ai-multilingual">AI Multilingual (Multiple Languages)</option>
+                        </select>
+                        <span id="modelStatus" class="model-status"></span>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="content-grid">
+                    <!-- Input Section -->
+                    <div class="input-section">
+                        <div class="liquid-glass p-6">
+                            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Input Text</h3>
+                            <div class="input-controls">
+                                <button id="loadFileBtn" class="btn btn-secondary">
+                                    <span class="btn-icon">📁</span> Load File
+                                </button>
+                                <button id="clearInputBtn" class="btn btn-secondary">
+                                    <span class="btn-icon">🗑️</span> Clear
+                                </button>
+                            </div>
+                            <textarea id="inputText" class="text-area" 
+                                placeholder="Enter or paste your text here, or drag and drop a file...
+
+Example text with PII:
+• My name is John Smith and I live at 123 Main Street
+• Contact me at john.smith@example.com or (555) 123-4567
+• My credit card is 4532-1234-5678-9010
+• SSN: 123-45-6789
+
+All processing happens entirely in your browser for complete privacy." rows="12"></textarea>
+                            <input type="file" id="fileInput" accept=".txt,.docx,.pdf" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Output Section -->
+                    <div class="output-section">
+                        <div class="liquid-glass p-6">
+                            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Anonymized Output</h3>
+                            <div class="output-controls">
+                                <button id="anonymizeBtn" class="btn btn-primary">
+                                    <span class="btn-icon">🛡️</span> Anonymize
+                                </button>
+                                <button id="deanonymizeBtn" class="btn btn-secondary">
+                                    <span class="btn-icon">🔓</span> Deanonymize
+                                </button>
+                                <button id="copyOutputBtn" class="btn btn-secondary">
+                                    <span class="btn-icon">📋</span> Copy
+                                </button>
+                            </div>
+                            <textarea id="outputText" class="text-area" readonly 
+                                placeholder="Anonymized text will appear here..." rows="12"></textarea>
+                            
+                            <!-- Highlight Controls -->
+                            <div class="highlight-controls">
+                                <button id="anonymizeHighlightBtn" class="btn btn-secondary btn-small">
+                                    Anonymize Selected Text
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detected Entities Panel -->
+                    <div class="entities-panel">
+                        <div class="liquid-glass p-6">
+                            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Detected Entities</h3>
+                            <div class="entities-controls">
+                                <button id="exportEntitiesBtn" class="btn btn-secondary btn-small">
+                                    <span class="btn-icon">💾</span> Export CSV
+                                </button>
+                                <button id="importEntitiesBtn" class="btn btn-secondary btn-small">
+                                    <span class="btn-icon">📥</span> Import
+                                </button>
+                                <input type="file" id="entitiesFileInput" accept=".csv" style="display: none;">
+                            </div>
+                            
+                            <div id="entitiesList" class="entities-list">
+                                <!-- Dynamically populated entity list -->
+                            </div>
+                            
+                            <div class="entity-stats">
+                                <span id="totalEntities">Total: 0</span>
+                                <span id="activeEntities">Active: 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LLM Integration Section -->
+                <div class="llm-section">
+                    <div class="liquid-glass p-6">
+                        <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">LLM Output Processing</h3>
+                        <p class="section-description">
+                            Paste LLM responses containing anonymized placeholders to restore original values
+                        </p>
+                        <div class="llm-controls">
+                            <textarea id="llmInput" class="text-area llm-input" 
+                                placeholder="Paste LLM output with [ENTITY_N] placeholders here..."></textarea>
+                            <button id="processLlmBtn" class="btn btn-primary">
+                                <span class="btn-icon">🔄</span> Restore Original Values
+                            </button>
+                            <textarea id="llmOutput" class="text-area llm-output" readonly 
+                                placeholder="Deanonymized text will appear here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="container mx-auto px-6 py-8">
+                <div class="flex flex-col md:flex-row justify-between items-center text-sm text-[var(--text-secondary)] border-t border-[var(--border-color)] pt-6">
+                    <p>© 2025 ASD123.ai. All rights reserved.</p>
+                    <div class="flex gap-6 mt-4 md:mt-0">
+                        <a class="hover:text-[var(--text-primary)] transition-colors" href="privacy.html">Privacy Policy</a>
+                        <a class="hover:text-[var(--text-primary)] transition-colors" href="#">Terms of Service</a>
+                        <a class="hover:text-[var(--text-primary)] transition-colors" href="contact.html">Contact Us</a>
+                        <div class="flex gap-4 ml-6">
+                            <a class="hover:text-[var(--text-primary)] transition-colors" href="https://github.com/patrickdobler/asd123.ai" target="_blank" rel="noopener" aria-label="GitHub">
+                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                            </a>
+                            <a class="hover:text-[var(--text-primary)] transition-colors" href="#" target="_blank" rel="noopener" aria-label="X (Twitter)">
+                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script type="module" src="anonymizer/js/anonymizer-core.js"></script>
+</body>
+</html>

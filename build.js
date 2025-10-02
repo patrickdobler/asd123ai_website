@@ -70,7 +70,7 @@ async function minifyFile(inputFile, outputFile, type) {
 
 async function copyAndMinifyFiles() {
     // HTML files
-    const htmlFiles = ['index.html', 'optimizer.html', 'documentation.html', 'about.html', 'contact.html', 'privacy.html', 'test-optimizer.html'];
+    const htmlFiles = ['index.html', 'optimizer.html', 'documentation.html', 'about.html', 'contact.html', 'privacy.html', 'test-optimizer.html', 'anonymizer.html'];
     for (const file of htmlFiles) {
         if (fs.existsSync(file)) {
             await minifyFile(file, path.join(distDir, file), 'html');
@@ -114,6 +114,27 @@ async function copyAndMinifyFiles() {
             fs.copyFileSync(file, path.join(distDir, file));
             console.log(`Copied: ${file}`);
         }
+    }
+    
+    // Copy anonymizer directory
+    if (fs.existsSync('anonymizer')) {
+        const copyRecursively = (src, dest) => {
+            if (!fs.existsSync(dest)) {
+                fs.mkdirSync(dest, { recursive: true });
+            }
+            const files = fs.readdirSync(src);
+            for (const file of files) {
+                const srcFile = path.join(src, file);
+                const destFile = path.join(dest, file);
+                if (fs.statSync(srcFile).isDirectory()) {
+                    copyRecursively(srcFile, destFile);
+                } else {
+                    fs.copyFileSync(srcFile, destFile);
+                }
+            }
+        };
+        copyRecursively('anonymizer', path.join(distDir, 'anonymizer'));
+        console.log('Copied: anonymizer directory');
     }
     
     // Copy components directory

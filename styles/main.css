@@ -15,7 +15,7 @@ body {
     background-color: var(--bg-color);
 }
 
-/* Aurora Background - Fixed to prevent edge visibility */
+/* Aurora Background - Static (no rotation) */
 .aurora-bg {
     position: fixed;
     top: 50%;
@@ -24,21 +24,11 @@ body {
     width: 200vw;
     height: 200vh;
     z-index: 0;
-    background-image: 
+    background-image:
         radial-gradient(circle at 20% 20%, rgba(66, 153, 225, 0.25) 0%, transparent 40%),
         radial-gradient(circle at 80% 70%, rgba(129, 140, 248, 0.2) 0%, transparent 40%),
         radial-gradient(circle at 50% 90%, rgba(244, 114, 182, 0.15) 0%, transparent 40%);
-    animation: aurora 20s infinite linear;
     overflow: hidden;
-}
-
-@keyframes aurora {
-    from {
-        transform: translate(-50%, -50%) rotate(0deg);
-    }
-    to {
-        transform: translate(-50%, -50%) rotate(360deg);
-    }
 }
 
 /* Glassmorphism Components */
