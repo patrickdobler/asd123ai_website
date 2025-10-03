@@ -59,9 +59,9 @@
                     <div class="model-selection">
                         <label for="modelSelect" class="text-[var(--text-primary)] font-medium">Processing Mode:</label>
                         <select id="modelSelect" class="model-dropdown">
-                            <option value="regex">Quick Scan (Pattern Matching)</option>
-                            <option value="ai-english">AI English (Advanced Detection)</option>
-                            <option value="ai-multilingual">AI Multilingual (Multiple Languages)</option>
+                            <option value="regex">Quick Scan (Pattern Matching) - FREE</option>
+                            <option value="ai-english">AI English (Advanced Detection) - PRO</option>
+                            <option value="ai-multilingual">AI Multilingual (Multiple Languages) - PRO</option>
                         </select>
                         <span id="modelStatus" class="model-status"></span>
                     </div>
@@ -69,20 +69,23 @@
 
                 <!-- Main Content Area -->
                 <div class="content-grid-improved">
-                    <!-- Input Section -->
-                    <div class="input-section-large">
+                    <!-- Unified Input/Output Section with Resizable Container -->
+                    <div class="unified-text-section">
                         <div class="liquid-glass p-6">
-                            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Input Text</h3>
-                            <div class="input-controls">
-                                <button id="loadFileBtn" class="btn btn-secondary">
-                                    <span class="btn-icon">📁</span> Load File
-                                </button>
-                                <button id="clearInputBtn" class="btn btn-secondary">
-                                    <span class="btn-icon">🗑️</span> Clear
-                                </button>
-                            </div>
-                            <textarea id="inputText" class="text-area-large" 
-                                placeholder="Enter or paste your text here, or drag and drop a file...
+                            <div class="resizable-container">
+                                <!-- Input Section -->
+                                <div class="text-section-half">
+                                    <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Input Text</h3>
+                                    <div class="input-controls">
+                                        <button id="loadFileBtn" class="btn btn-secondary">
+                                            <span class="btn-icon">📁</span> Load File
+                                        </button>
+                                        <button id="clearInputBtn" class="btn btn-secondary">
+                                            <span class="btn-icon">🗑️</span> Clear
+                                        </button>
+                                    </div>
+                                    <textarea id="inputText" class="text-area-large sync-scroll"
+                                        placeholder="Enter or paste your text here, or drag and drop a file...
 
 Example text with PII:
 • My name is John Smith and I live at 123 Main Street
@@ -91,30 +94,36 @@ Example text with PII:
 • SSN: 123-45-6789
 
 All processing happens entirely in your browser for complete privacy." rows="18"></textarea>
-                            <input type="file" id="fileInput" accept=".txt,.docx,.pdf" style="display: none;">
-                        </div>
-                    </div>
+                                    <input type="file" id="fileInput" accept=".txt,.docx,.pdf" style="display: none;">
+                                </div>
 
-                    <!-- Output Section -->
-                    <div class="output-section-large">
-                        <div class="liquid-glass p-6">
-                            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Anonymized Output</h3>
-                            <div class="output-controls">
-                                <button id="anonymizeBtn" class="btn btn-primary">
-                                    <span class="btn-icon">🛡️</span> Anonymize
-                                </button>
-                                <button id="copyOutputBtn" class="btn btn-secondary">
-                                    <span class="btn-icon">📋</span> Copy
-                                </button>
-                            </div>
-                            <textarea id="outputText" class="text-area-large" readonly 
-                                placeholder="Anonymized text will appear here..." rows="18"></textarea>
-                            
-                            <!-- Highlight Controls -->
-                            <div class="highlight-controls">
-                                <button id="anonymizeHighlightBtn" class="btn btn-secondary btn-small">
-                                    Anonymize Selected Text
-                                </button>
+                                <!-- Resize Handle -->
+                                <div class="resize-handle" id="resizeHandle"></div>
+
+                                <!-- Output Section -->
+                                <div class="text-section-half">
+                                    <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Anonymized Output</h3>
+                                    <div class="output-controls">
+                                        <button id="anonymizeBtn" class="btn btn-primary">
+                                            <span class="btn-icon">🛡️</span> Anonymize
+                                        </button>
+                                        <button id="redactBtn" class="btn btn-primary">
+                                            <span class="btn-icon">🔒</span> Redact Mode
+                                        </button>
+                                        <button id="copyOutputBtn" class="btn btn-secondary">
+                                            <span class="btn-icon">📋</span> Copy
+                                        </button>
+                                    </div>
+                                    <textarea id="outputText" class="text-area-large sync-scroll" readonly
+                                        placeholder="Anonymized text will appear here..." rows="18"></textarea>
+                                    
+                                    <!-- Highlight Controls -->
+                                    <div class="highlight-controls">
+                                        <button id="anonymizeHighlightBtn" class="btn btn-secondary btn-small">
+                                            Anonymize Selected Text
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -129,6 +138,13 @@ All processing happens entirely in your browser for complete privacy." rows="18"
                                 </button>
                                 <button id="importEntitiesBtn" class="btn btn-secondary btn-small">
                                     <span class="btn-icon">📥</span> Import
+                                </button>
+                                <select id="sortEntitiesSelect" class="model-dropdown btn-small" style="min-width: 200px;">
+                                    <option value="appearance">Sort by Appearance</option>
+                                    <option value="alphabetical">Sort Alphabetically</option>
+                                </select>
+                                <button id="viewToggleBtn2" class="btn btn-secondary btn-small" title="Toggle view">
+                                    <span class="btn-icon">🔲</span> <span id="viewToggleText2">List View</span>
                                 </button>
                                 <input type="file" id="entitiesFileInput" accept=".csv" style="display: none;">
                             </div>

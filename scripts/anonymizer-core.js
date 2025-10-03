@@ -122,7 +122,7 @@ const entityPatterns = {
         priority: 28
     },
     MONEY_CRYPTO: {
-        pattern: /\b\d+(?:\.\d+)?\s?(BTC|ETH|SOL|USDT|USDC|DAI)\b/gi,
+        pattern: /\b\d+(?:\.\d+)?\s?(BTC|ETH|XRP|XMR|BNB|SOL|USDT|USDC|LTC|TRX|ADA|XLM)\b/gi,
         priority: 29
     },
     CRYPTO_ADDRESS: {
@@ -140,10 +140,6 @@ const entityPatterns = {
     PASSPORT: {
         pattern: /\b(?:[A-Z]{2}\d{6,8}|[A-Z]\d{8})\b/gi,
         priority: 33
-    },
-    SWIFT_BIC: {
-        pattern: /(?:^|\s|SWIFT[:\s]*|BIC[:\s]*)([A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?)(?=\s|$)/gi,
-        priority: 92
     },
     MAC_ADDRESS: {
         pattern: /\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b/g,
@@ -320,6 +316,7 @@ class AnonymizerApp {
         
         this.currentMode = 'regex';
         this.isProcessing = false;
+        this.isRedactMode = false;
         
         this.initializeApp();
     }
@@ -345,6 +342,13 @@ class AnonymizerApp {
 
         // Anonymize button
         document.getElementById('anonymizeBtn').addEventListener('click', async () => {
+            this.isRedactMode = false;
+            await this.anonymizeText();
+        });
+
+        // Redact Mode button
+        document.getElementById('redactBtn').addEventListener('click', async () => {
+            this.isRedactMode = true;
             await this.anonymizeText();
         });
 
@@ -367,6 +371,15 @@ class AnonymizerApp {
         // Highlight anonymization
         document.getElementById('anonymizeHighlightBtn').addEventListener('click', () => {
             this.anonymizeHighlighted();
+        });
+
+        // View and sort change events
+        document.addEventListener('viewChanged', () => {
+            this.uiController.updateEntityList(this.entityManager.exportEntities());
+        });
+
+        document.addEventListener('sortChanged', () => {
+            this.uiController.updateEntityList(this.entityManager.exportEntities());
         });
 
         // Entity export/import
@@ -560,7 +573,14 @@ class AnonymizerApp {
         // First, generate placeholders in text order (forward)
         const entityPlaceholders = new Map();
         entities.forEach(entity => {
-            const placeholder = this.entityManager.generatePlaceholder(entity.type, entity.text);
+            let placeholder;
+            if (this.isRedactMode) {
+                // In redact mode, still generate unique placeholders internally
+                // but they will all be replaced with [redacted]
+                placeholder = this.entityManager.generatePlaceholder(entity.type, entity.text);
+            } else {
+                placeholder = this.entityManager.generatePlaceholder(entity.type, entity.text);
+            }
             entityPlaceholders.set(entity, placeholder);
         });
         
@@ -570,8 +590,9 @@ class AnonymizerApp {
         let result = text;
         for (const entity of entities) {
             const placeholder = entityPlaceholders.get(entity);
+            const displayText = this.isRedactMode ? '[redacted]' : placeholder;
             result = result.substring(0, entity.startPos) +
-                     placeholder +
+                     displayText +
                      result.substring(entity.endPos);
         }
         
@@ -599,23 +620,48 @@ class AnonymizerApp {
     }
 
     deanonymizeText() {
-        const outputText = document.getElementById('outputText').value;
-        if (!outputText) {
-            this.uiController.showError('No text to deanonymize');
+        const llmInputText = document.getElementById('llmInput').value;
+        if (!llmInputText) {
+            this.uiController.showError('Please enter LLM output text to deanonymize');
             return;
         }
 
-        let deanonymizedText = outputText;
+        let deanonymizedText = llmInputText;
+        let replacedCount = 0;
         
+        // Replace typed placeholders like [PERSON_1], [EMAIL_2], etc.
         this.entityManager.entityMap.forEach((entity, placeholder) => {
             if (entity.isActive) {
                 const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-                deanonymizedText = deanonymizedText.replace(regex, entity.original);
+                const matches = deanonymizedText.match(regex);
+                if (matches) {
+                    deanonymizedText = deanonymizedText.replace(regex, entity.original);
+                    replacedCount += matches.length;
+                }
             }
         });
         
-        document.getElementById('outputText').value = deanonymizedText;
-        this.uiController.showSuccess('Text deanonymized successfully');
+        // Handle [redacted] replacements - replace each occurrence with corresponding entity
+        if (deanonymizedText.includes('[redacted]')) {
+            // Get all active entities in order
+            const activeEntities = Array.from(this.entityManager.entityMap.entries())
+                .filter(([placeholder, entity]) => entity.isActive)
+                .sort((a, b) => {
+                    // Sort by placeholder to maintain consistent order
+                    return a[0].localeCompare(b[0]);
+                });
+            
+            // Replace [redacted] one by one with corresponding entities
+            activeEntities.forEach(([placeholder, entity]) => {
+                if (deanonymizedText.includes('[redacted]')) {
+                    deanonymizedText = deanonymizedText.replace('[redacted]', entity.original);
+                    replacedCount++;
+                }
+            });
+        }
+        
+        document.getElementById('llmOutput').value = deanonymizedText;
+        this.uiController.showSuccess(`Text deanonymized successfully! Replaced ${replacedCount} entities`);
     }
 
     anonymizeHighlighted() {
@@ -632,15 +678,16 @@ class AnonymizerApp {
 
         // Generate placeholder for selected text
         const placeholder = this.entityManager.generatePlaceholder('CUSTOM', selectedText);
+        const displayText = this.isRedactMode ? '[redacted]' : placeholder;
         
         // Replace in output
         const newText = outputTextArea.value.substring(0, outputTextArea.selectionStart) +
-                       placeholder +
+                       displayText +
                        outputTextArea.value.substring(outputTextArea.selectionEnd);
         
         outputTextArea.value = newText;
         this.uiController.updateEntityList(this.entityManager.exportEntities());
-        this.uiController.showSuccess('Selected text anonymized');
+        this.uiController.showSuccess('Selected text ' + (this.isRedactMode ? 'redacted' : 'anonymized'));
     }
 
     async loadFile(file) {

@@ -5,6 +5,8 @@ class UIController {
     constructor() {
         this.initialized = false;
         this.notificationTimeout = null;
+        this.currentView = 'tiles'; // 'tiles' or 'list'
+        this.currentSort = 'appearance'; // 'appearance' or 'alphabetical'
     }
 
     /**
@@ -13,6 +15,10 @@ class UIController {
     initialize() {
         this.initialized = true;
         this.setupDragAndDropVisuals();
+        this.setupViewToggle();
+        this.setupSyncScroll();
+        this.setupSortingControl();
+        this.setupResizeHandle();
         console.log('UIController initialized');
     }
 
@@ -32,6 +38,216 @@ class UIController {
     }
 
     /**
+     * Setup synchronized scrolling between textareas
+     */
+    setupSyncScroll() {
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        
+        if (!inputText || !outputText) return;
+        
+        let isScrolling = false;
+        
+        inputText.addEventListener('scroll', () => {
+            if (!isScrolling) {
+                isScrolling = true;
+                outputText.scrollTop = inputText.scrollTop;
+                outputText.scrollLeft = inputText.scrollLeft;
+                setTimeout(() => { isScrolling = false; }, 10);
+            }
+        });
+        
+        outputText.addEventListener('scroll', () => {
+            if (!isScrolling) {
+                isScrolling = true;
+                inputText.scrollTop = outputText.scrollTop;
+                inputText.scrollLeft = outputText.scrollLeft;
+                setTimeout(() => { isScrolling = false; }, 10);
+            }
+        });
+        
+        // Add synchronized resizing for main textboxes
+        this.setupSyncResize(inputText, outputText);
+        
+        // Setup synchronized resizing for LLM textboxes
+        this.setupLlmSyncResize();
+    }
+
+    /**
+     * Setup synchronized resizing between textareas
+     */
+    setupSyncResize(inputText, outputText) {
+        let isResizing = false;
+        
+        // Create ResizeObserver for input textarea
+        const inputObserver = new ResizeObserver(entries => {
+            if (isResizing) return;
+            
+            for (let entry of entries) {
+                isResizing = true;
+                const newHeight = entry.target.offsetHeight;
+                outputText.style.height = newHeight + 'px';
+                setTimeout(() => { isResizing = false; }, 10);
+            }
+        });
+        
+        // Create ResizeObserver for output textarea
+        const outputObserver = new ResizeObserver(entries => {
+            if (isResizing) return;
+            
+            for (let entry of entries) {
+                isResizing = true;
+                const newHeight = entry.target.offsetHeight;
+                inputText.style.height = newHeight + 'px';
+                setTimeout(() => { isResizing = false; }, 10);
+            }
+        });
+        
+        // Start observing both textareas
+        inputObserver.observe(inputText);
+        outputObserver.observe(outputText);
+    }
+
+    /**
+     * Setup synchronized resizing for LLM processing textboxes
+     */
+    setupLlmSyncResize() {
+        const llmInput = document.getElementById('llmInput');
+        const llmOutput = document.getElementById('llmOutput');
+        
+        if (!llmInput || !llmOutput) return;
+        
+        let isResizing = false;
+        
+        // Create ResizeObserver for LLM input textarea
+        const llmInputObserver = new ResizeObserver(entries => {
+            if (isResizing) return;
+            
+            for (let entry of entries) {
+                isResizing = true;
+                const newHeight = entry.target.offsetHeight;
+                llmOutput.style.height = newHeight + 'px';
+                setTimeout(() => { isResizing = false; }, 10);
+            }
+        });
+        
+        // Create ResizeObserver for LLM output textarea
+        const llmOutputObserver = new ResizeObserver(entries => {
+            if (isResizing) return;
+            
+            for (let entry of entries) {
+                isResizing = true;
+                const newHeight = entry.target.offsetHeight;
+                llmInput.style.height = newHeight + 'px';
+                setTimeout(() => { isResizing = false; }, 10);
+            }
+        });
+        
+        // Start observing both LLM textareas
+        llmInputObserver.observe(llmInput);
+        llmOutputObserver.observe(llmOutput);
+    }
+
+    /**
+     * Setup view toggle button
+     */
+    setupViewToggle() {
+        const viewToggleBtn2 = document.getElementById('viewToggleBtn2');
+        
+        if (viewToggleBtn2) {
+            viewToggleBtn2.addEventListener('click', () => {
+                this.currentView = this.currentView === 'tiles' ? 'list' : 'tiles';
+                this.updateViewToggleButtons();
+                // Re-render entities with new view
+                const event = new CustomEvent('viewChanged', { detail: { view: this.currentView } });
+                document.dispatchEvent(event);
+            });
+        }
+    }
+
+    /**
+     * Setup sorting control
+     */
+    setupSortingControl() {
+        const sortSelect = document.getElementById('sortEntitiesSelect');
+        if (!sortSelect) return;
+        
+        sortSelect.addEventListener('change', (e) => {
+            this.currentSort = e.target.value;
+            const event = new CustomEvent('sortChanged', { detail: { sort: this.currentSort } });
+            document.dispatchEvent(event);
+        });
+    }
+
+    /**
+     * Update view toggle button text
+     */
+    updateViewToggleButtons() {
+        const viewToggleText2 = document.getElementById('viewToggleText2');
+        const viewToggleBtn2 = document.getElementById('viewToggleBtn2');
+        
+        const newText = this.currentView === 'tiles' ? 'List View' : 'Tiles View';
+        const newIcon = this.currentView === 'tiles' ? '🔲' : '📋';
+        
+        if (viewToggleText2) {
+            viewToggleText2.textContent = newText;
+        }
+        
+        if (viewToggleBtn2) {
+            const icon = viewToggleBtn2.querySelector('.btn-icon');
+            if (icon) icon.textContent = newIcon;
+        }
+    }
+
+    /**
+     * Setup resize handle for input/output containers
+     */
+    setupResizeHandle() {
+        const resizeHandle = document.getElementById('resizeHandle');
+        if (!resizeHandle) return;
+        
+        const container = resizeHandle.parentElement;
+        const leftPanel = container.querySelector('.text-section-half:first-child');
+        const rightPanel = container.querySelector('.text-section-half:last-child');
+        
+        let isResizing = false;
+        let startX = 0;
+        let startLeftWidth = 0;
+        
+        resizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            startX = e.clientX;
+            startLeftWidth = leftPanel.offsetWidth;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            
+            const containerWidth = container.offsetWidth;
+            const deltaX = e.clientX - startX;
+            const newLeftWidth = startLeftWidth + deltaX;
+            const newLeftPercent = (newLeftWidth / containerWidth) * 100;
+            
+            // Limit resize between 20% and 80%
+            if (newLeftPercent >= 20 && newLeftPercent <= 80) {
+                leftPanel.style.flex = `0 0 ${newLeftPercent}%`;
+                rightPanel.style.flex = `0 0 ${100 - newLeftPercent}%`;
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        });
+    }
+
+    /**
      * Update entity list display
      * @param {Array} entities - Array of entity objects
      */
@@ -42,28 +258,71 @@ class UIController {
         // Clear existing list
         listElement.innerHTML = '';
 
-        // Sort entities by their placeholder number (ascending order)
-        // This ensures [ENTITY_1] appears before [ENTITY_2], etc.
-        const sortedEntities = [...entities].sort((a, b) => {
-            // Extract the number from the placeholder [TYPE_NUMBER]
-            const numA = parseInt(a.placeholder.match(/_(\d+)\]/)?.[1] || 0);
-            const numB = parseInt(b.placeholder.match(/_(\d+)\]/)?.[1] || 0);
-            return numA - numB;
-        });
+        // Apply sorting based on currentSort
+        const sortedEntities = this.sortEntities([...entities]);
 
-        // Group entities by type
-        const groupedEntities = this.groupEntitiesByType(sortedEntities);
+        // Update view class based on currentView
+        listElement.className = this.currentView === 'tiles' ? 'entities-list-compact' : 'entities-list-view';
 
         // Create entity items
-        Object.entries(groupedEntities).forEach(([type, typeEntities]) => {
-            typeEntities.forEach(entity => {
-                const entityItem = this.createEntityItem(entity);
-                listElement.appendChild(entityItem);
-            });
+        sortedEntities.forEach(entity => {
+            const entityItem = this.createEntityItem(entity);
+            listElement.appendChild(entityItem);
         });
 
         // Update stats
         this.updateEntityStats(entities);
+    }
+
+    /**
+     * Sort entities based on current sort mode
+     * @param {Array} entities - Array of entity objects
+     * @returns {Array} - Sorted entities
+     */
+    sortEntities(entities) {
+        const entitiesCopy = [...entities];
+        
+        if (this.currentSort === 'alphabetical') {
+            // Sort by entity type names alphabetically
+            return entitiesCopy.sort((a, b) => {
+                // First sort by type, then by number within type
+                const typeA = a.type.toLowerCase();
+                const typeB = b.type.toLowerCase();
+                
+                if (typeA !== typeB) {
+                    return typeA.localeCompare(typeB);
+                }
+                
+                // If same type, sort by number
+                const numA = parseInt(a.placeholder.match(/_(\d+)\]/)?.[1] || 0);
+                const numB = parseInt(b.placeholder.match(/_(\d+)\]/)?.[1] || 0);
+                return numA - numB;
+            });
+        } else {
+            // Sort by appearance in anonymized output
+            const outputText = document.getElementById('outputText')?.value || '';
+            if (!outputText) {
+                // Fallback to placeholder number if no output text
+                return entitiesCopy.sort((a, b) => {
+                    const numA = parseInt(a.placeholder.match(/_(\d+)\]/)?.[1] || 0);
+                    const numB = parseInt(b.placeholder.match(/_(\d+)\]/)?.[1] || 0);
+                    return numA - numB;
+                });
+            }
+            
+            // Sort by actual position in output text
+            return entitiesCopy.sort((a, b) => {
+                const posA = outputText.indexOf(a.placeholder);
+                const posB = outputText.indexOf(b.placeholder);
+                
+                // If either placeholder is not found, put it at the end
+                if (posA === -1 && posB === -1) return 0;
+                if (posA === -1) return 1;
+                if (posB === -1) return -1;
+                
+                return posA - posB;
+            });
+        }
     }
 
     /**
