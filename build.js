@@ -69,20 +69,31 @@ async function minifyFile(inputFile, outputFile, type) {
 }
 
 async function copyAndMinifyFiles() {
-    // HTML files
-    const htmlFiles = ['index.html', 'optimizer.html', 'documentation.html', 'about.html', 'contact.html', 'privacy.html', 'test-optimizer.html', 'anonymizer.html'];
+    // HTML files - including anonymizer_test.html
+    const htmlFiles = [
+        'index.html',
+        'optimizer.html',
+        'documentation.html',
+        'about.html',
+        'contact.html',
+        'privacy.html',
+        'test-optimizer.html',
+        'anonymizer.html',
+        'anonymizer_test.html'
+    ];
     for (const file of htmlFiles) {
         if (fs.existsSync(file)) {
             await minifyFile(file, path.join(distDir, file), 'html');
         }
     }
     
-    // CSS files
+    // CSS files - excluding anonymizer.css (merged into components.css)
     if (fs.existsSync('styles')) {
         if (!fs.existsSync(path.join(distDir, 'styles'))) {
             fs.mkdirSync(path.join(distDir, 'styles'), { recursive: true });
         }
-        const cssFiles = fs.readdirSync('styles').filter(f => f.endsWith('.css'));
+        const cssFiles = fs.readdirSync('styles')
+            .filter(f => f.endsWith('.css') && f !== 'anonymizer.css');
         for (const file of cssFiles) {
             await minifyFile(
                 path.join('styles', file),
@@ -92,7 +103,7 @@ async function copyAndMinifyFiles() {
         }
     }
     
-    // JS files
+    // JS files - minify and uglify all scripts
     if (fs.existsSync('scripts')) {
         if (!fs.existsSync(path.join(distDir, 'scripts'))) {
             fs.mkdirSync(path.join(distDir, 'scripts'), { recursive: true });
@@ -114,27 +125,6 @@ async function copyAndMinifyFiles() {
             fs.copyFileSync(file, path.join(distDir, file));
             console.log(`Copied: ${file}`);
         }
-    }
-    
-    // Copy anonymizer directory
-    if (fs.existsSync('anonymizer')) {
-        const copyRecursively = (src, dest) => {
-            if (!fs.existsSync(dest)) {
-                fs.mkdirSync(dest, { recursive: true });
-            }
-            const files = fs.readdirSync(src);
-            for (const file of files) {
-                const srcFile = path.join(src, file);
-                const destFile = path.join(dest, file);
-                if (fs.statSync(srcFile).isDirectory()) {
-                    copyRecursively(srcFile, destFile);
-                } else {
-                    fs.copyFileSync(srcFile, destFile);
-                }
-            }
-        };
-        copyRecursively('anonymizer', path.join(distDir, 'anonymizer'));
-        console.log('Copied: anonymizer directory');
     }
     
     // Copy components directory

@@ -7,24 +7,13 @@
     <meta name="description" content="Advanced PII anonymizer for protecting sensitive information. Detect and anonymize personally identifiable information locally in your browser. 100% privacy-focused processing.">
     <meta name="keywords" content="PII anonymizer, text anonymization, privacy protection, data anonymization, GDPR compliance, local processing">
     <meta name="author" content="ASD123.ai">
-    <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Anonymizer - Privacy-First Text Protection | ASD123.ai">
-    <meta property="og:description" content="Advanced PII anonymizer for protecting sensitive information. Detect and anonymize personally identifiable information locally in your browser.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://asd123.ai/anonymizer">
-    <meta property="og:site_name" content="ASD123.ai">
-    <meta property="og:locale" content="en_US">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Anonymizer - Privacy-First Text Protection | ASD123.ai">
-    <meta name="twitter:description" content="Advanced PII anonymizer for protecting sensitive information. Detect and anonymize personally identifiable information locally in your browser.">
-    <link rel="canonical" href="https://asd123.ai/anonymizer">
+    <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="styles/main.css" rel="stylesheet">
     <link href="styles/components.css" rel="stylesheet">
-    <link href="anonymizer/css/anonymizer.css" rel="stylesheet">
     <script src="scripts/shared.js"></script>
 </head>
 <body class="bg-[var(--bg-color)] text-[var(--text-primary)] min-h-screen">
@@ -66,7 +55,7 @@
                 </div>
 
                 <!-- Model Selection -->
-                <div class="max-w-4xl mx-auto mb-8">
+                <div class="max-w-6xl mx-auto mb-8">
                     <div class="model-selection">
                         <label for="modelSelect" class="text-[var(--text-primary)] font-medium">Processing Mode:</label>
                         <select id="modelSelect" class="model-dropdown">
@@ -79,9 +68,9 @@
                 </div>
 
                 <!-- Main Content Area -->
-                <div class="content-grid">
+                <div class="content-grid-improved">
                     <!-- Input Section -->
-                    <div class="input-section">
+                    <div class="input-section-large">
                         <div class="liquid-glass p-6">
                             <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Input Text</h3>
                             <div class="input-controls">
@@ -92,7 +81,7 @@
                                     <span class="btn-icon">🗑️</span> Clear
                                 </button>
                             </div>
-                            <textarea id="inputText" class="text-area" 
+                            <textarea id="inputText" class="text-area-large" 
                                 placeholder="Enter or paste your text here, or drag and drop a file...
 
 Example text with PII:
@@ -101,28 +90,25 @@ Example text with PII:
 • My credit card is 4532-1234-5678-9010
 • SSN: 123-45-6789
 
-All processing happens entirely in your browser for complete privacy." rows="12"></textarea>
+All processing happens entirely in your browser for complete privacy." rows="18"></textarea>
                             <input type="file" id="fileInput" accept=".txt,.docx,.pdf" style="display: none;">
                         </div>
                     </div>
 
                     <!-- Output Section -->
-                    <div class="output-section">
+                    <div class="output-section-large">
                         <div class="liquid-glass p-6">
                             <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Anonymized Output</h3>
                             <div class="output-controls">
                                 <button id="anonymizeBtn" class="btn btn-primary">
                                     <span class="btn-icon">🛡️</span> Anonymize
                                 </button>
-                                <button id="deanonymizeBtn" class="btn btn-secondary">
-                                    <span class="btn-icon">🔓</span> Deanonymize
-                                </button>
                                 <button id="copyOutputBtn" class="btn btn-secondary">
                                     <span class="btn-icon">📋</span> Copy
                                 </button>
                             </div>
-                            <textarea id="outputText" class="text-area" readonly 
-                                placeholder="Anonymized text will appear here..." rows="12"></textarea>
+                            <textarea id="outputText" class="text-area-large" readonly 
+                                placeholder="Anonymized text will appear here..." rows="18"></textarea>
                             
                             <!-- Highlight Controls -->
                             <div class="highlight-controls">
@@ -134,7 +120,7 @@ All processing happens entirely in your browser for complete privacy." rows="12"
                     </div>
 
                     <!-- Detected Entities Panel -->
-                    <div class="entities-panel">
+                    <div class="entities-panel-compact">
                         <div class="liquid-glass p-6">
                             <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Detected Entities</h3>
                             <div class="entities-controls">
@@ -147,7 +133,7 @@ All processing happens entirely in your browser for complete privacy." rows="12"
                                 <input type="file" id="entitiesFileInput" accept=".csv" style="display: none;">
                             </div>
                             
-                            <div id="entitiesList" class="entities-list">
+                            <div id="entitiesList" class="entities-list-compact">
                                 <!-- Dynamically populated entity list -->
                             </div>
                             
@@ -166,14 +152,23 @@ All processing happens entirely in your browser for complete privacy." rows="12"
                         <p class="section-description">
                             Paste LLM responses containing anonymized placeholders to restore original values
                         </p>
-                        <div class="llm-controls">
-                            <textarea id="llmInput" class="text-area llm-input" 
-                                placeholder="Paste LLM output with [ENTITY_N] placeholders here..."></textarea>
-                            <button id="processLlmBtn" class="btn btn-primary">
-                                <span class="btn-icon">🔄</span> Restore Original Values
-                            </button>
-                            <textarea id="llmOutput" class="text-area llm-output" readonly 
-                                placeholder="Deanonymized text will appear here..."></textarea>
+                        <div class="llm-controls-improved">
+                            <div class="llm-input-wrapper">
+                                <textarea id="llmInput" class="text-area-large llm-input" 
+                                    placeholder="Paste LLM output with [ENTITY_N] placeholders here..." rows="12"></textarea>
+                            </div>
+                            <div class="llm-button-wrapper">
+                                <button id="processLlmBtn" class="btn btn-primary">
+                                    <span class="btn-icon">🔄</span> Restore Original Values
+                                </button>
+                                <button id="deanonymizeBtn" class="btn btn-secondary">
+                                    <span class="btn-icon">🔓</span> Deanonymize
+                                </button>
+                            </div>
+                            <div class="llm-output-wrapper">
+                                <textarea id="llmOutput" class="text-area-large llm-output" readonly 
+                                    placeholder="Deanonymized text will appear here..." rows="12"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -205,6 +200,6 @@ All processing happens entirely in your browser for complete privacy." rows="12"
         </div>
     </div>
 
-    <script type="module" src="anonymizer/js/anonymizer-core.js"></script>
+    <script type="module" src="scripts/anonymizer-core.js"></script>
 </body>
 </html>

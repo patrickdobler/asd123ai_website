@@ -134,10 +134,9 @@ class AnonymizerApp {
             this.copyOutput();
         });
 
-        // Entity toggle event
-        document.addEventListener('entityToggle', (e) => {
-            this.entityManager.toggleEntity(e.detail.placeholder);
-            this.uiController.updateEntityList(this.entityManager.exportEntities());
+        // Entity removal event
+        document.addEventListener('entityRemove', (e) => {
+            this.removeEntity(e.detail.placeholder);
         });
     }
 
@@ -275,6 +274,26 @@ class AnonymizerApp {
         }
         
         return result;
+    }
+
+    removeEntity(placeholder) {
+        const entity = this.entityManager.getEntity(placeholder);
+        if (!entity) return;
+
+        // Restore the entity in the output text
+        const outputTextArea = document.getElementById('outputText');
+        if (outputTextArea.value) {
+            const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+            outputTextArea.value = outputTextArea.value.replace(regex, entity.original);
+        }
+
+        // Remove from entity manager
+        this.entityManager.entityMap.delete(placeholder);
+        this.entityManager.reverseLookup.delete(entity.original);
+
+        // Update UI
+        this.uiController.updateEntityList(this.entityManager.exportEntities());
+        this.uiController.showSuccess('Entity removed and restored in output');
     }
 
     deanonymizeText() {

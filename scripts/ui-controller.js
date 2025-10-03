@@ -88,16 +88,16 @@ class UIController {
                 <div class="entity-placeholder">${entity.placeholder}</div>
                 <div class="entity-original">${this.escapeHtml(entity.original)}</div>
             </div>
-            <button class="entity-toggle" data-placeholder="${entity.placeholder}">
-                ${entity.active ? '👁️' : '👁️‍🗨️'}
+            <button class="entity-remove" data-placeholder="${entity.placeholder}" title="Remove entity">
+                🗑️
             </button>
         `;
 
-        // Add click handler for toggle
-        const toggleBtn = item.querySelector('.entity-toggle');
-        toggleBtn.addEventListener('click', (e) => {
+        // Add click handler for removal
+        const removeBtn = item.querySelector('.entity-remove');
+        removeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.dispatchCustomEvent('entityToggle', { placeholder: entity.placeholder });
+            this.dispatchCustomEvent('entityRemove', { placeholder: entity.placeholder });
         });
 
         return item;
