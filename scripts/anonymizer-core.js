@@ -7,42 +7,307 @@ import { FileProcessor } from './file-processor.js';
 import { UIController } from './ui-controller.js';
 
 // Entity patterns for regex-based detection
+// Comprehensive pattern definitions from internet sources
 const entityPatterns = {
     PERSON_NAME: {
-        pattern: /\b([A-Z][a-z]+ ){1,3}[A-Z][a-z]+\b/g,
-        priority: 1
+        pattern: /\b([A-Z][a-z]{2,} ){1,3}[A-Z][a-z]{2,}\b/g,
+        priority: 80
     },
-    EMAIL: {
-        pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
-        priority: 2
+    PERSON_FULL: {
+        pattern: /\b[A-Z][a-z]{2,}(?:\s+[A-Z]\.?\s+)?[A-Z][a-z]{2,}\b/g,
+        priority: 81
     },
-    PHONE: {
-        pattern: /(\+?1?\s*[-.]?\s*)?(\(?\d{3}\)?[\s.-]?)?\d{3}[\s.-]?\d{4}\b/g,
+    PERSON_TITLE: {
+        pattern: /\b(?:Mr\.?|Mrs\.?|Miss|Ms\.?|Sir|Madam|Dr\.?|Professor|Prof\.?|Reverend|Rev\.?|Captain|Capt\.?|Colonel|Col\.?|Lieutenant|Lt\.?|Sergeant|Sgt\.?|Officer|Officer\.?|Judge|Justice|Honorable|Hon\.?|Senator|Sen\.?|Rep\.?|Mayor|President|Pres\.?|Vice President|VP|CEO|CFO|CTO|Director|Officer|Chief)\s+[A-Z][a-z]+(?:\s+[A-Z]\.?)?(?:\s+[A-Z][a-z]+)?\b/gi,
         priority: 3
     },
-    SSN: {
-        pattern: /\b\d{3}-\d{2}-\d{4}\b/g,
+    EMAIL: {
+        pattern: /[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/g,
         priority: 4
     },
-    CREDIT_CARD: {
-        pattern: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g,
+    PHONE: {
+        pattern: /(?:^|\s|\b)(?:\+?1?[-\s.]?)?(?:\(?\d{3}\)?[-\s.]?)?\d{3}[-\s.]\d{4}\b/g,
         priority: 5
+    },
+    SSN: {
+        pattern: /\b(?!000|666|9\d{2})([0-8]\d{2}|7([0-6]\d))([-]?)(?!00)\d{2}\2(?!0000)\d{4}\b/g,
+        priority: 6
+    },
+    CREDIT_CARD: {
+        pattern: /\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\d{3})\d{11}|(?:\d{4}[-\s]?){3}\d{4})\b/g,
+        priority: 7
+    },
+    IBAN: {
+        pattern: /\b[A-Z]{2}\d{2}[A-Z0-9]{4}\d{7}([A-Z0-9]?){0,16}\b/g,
+        priority: 8
+    },
+    US_PASSPORT: {
+        pattern: /\b[A-Z][0-9]{8}\b/g,
+        priority: 9
+    },
+    UK_NINO: {
+        pattern: /\b[A-Z]{2}\s?\d{2}\s?\d{2}\s?\d{2}\s?[A-Z]\b/g,
+        priority: 10
+    },
+    UK_NHS: {
+        pattern: /\b\d{3}\s?\d{3}\s?\d{4}\b/g,
+        priority: 11
+    },
+    CA_SIN: {
+        pattern: /\b\d{3}[-.\\s]?\d{3}[-.\\s]?\d{3}\b/g,
+        priority: 12
+    },
+    AU_MEDICARE: {
+        pattern: /\b\d{4}\s?\d{5}\s?\d\b/g,
+        priority: 13
+    },
+    AU_TFN: {
+        pattern: /\b\d{3}\s?\d{3}\s?\d{3}\b/g,
+        priority: 14
     },
     ADDRESS: {
         pattern: /\d{1,5}\s+[\w\s]{1,50}\s+(Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Circle|Cir|Plaza|Pl)\b/gi,
-        priority: 6
+        priority: 15
+    },
+    STREET_ADDRESS: {
+        pattern: /\b\d{1,5}\s+(?:(?:N\.?|S\.?|E\.?|W\.?|North|South|East|West|NE\.?|NW\.?|SE\.?|SW\.?|Northeast|Northwest|Southeast|Southwest)\s+)?[A-Za-z0-9.'-]{1,30}(?:\s+[A-Za-z0-9.'-]{1,30})?\s+(Street|Avenue|Lane|Road|Boulevard|Circle|Court|Drive|Square|Place|Alley|Ave\.?|Rd\.?|Blvd\.?|Ln\.?|Dr\.?|Way\.?|Pl\.?|Dr\.?|Cir\.?|Ct\.?|Sq\.?|Pkwy\.?|Hwy\.?|St\.?|Ter\.?|Trl\.?|Pass\.?|Loop\.?|Pike\.?)(?:\b|\.)/gi,
+        priority: 16
     },
     DATE: {
-        pattern: /\b(\d{1,2}[-/]\d{1,2}[-/]\d{2,4}|\d{4}[-/]\d{1,2}[-/]\d{1,2})\b/g,
-        priority: 7
+        pattern: /\b(?:(?:\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})|(?:\d{4}[-\/]\d{1,2}[-\/]\d{1,2})|(?:\d{1,2}\.\d{1,2}\.\d{2,4})|(?:\d{4}\.\d{1,2}\.\d{1,2})|(?:\d{1,2}\s+\d{1,2}\s+\d{2,4})|(?:\d{4}\s+\d{1,2}\s+\d{1,2})|(?:(?:Jan\.?(?:uary)?|Feb\.?(?:ruary)?|Mar\.?(?:ch)?|Apr\.?(?:il)?|May\.?|Jun\.?(?:e)?|Jul\.?(?:y)?|Aug\.?(?:ust)?|Sep\.?(?:tember)?|Oct\.?(?:ober)?|Nov\.?(?:ember)?|Dec\.?(?:ember)?)\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4})|(?:\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan\.?(?:uary)?|Feb\.?(?:ruary)?|Mar\.?(?:ch)?|Apr\.?(?:il)?|May\.?|Jun\.?(?:e)?|Jul\.?(?:y)?|Aug\.?(?:ust)?|Sep\.?(?:tember)?|Oct\.?(?:ober)?|Nov\.?(?:ember)?|Dec\.?(?:ember)?)\.?,?\s+\d{4}))\b/gi,
+        priority: 17
     },
     URL: {
-        pattern: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi,
-        priority: 8
+        pattern: /(https?:\/\/[^\s\)]+)|(www\.[^\s\)]+)|(?:^|[\s\(\[])((?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+(?:com|org|net|edu|gov|mil|int|eth|co|io|ai|sol|btc|money|ly|me|tv|cc|tk|ml|ga|cf|biz|info|name|pro|app|dev|tech|blog|site|online|store|shop|news|media|chat|email|cloud|data|finance|legal|plus|pro|premium|vip|max|mini|uk|eu|de|fr|es|it|nl|se|no|fi|ru|cn|jp|kr|in|au|ca|us|za|ch|at|be|pl|cz|sk|hu|ro|tr|gr|pt|dk|ie|il|hk|sg|nz|mx|ar|cl|co|pe|ve|sa|ae|qa|eg|ng|ke|tz|ug|gh|pk|bd|lk|my|th|ph|vn|id|tw|si|hr|lt|lv|ee|bg|rs|ua|by|kz|ge|az|am|md|al|ba|mk|me|lu|li|mc|sm|ad|fo|gl|gi|je|gg|im|re|yt|pm|wf|tf|pf|nc|bl|mf|gp|mq|gf|sr|aw|cw|sx|bq|ai|ag|dm|gd|lc|ms|kn|vc|bb|bm|ky|tc|vg|vi|jm|tt|bs|bz|cr|sv|gt|hn|ni|pa|do|ht|pr|bo|ec|gy|py|sr|uy|fk|aq|bv|io|sh|gs|hm|tf|um|wf|yt|asia|africa|america|antarctica|oceania))(?=[\s\.\,\;\:\!\?\)\]\}]|$)/gi,
+        priority: 18
     },
     IP_ADDRESS: {
         pattern: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
-        priority: 9
+        priority: 19
+    },
+    IP_ADDRESS_IPV6: {
+        pattern: /\b(?:(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}|(?:(?:[A-F0-9]{1,4}:)*)?::(?:(?:[A-F0-9]{1,4}:)*[A-F0-9]{1,4})?)\b/gi,
+        priority: 20
+    },
+    UUID: {
+        pattern: /\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b/g,
+        priority: 21
+    },
+    ACCOUNT: {
+        pattern: /\b(?:Account\s*:?|No\.?|Number\s*:?)[ ]*\d{4,}\b/gi,
+        priority: 22
+    },
+    PIN: {
+        pattern: /\bPIN:?\s*\d{4,6}\b/gi,
+        priority: 23
+    },
+    HANDLE: {
+        pattern: /@[^\s]{3,32}\b/g,
+        priority: 24
+    },
+    EURO: {
+        pattern: /\b\d{1,3}(?:[., ]\d{3})*(?:[.,]\d{2})?\s?\u20ac\b|\u20ac\s?\d{1,3}(?:[., ]\d{3})*(?:[.,]\d{2})?\b/gi,
+        priority: 25
+    },
+    POUND: {
+        pattern: /\b\d{1,3}(?:[., ]\d{3})*(?:[.,]\d{2})?\s?\u00a3\b|\u00a3\s?\d{1,3}(?:[., ]\d{3})*(?:[.,]\d{2})?\b/gi,
+        priority: 26
+    },
+    YEN: {
+        pattern: /\b\d{1,3}(?:[., ]\d{3})*(?:[.,]\d{2})?\s?\u00a5\b|\u00a5\s?\d{1,3}(?:[., ]\d{3})*(?:[.,]\d{2})?\b/gi,
+        priority: 27
+    },
+    MONEY: {
+        pattern: /(?:(?:US\$|\$|USD\$)\s?\d{1,3}(?:[, ]?\d{3})*(?:\.\d{2})?|\b\d{1,3}(?:[, ]?\d{3})*(?:\.\d{2})?(?:\s+(?:US |United States )?Dollars?|\s+euros?|\s+yen\b)|[\u20ac\u00a3\u00a5\u20bf\u039e\u00a2\u20b9]\s?\d{1,3}(?:[, ]?\d{3})*(?:\.\d{2})?)/gi,
+        priority: 28
+    },
+    MONEY_CRYPTO: {
+        pattern: /\b\d+(?:\.\d+)?\s?(BTC|ETH|SOL|USDT|USDC|DAI)\b/gi,
+        priority: 29
+    },
+    CRYPTO_ADDRESS: {
+        pattern: /\b(?:0x[a-fA-F0-9]{40}|(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}|[1-9A-HJ-NP-Za-km-z]{32,44})\b/g,
+        priority: 30
+    },
+    FILE: {
+        pattern: /(?:[A-Za-z]{1,4}:)?[^\r\n]+\.(?:pdf|docx?|xlsx?|csv|txt|rtf|pages|mp4|png|jpe?g|gif|svg|zip|rar|7z|tar|gz|mp3|wav|mov|avi|mkv|ppt|pptx|html?|css|js|json|xml|md|py|java|cpp|h|sql|php|rb|go|rs|bin|dat|img|ts)\b/gi,
+        priority: 31
+    },
+    COMPANY: {
+        pattern: /\b(?:[A-Za-z0-9&.'-]+\s+){0,3}[A-Za-z0-9&.'-]+(?:,?\s*)(?:LLC|L\.L\.C\.|Ltd\.?|Inc\.?|Corp\.?|GmbH|PLC|LP|L\.P\.|LLP|L\.L\.P\.|GP|G\.P\.|DAO|SA|Foundation|Association|Cooperative|Corporation|Incorporated|Limited Company|Financial Group|& Co\.|& Partners|Limited Liability Company|Limited Partnership|Limited Liability Partnership|Sociedad Anonima|S\.A\.|S\.A\.S\.|S\.A\.S\.S\.)\b/gi,
+        priority: 32
+    },
+    PASSPORT: {
+        pattern: /\b(?:[A-Z]{2}\d{6,8}|[A-Z]\d{8})\b/gi,
+        priority: 33
+    },
+    SWIFT_BIC: {
+        pattern: /(?:^|\s|SWIFT[:\s]*|BIC[:\s]*)([A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?)(?=\s|$)/gi,
+        priority: 92
+    },
+    MAC_ADDRESS: {
+        pattern: /\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b/g,
+        priority: 35
+    },
+    VIN: {
+        pattern: /\b[A-HJ-NPR-Z0-9]{17}\b/g,
+        priority: 36
+    },
+    LICENSE: {
+        pattern: /\b(?:(?:DL|Driver's?\s+License|License|ID|Identification)\s*:?\s*)?(?:[A-Z]{1,3}\d{6,18}|\d{6,18}|[A-Z]{7}\*\d{3})\b/gi,
+        priority: 37
+    },
+    GPS: {
+        pattern: /\b(?:[\(\[]\s*(?:[NS]\s*)?[+-]?(?:90(?:\.0+)?|[1-8]?\d(?:\.\d+)?)\s*(?:\u00b0|deg(?:rees)?)?(?:\s*[NS])?\s*[\s,;]\s*(?:[EW]\s*)?[+-]?(?:180(?:\.0+)?|(?:1[0-7]\d|[1-9]?\d)(?:\.\d+)?)\s*(?:\u00b0|deg(?:rees)?)?(?:\s*[EW])?\s*[\)\]]|(?:[NS]\s*)?[+-]?(?:90(?:\.0+)?|[1-8]?\d(?:\.\d+)?)\s*(?:\u00b0|deg(?:rees)?)?(?:\s*[NS])?\s*[\s,;]\s*(?:[EW]\s*)?[+-]?(?:180(?:\.0+)?|(?:1[0-7]\d|[1-9]?\d)(?:\.\d+)?)\s*(?:\u00b0|deg(?:rees)?)?(?:\s*[EW])?|@\s*[+-]?(?:90(?:\.0+)?|[1-8]?\d(?:\.\d+)?)\s*[\s,;]\s*[+-]?(?:180(?:\.0+)?|(?:1[0-7]\d|[1-9]?\d)(?:\.\d+)?)|(?:Lat(?:itude)?[\s:=-]*)?\s*(?:[NS]\s*)?(?:[0-8]?\d|90)\u00b0?\s*[0-5]?\d['"\u2032]\s*[0-5]?\d(?:\.\d+)?['"\u2033]?\s*(?:[NS])?\s*[\s,;]\s*(?:Long?(?:itude)?[\s:=-]*)?\s*(?:[EW]\s*)?(?:[0-1]?[0-7]?\d|180)\u00b0?\s*[0-5]?\d['"\u2032]\s*[0-5]?\d(?:\.\d+)?['"\u2033]?\s*(?:[EW])?|(?:[NS]\s*)?(?:[0-8]?\d|90)\u00b0?\s*[0-5]?\d(?:\.\d+)?['"\u2032]\s*(?:[NS])?\s*[\s,;]\s*(?:[EW]\s*)?(?:[0-1]?[0-7]?\d|180)\u00b0?\s*[0-5]?\d(?:\.\d+)?['"\u2032]\s*(?:[EW])?|(?:UTM\s*)?(?:[1-6][0-9]|[0-9])[A-HJ-NP-Z]\s*[0-9]{6}(?:\.\d+)?\s*[mE]?\s*[0-9]{7}(?:\.\d+)?\s*[mN]?|(?:UTM\s*)?(?:[1-6][0-9]|[0-9])[A-HJ-NP-Z]\s*(?:E|Easting|East)?\s*[0-9]{6}(?:\.\d+)?\s*[mE]?\s*(?:N|Northing|North)?\s*[0-9]{7}(?:\.\d+)?\s*[mN]?)\b/gi,
+        priority: 38
+    },
+    MEDICARE_ID: {
+        pattern: /\b[0-9][ACDEFGHJKMNPQRTUVWXY][ACDEFGHJKMNPQRTUVWXY][0-9](?:[-\s]?)[ACDEFGHJKMNPQRTUVWXY][ACDEFGHJKMNPQRTUVWXY][0-9](?:[-\s]?)[ACDEFGHJKMNPQRTUVWXY][ACDEFGHJKMNPQRTUVWXY][0-9][0-9]\b/g,
+        priority: 39
+    },
+    MEDICAL_RECORD: {
+        pattern: /\b[A-Z]{0,2}\d{6,10}\b/g,
+        priority: 40
+    },
+    TRADEMARK: {
+        pattern: /\b[A-Z][a-zA-Z0-9]*(?:\u2122|\u00ae|\(TM\)|\(R\)|\(tm\)|\(r\))/g,
+        priority: 41
+    },
+    AGE: {
+        pattern: /\b\d{1,3}\s?(?:years?\s?old|y\.?o\.?)\b/gi,
+        priority: 42
+    },
+    ZIP: {
+        pattern: /\b(?:P\.?\s?O\.?\s?Box\s?\d{1,6}|[A-Z]{2}\s+\d{5}(?:-\d{4})?|\d{5}(?:-\d{4})?)\b/g,
+        priority: 43
+    },
+    ZIP_US: {
+        pattern: /(?:^|\s)\d{5}(?:-\d{4})?(?=\s|$)/g,
+        priority: 85
+    },
+    ZIP_UK: {
+        pattern: /\b[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}\b/gi,
+        priority: 45
+    },
+    ZIP_CA: {
+        pattern: /\b[A-Z]\d[A-Z]\s?\d[A-Z]\d\b/gi,
+        priority: 46
+    },
+    EMAIL_RFC5322: {
+        pattern: /[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/g,
+        priority: 47
+    },
+    EMAIL_SIMPLE: {
+        pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+        priority: 48
+    },
+    IP_ADDRESS_IPV4: {
+        pattern: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
+        priority: 49
+    },
+    IP_ADDRESS_IPV6_COMPRESSED: {
+        pattern: /\b(?:(?:[A-F0-9]{1,4}:)*)?::(?:(?:[A-F0-9]{1,4}:)*[A-F0-9]{1,4})?\b/gi,
+        priority: 50
+    },
+    CH_PHONE_MOBILE: {
+        pattern: /\b(?:\+41|0041|0)\s?7[5-9]\d\s?\d{3}\s?\d{2}\s?\d{2}\b/g,
+        priority: 51
+    },
+    CH_PHONE_LANDLINE: {
+        pattern: /\b(?:\+41|0041|0)\s?(?:[1-9]\d{1,2})\s?\d{3}\s?\d{2}\s?\d{2}\b/g,
+        priority: 52
+    },
+    CH_PASSPORT_NUMBER: {
+        pattern: /\b[A-Z]\d{7}\b/g,
+        priority: 53
+    },
+    CH_DATE_DDMMYYYY: {
+        pattern: /\b(?:0?[1-9]|[12]\d|3[01])\.(?:0?[1-9]|1[0-2])\.(?:\d{2}|\d{4})\b/g,
+        priority: 54
+    },
+    CH_POSTAL_CODE: {
+        pattern: /(?:^|\s)(?:CH-)?[1-9]\d{3}(?=\s|$)/g,
+        priority: 90
+    },
+    CH_TAX_AHV_NUMBER: {
+        pattern: /\b756(?:\.\d{4}){2}\.\d{2}\b|\b756\d{10}\b/g,
+        priority: 56
+    },
+    CH_SOCIAL_SECURITY_OASI: {
+        pattern: /(?:AHV|AVS|OASI)\s*(?:Nr\.?|Number|Nummer)?\s*[:#]?\s*(?:756(?:\.\d{4}){2}\.\d{2}|756\d{10})/gi,
+        priority: 57
+    },
+    CH_BANK_IBAN: {
+        pattern: /\bCH\d{2}[0-9A-Z]{17}\b/g,
+        priority: 58
+    },
+    CH_DRIVER_LICENSE: {
+        pattern: /(?:Führerausweis|Fuehrerausweis|Permis de conduire|Licenza di condurre)\s*[:#]?\s*[A-Z0-9]{6,10}\b/gi,
+        priority: 59
+    },
+    CH_NATIONAL_ID_CARD: {
+        pattern: /(?:Identitätskarte|Identitaetskarte|Carte d(?:'|\u2019)?identit(?:e|\u00e9)|Carta d(?:'|\u2019)?identit(?:a|\u00e0)|ID(?:-?Card)?)\s*[:#]?\s*[A-Z]\s?\d{7}\b/gi,
+        priority: 60
+    },
+    CH_VAT_UID: {
+        pattern: /\bCHE[-\s]?\d{3}\.\d{3}\.\d{3}(?:\s*(?:MWST|TVA|IVA))?\b|\bCHE\d{9}(?:MWST|TVA|IVA)?\b/gi,
+        priority: 61
+    },
+    CH_HEALTH_INSURANCE_NUMBER: {
+        pattern: /(?:Krankenkasse|Versichertennummer|Assurance maladie|Numero assicurazione)\s*[:#]?\s*\d{3}\.\d{4}\.\d{4}\.\d{2}\b/gi,
+        priority: 62
+    },
+    DE_PHONE_MOBILE: {
+        pattern: /\b(?:\+49|0049|0)\s?1[5-7]\d(?:\s?\d{2,4}){2,3}\b/g,
+        priority: 63
+    },
+    DE_PHONE_LANDLINE: {
+        pattern: /\b(?:\+49|0049|0)\s?(?:[2-9]\d{1,4})\s?\d{3,8}\b/g,
+        priority: 64
+    },
+    DE_PASSPORT_NUMBER: {
+        pattern: /\b[CFGHJKLMNPRTVWXYZ]\d{8}\b/g,
+        priority: 65
+    },
+    DE_REISEPASS_LABELLED: {
+        pattern: /(?:Reisepass(?:nummer)?|Pass-Nr\.?|Passnummer)\s*[:#]?\s*[CFGHJKLMNPRTVWXYZ]\d{8}\b/gi,
+        priority: 66
+    },
+    DE_DATE_DDMMYYYY: {
+        pattern: /\b(?:0?[1-9]|[12]\d|3[01])[.\\/-](?:0?[1-9]|1[0-2])[.\\/-](?:\d{2}|\d{4})\b/g,
+        priority: 67
+    },
+    DE_POSTAL_CODE: {
+        pattern: /(?:^|\s)(?:D-)?\d{5}(?=\s|$)/g,
+        priority: 91
+    },
+    DE_TAX_ID: {
+        pattern: /(?:Steuer(?:identifikationsnummer|[-\s]?ID(?:Nr\.\s*)?)|steuerliche\s+Identifikationsnummer)\s*[:#]?\s*\d{2}\s?\d{3}\s?\d{3}\s?\d{2}\b/gi,
+        priority: 69
+    },
+    DE_SOCIAL_SECURITY_NUMBER: {
+        pattern: /\b\d{2}\s?\d{2}\s?\d{2}\s?[A-Z]\s?\d{3}\b/g,
+        priority: 70
+    },
+    DE_BANK_IBAN: {
+        pattern: /\bDE\d{20}\b/g,
+        priority: 71
+    },
+    DE_DRIVER_LICENSE: {
+        pattern: /(?:Führerscheinnummer|Führerschein-Nr\.?|Fuehrerschein(?:nummer)?|FSNR|Fahrerlaubnisnummer)\s*[:#]?\s*[A-Z0-9]{5,15}\b/gi,
+        priority: 72
+    },
+    DE_NATIONAL_ID_CARD: {
+        pattern: /(?:Personalausweis(?:nummer)?|PA(?:-?Nr\.?|-?Nummer)?)\s*[:#]?\s*(?:[CFGHJKLMNPRTVWXYZ]\d{8}|(?:[A-Z]\d{2}){3})\b/gi,
+        priority: 73
+    },
+    DE_VAT_UST_ID: {
+        pattern: /(?:USt-IdNr\.?|Umsatzsteuer-Identifikationsnummer)\s*[:#]?\s*DE\s?\d{9}\b|\bDE\s?\d{9}\b/gi,
+        priority: 74
+    },
+    DE_HEALTH_INSURANCE_NUMBER: {
+        pattern: /(?:Versichertennummer|Gesundheitskarte|Krankenversicherungsnummer)\s*[:#]?\s*[A-Z]\d{9}[A-Z]\b/gi,
+        priority: 75
     }
 };
 
@@ -119,10 +384,13 @@ class AnonymizerApp {
             }
         });
 
-        // LLM processing
-        document.getElementById('processLlmBtn').addEventListener('click', () => {
-            this.processLlmOutput();
-        });
+        // LLM processing (optional - button may not exist)
+        const processLlmBtn = document.getElementById('processLlmBtn');
+        if (processLlmBtn) {
+            processLlmBtn.addEventListener('click', () => {
+                this.processLlmOutput();
+            });
+        }
 
         // Clear input
         document.getElementById('clearInputBtn').addEventListener('click', () => {
@@ -236,25 +504,52 @@ class AnonymizerApp {
     }
 
     processWithRegex(text) {
-        const entities = [];
+        const allMatches = [];
+        const occupiedRanges = [];
+        
+        // Helper function to check if a range overlaps with existing ranges
+        const hasOverlap = (start, end) => {
+            return occupiedRanges.some(range => {
+                return !(end <= range.start || start >= range.end);
+            });
+        };
         
         // Sort patterns by priority
         const sortedPatterns = Object.entries(entityPatterns)
             .sort((a, b) => a[1].priority - b[1].priority);
         
+        // First pass: collect ALL matches from all patterns
         for (const [type, config] of sortedPatterns) {
             const matches = [...text.matchAll(config.pattern)];
             
             for (const match of matches) {
-                // Check if this text is already detected
-                if (!this.entityManager.reverseLookup.has(match[0])) {
-                    entities.push({
-                        text: match[0],
-                        type: type,
-                        startPos: match.index,
-                        endPos: match.index + match[0].length
-                    });
-                }
+                allMatches.push({
+                    text: match[0],
+                    type: type,
+                    startPos: match.index,
+                    endPos: match.index + match[0].length,
+                    priority: config.priority
+                });
+            }
+        }
+        
+        // Sort all matches by their position in the text (ascending order)
+        allMatches.sort((a, b) => a.startPos - b.startPos);
+        
+        // Second pass: process matches in text order, checking for overlaps
+        const entities = [];
+        for (const match of allMatches) {
+            // Check if this position overlaps with already accepted entities
+            if (!hasOverlap(match.startPos, match.endPos)) {
+                entities.push({
+                    text: match.text,
+                    type: match.type,
+                    startPos: match.startPos,
+                    endPos: match.endPos
+                });
+                
+                // Mark this range as occupied
+                occupiedRanges.push({ start: match.startPos, end: match.endPos });
             }
         }
         
@@ -262,14 +557,21 @@ class AnonymizerApp {
     }
 
     applyAnonymization(text, entities) {
-        // Sort entities by position (reverse order for replacement)
+        // First, generate placeholders in text order (forward)
+        const entityPlaceholders = new Map();
+        entities.forEach(entity => {
+            const placeholder = this.entityManager.generatePlaceholder(entity.type, entity.text);
+            entityPlaceholders.set(entity, placeholder);
+        });
+        
+        // Then sort entities by position (reverse order for replacement to avoid position shifting)
         entities.sort((a, b) => b.startPos - a.startPos);
         
         let result = text;
         for (const entity of entities) {
-            const placeholder = this.entityManager.generatePlaceholder(entity.type, entity.text);
-            result = result.substring(0, entity.startPos) + 
-                     placeholder + 
+            const placeholder = entityPlaceholders.get(entity);
+            result = result.substring(0, entity.startPos) +
+                     placeholder +
                      result.substring(entity.endPos);
         }
         
@@ -431,26 +733,9 @@ class AnonymizerApp {
     }
 
     processLlmOutput() {
-        const llmInput = document.getElementById('llmInput').value;
-        if (!llmInput) {
-            this.uiController.showError('Please enter LLM output to process');
-            return;
-        }
-
-        let processedText = llmInput;
-        let replacementCount = 0;
-        
-        this.entityManager.entityMap.forEach((entity, placeholder) => {
-            const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-            const matches = processedText.match(regex);
-            if (matches) {
-                replacementCount += matches.length;
-                processedText = processedText.replace(regex, entity.original);
-            }
-        });
-        
-        document.getElementById('llmOutput').value = processedText;
-        this.uiController.showSuccess(`Restored ${replacementCount} placeholders to original values`);
+        // This method is now deprecated - functionality moved to deanonymizeText()
+        // Redirect to deanonymizeText for backward compatibility
+        this.deanonymizeText();
     }
 
     clearInput() {

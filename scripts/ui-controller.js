@@ -42,8 +42,17 @@ class UIController {
         // Clear existing list
         listElement.innerHTML = '';
 
+        // Sort entities by their placeholder number (ascending order)
+        // This ensures [ENTITY_1] appears before [ENTITY_2], etc.
+        const sortedEntities = [...entities].sort((a, b) => {
+            // Extract the number from the placeholder [TYPE_NUMBER]
+            const numA = parseInt(a.placeholder.match(/_(\d+)\]/)?.[1] || 0);
+            const numB = parseInt(b.placeholder.match(/_(\d+)\]/)?.[1] || 0);
+            return numA - numB;
+        });
+
         // Group entities by type
-        const groupedEntities = this.groupEntitiesByType(entities);
+        const groupedEntities = this.groupEntitiesByType(sortedEntities);
 
         // Create entity items
         Object.entries(groupedEntities).forEach(([type, typeEntities]) => {
