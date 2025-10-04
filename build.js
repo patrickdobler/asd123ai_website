@@ -69,7 +69,7 @@ async function minifyFile(inputFile, outputFile, type) {
 }
 
 async function copyAndMinifyFiles() {
-    // HTML files - including anonymizer_test.html
+    // HTML files - including anonymizer_test.html, anonymizer-guide.html, and optimizer-guide.html
     const htmlFiles = [
         'index.html',
         'optimizer.html',
@@ -79,7 +79,9 @@ async function copyAndMinifyFiles() {
         'privacy.html',
         'test-optimizer.html',
         'anonymizer.html',
-        'anonymizer_test.html'
+        'anonymizer_test.html',
+        'anonymizer-guide.html',
+        'optimizer-guide.html'
     ];
     for (const file of htmlFiles) {
         if (fs.existsSync(file)) {

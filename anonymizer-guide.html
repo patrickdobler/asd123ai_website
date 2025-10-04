@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Anonymizer User Guide - ASD123.ai</title>
+<meta name="description" content="Complete user guide for the ASD123.ai Anonymizer. Learn how to protect sensitive information with privacy-first PII detection and anonymization."/>
+<meta name="keywords" content="anonymizer guide, PII protection, data anonymization tutorial, privacy protection guide"/>
+<meta name="author" content="ASD123.ai"/>
+<meta name="robots" content="index, follow"/>
+<meta property="og:title" content="Anonymizer User Guide - ASD123.ai"/>
+<meta property="og:description" content="Complete user guide for the ASD123.ai Anonymizer. Learn how to protect sensitive information with privacy-first PII detection and anonymization."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://asd123.ai/anonymizer-guide"/>
+<meta property="og:site_name" content="ASD123.ai"/>
+<link rel="canonical" href="https://asd123.ai/anonymizer-guide"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="styles/main.css" rel="stylesheet"/>
+<link href="styles/components.css" rel="stylesheet"/>
+<script src="scripts/shared.js"></script>
+</head>
+<body class="bg-[var(--bg-color)] text-[var(--text-primary)] min-h-screen">
+<div class="relative overflow-hidden">
+<div class="aurora-bg"></div>
+<div class="relative z-10 flex flex-col min-h-screen">
+<header class="container mx-auto px-6 py-5">
+<nav class="flex items-center justify-between">
+<a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+<svg class="h-8 w-8 text-[var(--primary-color)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+<h1 class="text-2xl font-bold text-[var(--text-primary)]">ASD123.ai</h1>
+</a>
+<div class="flex items-center justify-center flex-1">
+<div class="hidden md:flex items-center gap-8 text-sm font-medium text-[var(--text-secondary)]">
+<a class="nav-link hover:text-[var(--text-primary)] transition-colors" href="documentation.html">Documentation</a>
+<a class="nav-link hover:text-[var(--text-primary)] transition-colors" href="about.html">About</a>
+</div>
+</div>
+<div class="w-[200px]"></div>
+</nav>
+</header>
+
+<main class="flex-grow container mx-auto px-6 py-8 md:py-12">
+<!-- Page Title Section -->
+<div class="w-full text-center mb-12">
+<h2 class="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-300 mb-4">
+Anonymizer User Guide
+</h2>
+<p class="text-lg md:text-xl text-[var(--text-secondary)] max-w-3xl mx-auto">
+Complete guide to protecting sensitive information with privacy-first PII detection and anonymization
+</p>
+</div>
+
+<!-- User Guide Content -->
+<div class="max-w-6xl mx-auto">
+<div class="liquid-glass p-8 md:p-12">
+
+<!-- Table of Contents -->
+<div class="mb-12 p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h3>
+<div class="grid md:grid-cols-2 gap-3 text-sm">
+<a href="#getting-started" class="text-[var(--primary-color)] hover:underline">→ Getting Started</a>
+<a href="#processing-modes" class="text-[var(--primary-color)] hover:underline">→ Processing Modes</a>
+<a href="#basic-workflow" class="text-[var(--primary-color)] hover:underline">→ Basic Workflow</a>
+<a href="#file-upload" class="text-[var(--primary-color)] hover:underline">→ File Upload</a>
+<a href="#entity-management" class="text-[var(--primary-color)] hover:underline">→ Entity Management</a>
+<a href="#llm-integration" class="text-[var(--primary-color)] hover:underline">→ LLM Integration</a>
+<a href="#redact-mode" class="text-[var(--primary-color)] hover:underline">→ Redact Mode</a>
+<a href="#export-import" class="text-[var(--primary-color)] hover:underline">→ Export & Import</a>
+<a href="#privacy-security" class="text-[var(--primary-color)] hover:underline">→ Privacy & Security</a>
+<a href="#best-practices" class="text-[var(--primary-color)] hover:underline">→ Best Practices</a>
+</div>
+</div>
+
+<!-- Getting Started -->
+<div id="getting-started" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">1.</span> Getting Started
+</h3>
+<div class="space-y-4 text-[var(--text-secondary)]">
+<p class="leading-relaxed">
+The Anonymizer is a privacy-first tool that detects and anonymizes Personally Identifiable Information (PII) entirely within your browser. <strong class="text-[var(--text-primary)]">No data ever leaves your device</strong>, ensuring complete privacy.
+</p>
+<div class="p-4 bg-green-400/10 border border-green-400/30 rounded-lg">
+<p class="text-sm text-green-300">
+<strong>🔒 Privacy Guarantee:</strong> All processing happens locally in your browser. Your text is never transmitted to any server.
+</p>
+</div>
+<p><strong class="text-[var(--text-primary)]">What is detected?</strong> The Anonymizer recognizes <strong>75+ types of PII</strong> including:</p>
+<ul class="list-disc list-inside space-y-2 ml-4">
+<li>Personal information: Names, emails, phone numbers, addresses</li>
+<li>Financial data: Credit cards, IBANs, cryptocurrency addresses</li>
+<li>Identification: SSNs, passports, driver licenses, tax IDs</li>
+<li>Country-specific: Swiss AHV, German tax ID, UK NINO, and more</li>
+<li>Technical: IP addresses, URLs, MAC addresses, UUIDs</li>
+</ul>
+</div>
+</div>
+
+<!-- Processing Modes -->
+<div id="processing-modes" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">2.</span> Processing Modes
+</h3>
+<div class="grid md:grid-cols-3 gap-4">
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<div class="flex items-center gap-2 mb-2">
+<span class="text-2xl">⚡</span>
+<h4 class="font-bold text-[var(--text-primary)]">Quick Scan</h4>
+</div>
+<p class="text-sm text-[var(--text-secondary)] mb-2">Pattern matching (Regex)</p>
+<ul class="text-xs text-[var(--text-secondary)] space-y-1">
+<li>✓ Instant results</li>
+<li>✓ Works offline</li>
+<li>✓ Free to use</li>
+<li>✓ Good accuracy</li>
+</ul>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<div class="flex items-center gap-2 mb-2">
+<span class="text-2xl">🤖</span>
+<h4 class="font-bold text-[var(--text-primary)]">AI English</h4>
+</div>
+<p class="text-sm text-[var(--text-secondary)] mb-2">Advanced AI detection</p>
+<ul class="text-xs text-[var(--text-secondary)] space-y-1">
+<li>✓ Context-aware</li>
+<li>✓ Higher accuracy</li>
+<li>✓ English only</li>
+<li>⚠ Requires internet</li>
+</ul>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<div class="flex items-center gap-2 mb-2">
+<span class="text-2xl">🌍</span>
+<h4 class="font-bold text-[var(--text-primary)]">AI Multilingual</h4>
+</div>
+<p class="text-sm text-[var(--text-secondary)] mb-2">Multi-language support</p>
+<ul class="text-xs text-[var(--text-secondary)] space-y-1">
+<li>✓ Multiple languages</li>
+<li>✓ High accuracy</li>
+<li>✓ Context-aware</li>
+<li>⚠ Slower processing</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- Basic Workflow -->
+<div id="basic-workflow" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">3.</span> Basic Anonymization Workflow
+</h3>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">1</div>
+<div class="flex-1">
+<h4 class="font-bold text-[var(--text-primary)] mb-2">Enter or Paste Text</h4>
+<p class="text-sm text-[var(--text-secondary)]">Type or paste your text into the <strong>Input Text</strong> area. You can also drag-and-drop files.</p>
+<div class="mt-2 p-3 bg-[var(--glass-bg)]/20 rounded border border-[var(--border-color)] font-mono text-xs">
+Example: "My name is John Smith, email john@example.com, phone (555) 123-4567"
+</div>
+</div>
+</div>
+
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">2</div>
+<div class="flex-1">
+<h4 class="font-bold text-[var(--text-primary)] mb-2">Select Processing Mode</h4>
+<p class="text-sm text-[var(--text-secondary)]">Choose from the dropdown: <strong>Quick Scan</strong> (recommended), <strong>AI English</strong>, or <strong>AI Multilingual</strong>.</p>
+</div>
+</div>
+
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">3</div>
+<div class="flex-1">
+<h4 class="font-bold text-[var(--text-primary)] mb-2">Click Anonymize</h4>
+<p class="text-sm text-[var(--text-secondary)]">Press the <strong class="text-[var(--primary-color)]">🛡️ Anonymize</strong> button. The tool will detect all PII and replace it with placeholders.</p>
+<div class="mt-2 p-3 bg-[var(--glass-bg)]/20 rounded border border-[var(--border-color)] font-mono text-xs">
+Result: "My name is [PERSON_NAME_1], email [EMAIL_1], phone [PHONE_1]"
+</div>
+</div>
+</div>
+
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">4</div>
+<div class="flex-1">
+<h4 class="font-bold text-[var(--text-primary)] mb-2">Review & Copy</h4>
+<p class="text-sm text-[var(--text-secondary)]">Check the <strong>Detected Entities</strong> panel, review the anonymized output, and click <strong>📋 Copy</strong> to use elsewhere.</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- File Upload -->
+<div id="file-upload" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">4.</span> File Upload & Processing
+</h3>
+<div class="space-y-4 text-[var(--text-secondary)]">
+<p class="leading-relaxed">
+The Anonymizer supports multiple file formats for easy text extraction:
+</p>
+<div class="grid md:grid-cols-3 gap-4">
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg text-center">
+<div class="text-3xl mb-2">📄</div>
+<h4 class="font-bold text-[var(--text-primary)] mb-1">.txt Files</h4>
+<p class="text-xs text-[var(--text-secondary)]">Plain text documents</p>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg text-center">
+<div class="text-3xl mb-2">📝</div>
+<h4 class="font-bold text-[var(--text-primary)] mb-1">.docx Files</h4>
+<p class="text-xs text-[var(--text-secondary)]">Microsoft Word documents</p>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg text-center">
+<div class="text-3xl mb-2">📕</div>
+<h4 class="font-bold text-[var(--text-primary)] mb-1">.pdf Files</h4>
+<p class="text-xs text-[var(--text-secondary)]">PDF documents (text-based)</p>
+</div>
+</div>
+<p><strong class="text-[var(--text-primary)]">Two Ways to Upload:</strong></p>
+<ul class="list-disc list-inside space-y-2 ml-4">
+<li><strong>Click Method:</strong> Click <strong class="text-[var(--primary-color)]">📁 Load File</strong> button and select your file</li>
+<li><strong>Drag & Drop:</strong> Drag file directly onto the Input Text area</li>
+</ul>
+<div class="p-4 bg-yellow-400/10 border border-yellow-400/30 rounded-lg">
+<p class="text-sm text-yellow-300">
+<strong>⚠ Limits:</strong> Maximum file size is 10MB. Scanned PDFs (images) are not supported.
+</p>
+</div>
+</div>
+</div>
+
+<!-- Entity Management -->
+<div id="entity-management" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">5.</span> Entity Management
+</h3>
+<div class="space-y-4 text-[var(--text-secondary)]">
+<p class="leading-relaxed">
+The <strong class="text-[var(--text-primary)]">Detected Entities</strong> panel shows all found PII with their placeholders and original values:
+</p>
+<div class="grid md:grid-cols-2 gap-4">
+<div class="space-y-3">
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">👁️</span> View Options
+</h4>
+<ul class="text-sm space-y-1">
+<li>• <strong>Tiles View:</strong> Compact grid layout</li>
+<li>• <strong>List View:</strong> Detailed list format</li>
+</ul>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">🔀</span> Sorting Options
+</h4>
+<ul class="text-sm space-y-1">
+<li>• <strong>By Appearance:</strong> Order as they appear</li>
+<li>• <strong>Alphabetical:</strong> Sort by entity type</li>
+</ul>
+</div>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">🗑️</span> Managing Entities
+</h4>
+<ul class="text-sm space-y-2">
+<li><strong>Remove Entity:</strong> Click the trash icon (🗑️) on any entity to remove it and restore the original value in the output</li>
+<li><strong>Entity Stats:</strong> View total and active entity counts at the bottom of the panel</li>
+<li><strong>Manual Selection:</strong> Use "Anonymize Selected Text" to manually anonymize specific portions</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<!-- LLM Integration -->
+<div id="llm-integration" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">6.</span> LLM Integration & Deanonymization
+</h3>
+<div class="space-y-4 text-[var(--text-secondary)]">
+<p class="leading-relaxed">
+Use the Anonymizer to safely process text with AI services like ChatGPT, Claude, or others:
+</p>
+<div class="bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg p-6 space-y-4">
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">1</div>
+<div>
+<h4 class="font-bold text-[var(--text-primary)] mb-1">Anonymize Your Text</h4>
+<p class="text-sm">Use the main anonymization feature to protect your PII. Copy the anonymized output.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">2</div>
+<div>
+<h4 class="font-bold text-[var(--text-primary)] mb-1">Send to LLM</h4>
+<p class="text-sm">Paste the anonymized text into ChatGPT, Claude, or any AI service. The placeholders like [PERSON_NAME_1] will be preserved.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">3</div>
+<div>
+<h4 class="font-bold text-[var(--text-primary)] mb-1">Get AI Response</h4>
+<p class="text-sm">The AI will process your text and maintain the placeholders in its response.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">4</div>
+<div>
+<h4 class="font-bold text-[var(--text-primary)] mb-1">Deanonymize</h4>
+<p class="text-sm">Paste the AI response into the <strong>LLM Input</strong> field and click <strong class="text-[var(--primary-color)]">🔓 Deanonymize</strong>. All placeholders will be replaced with original values!</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-blue-400/10 border border-blue-400/30 rounded-lg">
+<p class="text-sm text-blue-300">
+<strong>💡 Pro Tip:</strong> Export your entities as CSV before closing the page. This lets you deanonymize responses even days later!
+</p>
+</div>
+</div>
+</div>
+
+<!-- Redact Mode -->
+<div id="redact-mode" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">7.</span> Redact Mode
+</h3>
+<div class="space-y-4 text-[var(--text-secondary)]">
+<p class="leading-relaxed">
+For maximum privacy when sharing with untrusted parties, use <strong class="text-[var(--text-primary)]">Redact Mode</strong>:
+</p>
+<div class="grid md:grid-cols-2 gap-4">
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-2">🛡️ Anonymize Mode</h4>
+<p class="text-sm mb-2">Default mode with unique placeholders:</p>
+<div class="p-2 bg-[var(--glass-bg)]/20 rounded font-mono text-xs">
+[PERSON_NAME_1], [EMAIL_1], [PHONE_1]
+</div>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-2">🔒 Redact Mode</h4>
+<p class="text-sm mb-2">All entities replaced with [redacted]:</p>
+<div class="p-2 bg-[var(--glass-bg)]/20 rounded font-mono text-xs">
+[redacted], [redacted], [redacted]
+</div>
+</div>
+</div>
+<p><strong class="text-[var(--text-primary)]">When to use Redact Mode:</strong></p>
+<ul class="list-disc list-inside space-y-1 ml-4 text-sm">
+<li>Sharing documents with untrusted parties</li>
+<li>Public posting or publishing</li>
+<li>When you don't need to reverse the anonymization</li>
+<li>Maximum privacy protection</li>
+</ul>
+<div class="p-4 bg-green-400/10 border border-green-400/30 rounded-lg">
+<p class="text-sm text-green-300">
+<strong>✓ Good to know:</strong> Even in Redact Mode, you can still deanonymize using the entity list, as the mapping is preserved internally!
+</p>
+</div>
+</div>
+</div>
+
+<!-- Export & Import -->
+<div id="export-import" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">8.</span> Export & Import Entities
+</h3>
+<div class="space-y-4 text-[var(--text-secondary)]">
+<p class="leading-relaxed">
+Preserve your entity mappings for later use or share them with trusted recipients:
+</p>
+<div class="grid md:grid-cols-2 gap-4">
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<span>💾</span> Export Entities
+</h4>
+<ol class="text-sm space-y-2">
+<li>1. After anonymization, click <strong class="text-[var(--primary-color)]">💾 Export CSV</strong></li>
+<li>2. Save the file with a descriptive name</li>
+<li>3. Store securely (file contains PII!)</li>
+</ol>
+<div class="mt-3 p-2 bg-[var(--glass-bg)]/20 rounded text-xs">
+<strong>CSV Format:</strong><br/>
+"Placeholder","Original","Type","Active"<br/>
+"[EMAIL_1]","john@example.com","EMAIL","true"
+</div>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<span>📥</span> Import Entities
+</h4>
+<ol class="text-sm space-y-2">
+<li>1. Click <strong class="text-[var(--primary-color)]">📥 Import</strong> button</li>
+<li>2. Select your previously exported CSV file</li>
+<li>3. Entity list will populate automatically</li>
+<li>4. Now you can deanonymize LLM outputs!</li>
+</ol>
+</div>
+</div>
+<div class="p-4 bg-red-400/10 border border-red-400/30 rounded-lg">
+<p class="text-sm text-red-300">
+<strong>⚠ Security Warning:</strong> CSV files contain the original ↔ placeholder mapping. Protect these files like you would the original sensitive data. Use encryption when storing or sharing.
+</p>
+</div>
+</div>
+</div>
+
+<!-- Privacy & Security -->
+<div id="privacy-security" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">9.</span> Privacy & Security
+</h3>
+<div class="space-y-4 text-[var(--text-secondary)]">
+<div class="p-6 bg-green-400/10 border border-green-400/30 rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-3 text-lg">🔒 Privacy Guarantees</h4>
+<ul class="space-y-2">
+<li class="flex items-start gap-2">
+<span class="text-green-300">✓</span>
+<span><strong class="text-[var(--text-primary)]">100% Client-Side:</strong> All processing happens in your browser. Zero server communication.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="text-green-300">✓</span>
+<span><strong class="text-[var(--text-primary)]">No Data Transmission:</strong> Your text never leaves your device.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="text-green-300">✓</span>
+<span><strong class="text-[var(--text-primary)]">Memory-Only Storage:</strong> Entity mappings stored in RAM only, cleared when you close the page.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="text-green-300">✓</span>
+<span><strong class="text-[var(--text-primary)]">No Cookies or Tracking:</strong> No localStorage, no cookies, no analytics for PII data.</span>
+</li>
+</ul>
+</div>
+<p><strong class="text-[var(--text-primary)]">Best Security Practices:</strong></p>
+<ul class="list-disc list-inside space-y-2 ml-4 text-sm">
+<li>Use on trusted devices only (not public computers)</li>
+<li>Clear browser cache after processing highly sensitive data</li>
+<li>Encrypt CSV exports before storing</li>
+<li>Always review anonymized output before sharing</li>
+<li>Use Redact Mode for untrusted recipients</li>
+</ul>
+</div>
+</div>
+
+<!-- Best Practices -->
+<div id="best-practices" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">10.</span> Best Practices & Tips
+</h3>
+<div class="grid md:grid-cols-2 gap-4">
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<span>💡</span> For Maximum Privacy
+</h4>
+<ul class="text-sm space-y-2 text-[var(--text-secondary)]">
+<li>• Use Redact Mode for public sharing</li>
+<li>• Clear all data after each session</li>
+<li>• Don't share entity CSV files publicly</li>
+<li>• Process offline when possible</li>
+</ul>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<span>🎯</span> For Best Accuracy
+</h4>
+<ul class="text-sm space-y-2 text-[var(--text-secondary)]">
+<li>• Use AI mode for complex text</li>
+<li>• Review detected entities manually</li>
+<li>• Format text properly (standard dates/phones)</li>
+<li>• Remove false positives from entity list</li>
+</ul>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<span>⚡</span> For Performance
+</h4>
+<ul class="text-sm space-y-2 text-[var(--text-secondary)]">
+<li>• Use Quick Scan (Regex) for speed</li>
+<li>• Process large docs in batches</li>
+<li>• Close unused browser tabs</li>
+<li>• Desktop browsers work best</li>
+</ul>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<span>🔄</span> For LLM Workflows
+</h4>
+<ul class="text-sm space-y-2 text-[var(--text-secondary)]">
+<li>• Export entities before using LLM</li>
+<li>• Keep CSV files organized</li>
+<li>• Test deanonymization first</li>
+<li>• Document your workflow</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- Additional Resources -->
+<div class="p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">📚 Additional Resources</h3>
+<div class="grid md:grid-cols-2 gap-4 text-sm text-[var(--text-secondary)]">
+<div>
+<h4 class="font-semibold text-[var(--text-primary)] mb-2">Need Help?</h4>
+<ul class="space-y-1">
+<li>• Check the troubleshooting section in <a href="https://github.com/patrickdobler/asd123.ai" class="text-[var(--primary-color)] hover:underline" target="_blank" rel="noopener">GitHub README</a></li>
+<li>• Review the <a href="privacy.html" class="text-[var(--primary-color)] hover:underline">Privacy Policy</a></li>
+<li>• Report issues on <a href="https://github.com/patrickdobler/asd123.ai/issues" class="text-[var(--primary-color)] hover:underline" target="_blank" rel="noopener">GitHub</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-semibold text-[var(--text-primary)] mb-2">Supported Entity Types</h4>
+<p>75+ types including names, emails, phones, credit cards, SSNs, passports, IBANs, IP addresses, URLs, Swiss AHV, German tax IDs, UK NINO, and more.</p>
+</div>
+</div>
+</div>
+
+<!-- Try It Now CTA -->
+<div class="mt-12 text-center">
+<a href="anonymizer.html" class="inline-block px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-[var(--primary-color)] to-[var(--secondary-color)] rounded-lg hover:from-[var(--secondary-color)] hover:to-[var(--primary-color)] transition-all duration-300">
+Try the Anonymizer Now →
+</a>
+</div>
+
+</div>
+</div>
+</main>
+
+<footer class="container mx-auto px-6 py-8">
+<div class="flex flex-col md:flex-row justify-between items-center text-sm text-[var(--text-secondary)] border-t border-[var(--border-color)] pt-6">
+<p>© 2025 ASD123.ai. All rights reserved.</p>
+<div class="flex gap-6 mt-4 md:mt-0">
+  <a class="hover:text-[var(--text-primary)] transition-colors" href="privacy.html">Privacy Policy</a>
+  <a class="hover:text-[var(--text-primary)] transition-colors" href="#" >Terms of Service</a>
+  <a class="hover:text-[var(--text-primary)] transition-colors" href="contact.html">Contact Us</a>
+<div class="flex gap-4 ml-6">
+<a class="hover:text-[var(--text-primary)] transition-colors" href="https://github.com/patrickdobler/asd123.ai" target="_blank" rel="noopener" aria-label="GitHub">
+<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z"/>
+</svg>
+</a>
+<a class="hover:text-[var(--text-primary)] transition-colors" href="#" target="_blank" rel="noopener" aria-label="X (Twitter)">
+<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+</svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+</div>
+
+</body></html>

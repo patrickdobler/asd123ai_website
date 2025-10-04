@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimizer User Guide - ASD123.ai</title>
+    <meta name="description" content="Complete user guide for the ASD123.ai Optimizer. Learn how to clean, standardize, and optimize AI-generated text with privacy-first processing.">
+    <meta name="keywords" content="optimizer guide, text cleaning tutorial, AI text processing, diacritic removal guide, citation removal">
+    <meta name="author" content="ASD123.ai">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:title" content="Optimizer User Guide - ASD123.ai">
+    <meta property="og:description" content="Complete user guide for the ASD123.ai Optimizer. Learn how to clean, standardize, and optimize AI-generated text with privacy-first processing.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://asd123.ai/optimizer-guide">
+    <meta property="og:site_name" content="ASD123.ai">
+    
+    <link rel="canonical" href="https://asd123.ai/optimizer-guide">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="styles/main.css" rel="stylesheet">
+    <link href="styles/components.css" rel="stylesheet">
+    <script src="scripts/shared.js"></script>
+</head>
+<body class="bg-[var(--bg-color)] text-[var(--text-primary)] min-h-screen">
+    <div class="relative overflow-hidden">
+        <div class="aurora-bg"></div>
+        <div class="relative z-10 flex flex-col min-h-screen">
+            <header class="container mx-auto px-6 py-5">
+                <nav class="flex items-center justify-between">
+                    <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                        <svg class="h-8 w-8 text-[var(--primary-color)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+                        </svg>
+                        <h1 class="text-2xl font-bold text-[var(--text-primary)]">ASD123.ai</h1>
+                    </a>
+                    <div class="flex items-center justify-center flex-1">
+                        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-[var(--text-secondary)]">
+                            <a class="nav-link hover:text-[var(--text-primary)] transition-colors" href="documentation.html">Documentation</a>
+                            <a class="nav-link hover:text-[var(--text-primary)] transition-colors" href="about.html">About</a>
+                        </div>
+                    </div>
+                    <div class="w-[200px]"></div>
+                </nav>
+            </header>
+
+            <main class="flex-grow container mx-auto px-6 py-8 md:py-12">
+                <!-- Page Title -->
+                <div class="w-full text-center mb-12">
+                    <h2 class="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-300 mb-4">
+                        Optimizer User Guide
+                    </h2>
+                    <p class="text-lg md:text-xl text-[var(--text-secondary)] max-w-3xl mx-auto">
+                        Complete guide to cleaning and standardizing AI-generated text with privacy-first processing
+                    </p>
+                </div>
+
+                <!-- Main Content -->
+                <div class="max-w-6xl mx-auto">
+                    <div class="liquid-glass p-8 md:p-12">
+                        
+                        <!-- Table of Contents -->
+                        <div class="mb-12 p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h3>
+                            <div class="grid md:grid-cols-2 gap-3 text-sm">
+                                <a href="#getting-started" class="text-[var(--primary-color)] hover:underline">→ Getting Started</a>
+                                <a href="#language-mapping" class="text-[var(--primary-color)] hover:underline">→ Language Mapping</a>
+                                <a href="#basic-workflow" class="text-[var(--primary-color)] hover:underline">→ Basic Workflow</a>
+                                <a href="#processing-options" class="text-[var(--primary-color)] hover:underline">→ Processing Options</a>
+                                <a href="#advanced-features" class="text-[var(--primary-color)] hover:underline">→ Advanced Features</a>
+                                <a href="#use-cases" class="text-[var(--primary-color)] hover:underline">→ Common Use Cases</a>
+                                <a href="#privacy-security" class="text-[var(--primary-color)] hover:underline">→ Privacy & Security</a>
+                                <a href="#best-practices" class="text-[var(--primary-color)] hover:underline">→ Best Practices</a>
+                            </div>
+                        </div>
+
+                        <!-- 1. Getting Started -->
+                        <div id="getting-started" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">1.</span> Getting Started
+                            </h3>
+                            <div class="space-y-4 text-[var(--text-secondary)]">
+                                <p class="leading-relaxed">
+                                    The Optimizer is a powerful text processing tool designed to clean and standardize AI-generated content. <strong class="text-[var(--text-primary)]">All processing happens locally in your browser</strong>, ensuring complete privacy.
+                                </p>
+                                <div class="p-4 bg-green-400/10 border border-green-400/30 rounded-lg">
+                                    <p class="text-sm text-green-300">
+                                        <strong>🔒 Privacy Guarantee:</strong> Your text never leaves your device. All processing is performed client-side with zero server communication.
+                                    </p>
+                                </div>
+                                <p><strong class="text-[var(--text-primary)]">What can it do?</strong> The Optimizer offers <strong>6 powerful processing modes</strong>:</p>
+                                <ul class="list-disc list-inside space-y-2 ml-4">
+                                    <li>Language-specific character mapping (quotes, dashes, spaces)</li>
+                                    <li>Diacritic removal for international compatibility</li>
+                                    <li>Citation and reference cleaning</li>
+                                    <li>Markdown to plain text conversion</li>
+                                    <li>Fancy Unicode text normalization</li>
+                                    <li>Experimental em-dash sentence splitting</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 2. Language Mapping -->
+                        <div id="language-mapping" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">2.</span> Language Mapping
+                            </h3>
+                            <div class="space-y-4 text-[var(--text-secondary)]">
+                                <p class="leading-relaxed">
+                                    Language mapping replaces region-specific characters with standardized alternatives according to the selected language profile.
+                                </p>
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">🇨🇭 Swiss German</h4>
+                                        <p class="text-sm mb-2">Optimized for Swiss writing standards:</p>
+                                        <div class="p-2 bg-[var(--glass-bg)]/20 rounded font-mono text-xs space-y-1">
+                                            <div>ß → ss</div>
+                                            <div>« » → " "</div>
+                                            <div>— → -</div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">🇩🇪 German</h4>
+                                        <p class="text-sm mb-2">Standard German conventions:</p>
+                                        <div class="p-2 bg-[var(--glass-bg)]/20 rounded font-mono text-xs space-y-1">
+                                            <div>„ " → " "</div>
+                                            <div>œ → oe, æ → ae</div>
+                                            <div>Various dash types → -</div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">🇫🇷 French / 🇮🇹 Italian</h4>
+                                        <p class="text-sm mb-2">Romance language support:</p>
+                                        <div class="p-2 bg-[var(--glass-bg)]/20 rounded font-mono text-xs space-y-1">
+                                            <div>« » → " "</div>
+                                            <div>œ → oe, æ → ae</div>
+                                            <div>Standardized punctuation</div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">🇺🇸 English (US/Int'l)</h4>
+                                        <p class="text-sm mb-2">English quotation marks:</p>
+                                        <div class="p-2 bg-[var(--glass-bg)]/20 rounded font-mono text-xs space-y-1">
+                                            <div>" " ' ' → " " ' '</div>
+                                            <div>… → ...</div>
+                                            <div>Normalized spaces/dashes</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Basic Workflow -->
+                        <div id="basic-workflow" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">3.</span> Basic Workflow
+                            </h3>
+                            <div class="space-y-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">1</div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Paste Your Text</h4>
+                                        <p class="text-sm text-[var(--text-secondary)]">Copy AI-generated text or any content that needs cleaning and paste it into the <strong>Input Text</strong> area.</p>
+                                        <div class="mt-2 p-3 bg-[var(--glass-bg)]/20 rounded border border-[var(--border-color)] font-mono text-xs">
+                                            Example: "Text with diacrítics, **bold markdown**, [citations], and fancy 𝐔𝐧𝐢𝐜𝐨𝐝𝐞"
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">2</div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Select Language & Options</h4>
+                                        <p class="text-sm text-[var(--text-secondary)]">Choose your target language from the dropdown and enable the processing options you need (diacritics, citations, markdown, etc.).</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">3</div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Click Clean Text Now</h4>
+                                        <p class="text-sm text-[var(--text-secondary)]">Press the <strong class="text-[var(--primary-color)]">Clean Text Now</strong> button to process your text instantly.</p>
+                                        <div class="mt-2 p-3 bg-[var(--glass-bg)]/20 rounded border border-[var(--border-color)] font-mono text-xs">
+                                            Result: "Text with diacritics, bold markdown, citations, and fancy Unicode"
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">4</div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Copy or Clear</h4>
+                                        <p class="text-sm text-[var(--text-secondary)]">Click <strong>Copy to Clipboard</strong> to use the cleaned text, or <strong>Clear Input</strong> to start fresh.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Processing Options -->
+                        <div id="processing-options" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">4.</span> Processing Options Explained
+                            </h3>
+                            <div class="space-y-4">
+                                
+                                <!-- Apply Language Mapping -->
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="text-2xl">🗺️</span>
+                                        <h4 class="font-bold text-[var(--text-primary)]">Apply Language Character Mapping</h4>
+                                    </div>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Replaces special characters like quotes, dashes, and spaces according to the selected language mapping.</p>
+                                    <div class="mt-2 p-2 bg-[var(--glass-bg)]/20 rounded text-xs">
+                                        <strong>Before:</strong> „Zürich ist schön" — sagte er<br>
+                                        <strong>After:</strong> "Zurich ist schoen" - sagte er
+                                    </div>
+                                </div>
+
+                                <!-- Remove Diacritics -->
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="text-2xl">á→a</span>
+                                        <h4 class="font-bold text-[var(--text-primary)]">Remove Diacritics</h4>
+                                    </div>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Converts accented characters to their basic equivalents. Essential for Swiss German and international compatibility.</p>
+                                    <div class="mt-2 p-2 bg-[var(--glass-bg)]/20 rounded text-xs">
+                                        <strong>Examples:</strong> è→e, ä→ae, ö→oe, ü→ue, ñ→n, ç→c
+                                    </div>
+                                </div>
+
+                                <!-- Remove Citations -->
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="text-2xl">📚</span>
+                                        <h4 class="font-bold text-[var(--text-primary)]">Remove Citation References</h4>
+                                    </div>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Removes source and citation references commonly found in AI outputs like Perplexity or ChatGPT.</p>
+                                    <div class="mt-2 p-2 bg-[var(--glass-bg)]/20 rounded text-xs">
+                                        <strong>Removes:</strong> [1], [2], (Source: XYZ), (https://...), superscripts¹²³
+                                    </div>
+                                </div>
+
+                                <!-- Convert Markdown -->
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="text-2xl">📝</span>
+                                        <h4 class="font-bold text-[var(--text-primary)]">Convert MD to Normal Text</h4>
+                                    </div>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Converts Markdown formatting to plain text by removing syntax commonly used in AI responses.</p>
+                                    <div class="mt-2 p-2 bg-[var(--glass-bg)]/20 rounded text-xs">
+                                        <strong>Removes:</strong> **bold**, *italic*, # headers, `code`, [links](url), etc.
+                                    </div>
+                                </div>
+
+                                <!-- Remove Fancy Font -->
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="text-2xl">𝐀→A</span>
+                                        <h4 class="font-bold text-[var(--text-primary)]">Remove Fancy Text Font</h4>
+                                    </div>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Converts fancy Unicode text styles back to plain characters.</p>
+                                    <div class="mt-2 p-2 bg-[var(--glass-bg)]/20 rounded text-xs">
+                                        <strong>Examples:</strong> 𝐛𝐨𝐥𝐝→bold, 𝑖𝑡𝑎𝑙𝑖𝑐→italic, 𝚖𝚘𝚗𝚘→mono
+                                    </div>
+                                </div>
+
+                                <!-- Em Dash Replacement -->
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-yellow-400/30 rounded-lg">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="text-2xl">—→.</span>
+                                        <h4 class="font-bold text-[var(--text-primary)]">Replace em dash with new sentence</h4>
+                                        <span class="text-xs px-2 py-1 bg-yellow-400/20 text-yellow-300 rounded-full font-semibold">EXPERIMENTAL</span>
+                                    </div>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Replaces em dashes (—) with periods and starts new sentences. Use with caution as results may vary.</p>
+                                    <div class="mt-2 p-2 bg-[var(--glass-bg)]/20 rounded text-xs">
+                                        <strong>Before:</strong> This is a sentence — and this continues<br>
+                                        <strong>After:</strong> This is a sentence. And this continues
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Advanced Features -->
+                        <div id="advanced-features" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">5.</span> Advanced Features
+                            </h3>
+                            <div class="space-y-4 text-[var(--text-secondary)]">
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
+                                        <span>⚙️</span> Settings Persistence
+                                    </h4>
+                                    <p class="text-sm">Your selected language and enabled options are automatically saved in your browser. They'll be restored when you return to the tool.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
+                                        <span>📊</span> Character Counter
+                                    </h4>
+                                    <p class="text-sm">Real-time character count display helps you track text length as you paste and process content.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
+                                        <span>📏</span> Auto-Resizing Textarea
+                                    </h4>
+                                    <p class="text-sm">The text area automatically expands to fit your content, making it easier to work with long documents.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6. Common Use Cases -->
+                        <div id="use-cases" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">6.</span> Common Use Cases
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">🤖 Cleaning ChatGPT/Claude Outputs</h4>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Remove markdown formatting and citations for clean copy-paste</p>
+                                    <div class="text-xs text-[var(--text-secondary)]">
+                                        <strong>Enable:</strong> Convert MD, Remove Citations
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">🔍 Processing Perplexity Results</h4>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Remove all citations and source references</p>
+                                    <div class="text-xs text-[var(--text-secondary)]">
+                                        <strong>Enable:</strong> Remove Citations, Convert MD
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">🇨🇭 Swiss German Standardization</h4>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Convert ß to ss, remove diacritics, fix quotes</p>
+                                    <div class="text-xs text-[var(--text-secondary)]">
+                                        <strong>Enable:</strong> Language Mapping (Swiss), Remove Diacritics
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">📱 Social Media Text Cleaning</h4>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Remove fancy Unicode fonts and normalize formatting</p>
+                                    <div class="text-xs text-[var(--text-secondary)]">
+                                        <strong>Enable:</strong> Remove Fancy Font, Language Mapping
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">📧 Email Preparation</h4>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Clean AI drafts for professional communication</p>
+                                    <div class="text-xs text-[var(--text-secondary)]">
+                                        <strong>Enable:</strong> All options except Em Dash
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">📄 Document Formatting</h4>
+                                    <p class="text-sm text-[var(--text-secondary)] mb-2">Standardize text for consistent documentation</p>
+                                    <div class="text-xs text-[var(--text-secondary)]">
+                                        <strong>Enable:</strong> Language Mapping, Remove Diacritics
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 7. Privacy & Security -->
+                        <div id="privacy-security" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">7.</span> Privacy & Security
+                            </h3>
+                            <div class="space-y-4 text-[var(--text-secondary)]">
+                                <div class="p-6 bg-green-400/10 border border-green-400/30 rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-3 text-lg">🔒 Privacy Guarantees</h4>
+                                    <ul class="space-y-2">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-300">✓</span>
+                                            <span><strong class="text-[var(--text-primary)]">100% Client-Side:</strong> All text processing happens entirely in your browser. No server communication.</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-300">✓</span>
+                                            <span><strong class="text-[var(--text-primary)]">No Data Transmission:</strong> Your text never leaves your device or gets sent to any server.</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-300">✓</span>
+                                            <span><strong class="text-[var(--text-primary)]">Local Storage Only:</strong> Only your settings preferences are saved (language, enabled options) - never your text content.</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-green-300">✓</span>
+                                            <span><strong class="text-[var(--text-primary)]">No Analytics:</strong> No tracking, no cookies for text data, complete privacy.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 bg-blue-400/10 border border-blue-400/30 rounded-lg">
+                                    <p class="text-sm text-blue-300">
+                                        <strong>💡 Technical Note:</strong> The Optimizer loads language mapping files from local JSON files and processes everything using JavaScript in your browser's memory. It's completely offline-capable once the page loads.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 8. Best Practices -->
+                        <div id="best-practices" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">8.</span> Best Practices & Tips
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                                        <span>🎯</span> For Best Results
+                                    </h4>
+                                    <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
+                                        <li>• Start with fewer options enabled, add more as needed</li>
+                                        <li>• Test different language mappings to find the best fit</li>
+                                        <li>• Review the output before copying to ensure quality</li>
+                                        <li>• Use the experimental em-dash feature cautiously</li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                                        <span>⚡</span> For Efficiency
+                                    </h4>
+                                    <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
+                                        <li>• Save your common settings by using the tool regularly</li>
+                                        <li>• Process large documents in batches if needed</li>
+                                        <li>• Use keyboard shortcuts (Ctrl+A, Ctrl+V, Ctrl+C)</li>
+                                        <li>• Clear input between different text types</li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                                        <span>🇨🇭</span> For Swiss German
+                                    </h4>
+                                    <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
+                                        <li>• Always enable "Remove Diacritics" for proper ä→ae conversion</li>
+                                        <li>• Enable "Apply Language Mapping" for ß→ss and quotes</li>
+                                        <li>• This combination ensures proper Swiss German standardization</li>
+                                        <li>• Works great for official documents and communications</li>
+                                    </ul>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                                        <span>🤖</span> For AI Text
+                                    </h4>
+                                    <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
+                                        <li>• Enable "Convert MD" to remove markdown formatting</li>
+                                        <li>• Enable "Remove Citations" for research-based outputs</li>
+                                        <li>• Check for fancy Unicode if copying from formatted sources</li>
+                                        <li>• Review automated changes before final use</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Resources -->
+                        <div class="p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">📚 Additional Resources</h3>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm text-[var(--text-secondary)]">
+                                <div>
+                                    <h4 class="font-semibold text-[var(--text-primary)] mb-2">Need Help?</h4>
+                                    <ul class="space-y-1">
+                                        <li>• Check the <a href="https://github.com/patrickdobler/asd123.ai" class="text-[var(--primary-color)] hover:underline" target="_blank" rel="noopener">GitHub README</a> for technical details</li>
+                                        <li>• Review the <a href="privacy.html" class="text-[var(--primary-color)] hover:underline">Privacy Policy</a></li>
+                                        <li>• Report issues on <a href="https://github.com/patrickdobler/asd123.ai/issues" class="text-[var(--primary-color)] hover:underline" target="_blank" rel="noopener">GitHub</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-[var(--text-primary)] mb-2">Supported Languages</h4>
+                                    <p>Swiss German, German, French, Italian, English (US), English (International) - with comprehensive character mappings for each.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Call to Action -->
+                        <div class="mt-12 text-center">
+                            <a href="optimizer.html" class="inline-block px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-[var(--primary-color)] to-[var(--secondary-color)] rounded-lg hover:from-[var(--secondary-color)] hover:to-[var(--primary-color)] transition-all duration-300">
+                                Try the Optimizer Now →
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </main>
+
+            <footer class="container mx-auto px-6 py-8">
+                <div class="flex flex-col md:flex-row justify-between items-center text-sm text-[var(--text-secondary)] border-t border-[var(--border-color)] pt-6">
+                    <p>© 2025 ASD123.ai. All rights reserved.</p>
+                    <div class="flex gap-6 mt-4 md:mt-0">
+                        <a class="hover:text-[var(--text-primary)] transition-colors" href="privacy.html">Privacy Policy</a>
+                        <a class="hover:text-[var(--text-primary)] transition-colors" href="#">Terms of Service</a>
+                        <a class="hover:text-[var(--text-primary)] transition-colors" href="contact.html">Contact Us</a>
+                        <div class="flex gap-4 ml-6">
+                            <a class="hover:text-[var(--text-primary)] transition-colors" href="https://github.com/patrickdobler/asd123.ai" target="_blank" rel="noopener" aria-label="GitHub">
+                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                            </a>
+                            <a class="hover:text-[var(--text-primary)] transition-colors" href="#" target="_blank" rel="noopener" aria-label="X (Twitter)">
+                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

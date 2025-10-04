@@ -10,7 +10,9 @@ export default {
       '/about.html': '/about',
       '/contact.html': '/contact',
       '/privacy.html': '/privacy',
-      '/test-optimizer.html': '/test'
+      '/test-optimizer.html': '/test',
+      '/anonymizer-guide.html': '/anonymizer-guide',
+      '/optimizer-guide.html': '/optimizer-guide'
     };
 
     if (redirects[url.pathname]) {
@@ -25,7 +27,9 @@ export default {
       '/about': '/about.html',
       '/contact': '/contact.html',
       '/privacy': '/privacy.html',
-      '/test': '/test-optimizer.html'
+      '/test': '/test-optimizer.html',
+      '/anonymizer-guide': '/anonymizer-guide.html',
+      '/optimizer-guide': '/optimizer-guide.html'
     };
 
     if (cleanUrls[url.pathname]) {
