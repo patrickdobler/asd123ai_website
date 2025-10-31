@@ -7,6 +7,8 @@ services:
     volumes:
       # Mount the entire workspace
       - ..:/workspace:cached
+      # Mount Claude Code config directory to persist authentication
+      - ~/.config/claude-code:/home/node/.config/claude-code:cached
     
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
