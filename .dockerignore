@@ -1,0 +1,48 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Build outputs
+dist
+build
+*.log
+
+# Testing
+coverage
+.nyc_output
+
+# Cloudflare
+.wrangler
+wrangler.toml.local
+
+# Documentation
+*.md
+!README.md
+
+# Other
+.editorconfig
