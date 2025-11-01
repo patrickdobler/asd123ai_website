@@ -1,13 +1,18 @@
-/* ASD123 AI Text Tools - Main Styles */
+/* ASD123 AI Text Tools - E Ink Paper Style */
 
 :root {
-    --bg-color: #1a202c;
-    --glass-bg: rgba(45, 55, 72, 0.5);
-    --border-color: rgba(255, 255, 255, 0.15);
-    --primary-color: #4299e1;
-    --secondary-color: #63b3ed;
-    --text-primary: #edf2f7;
-    --text-secondary: #a0aec0;
+    /* E Ink Color Palette - Paper-like grayscale with improved contrast */
+    --bg-color: #e4e4dc;
+    --paper-texture: #f0f0e8;
+    --glass-bg: rgba(240, 240, 232, 0.9);
+    --border-color: rgba(60, 60, 60, 0.3);
+    --primary-color: #1a1a1a;
+    --secondary-color: #2a2a2a;
+    --text-primary: #0a0a0a;
+    --text-secondary: #3a3a3a;
+    --highlight-color: #000000;
+    --shadow-subtle: rgba(0, 0, 0, 0.12);
+    --eink-refresh: rgba(0, 0, 0, 0.03);
 }
 
 body {
@@ -15,7 +20,7 @@ body {
     background-color: var(--bg-color);
 }
 
-/* Aurora Background - Static (no rotation) */
+/* E Ink Paper Background - Subtle texture */
 .aurora-bg {
     position: fixed;
     top: 50%;
@@ -25,35 +30,34 @@ body {
     height: 200vh;
     z-index: 0;
     background-image:
-        radial-gradient(circle at 20% 20%, rgba(66, 153, 225, 0.25) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(129, 140, 248, 0.2) 0%, transparent 40%),
-        radial-gradient(circle at 50% 90%, rgba(244, 114, 182, 0.15) 0%, transparent 40%);
+        radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.015) 0%, transparent 50%);
+    filter: blur(40px);
     overflow: hidden;
 }
 
-/* Glassmorphism Components */
+/* E Ink Paper Components - Matte finish with E Ink characteristics */
 .liquid-glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 1.5rem;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    transition: all 0.3s ease-in-out;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    border-radius: 0.5rem;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 1px 4px 0 var(--shadow-subtle), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    transition: all 0.2s ease-in-out;
 }
 
 .liquid-glass:hover {
-    /* Removed transform to prevent annoying movement */
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
-    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    border-color: rgba(60, 60, 60, 0.35);
+    background: rgba(242, 242, 234, 0.92);
 }
 
-/* Typography */
+/* Typography - E Ink readable text with strong contrast */
 .text-gradient {
-    background: linear-gradient(135deg, var(--secondary-color), white);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+    background: none;
+    -webkit-text-fill-color: var(--text-primary);
 }
 
 .main-title {
@@ -72,33 +76,34 @@ body {
     color: var(--text-secondary);
 }
 
-/* Buttons */
+/* Buttons - E Ink matte style */
 .btn {
     padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
     font-weight: 600;
-    transition: all 0.3s ease-in-out;
-    border: none;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid var(--border-color);
     cursor: pointer;
 }
 
 .btn--primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+    background: var(--text-primary);
+    color: var(--paper-texture);
+    box-shadow: 0 2px 6px var(--shadow-subtle);
+    border-color: var(--text-primary);
 }
 
 .btn--primary:hover {
-    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-    /* Removed transform for better UX */
-    box-shadow: 0 6px 16px rgba(66, 153, 225, 0.4);
+    background: var(--highlight-color);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    border-color: var(--highlight-color);
 }
 
 /* Navigation */
 .nav-link {
     color: var(--text-secondary);
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color 0.2s ease;
 }
 
 .nav-link:hover,
@@ -106,24 +111,26 @@ body {
     color: var(--text-primary);
 }
 
-/* Form Controls */
+/* Form Controls - E Ink paper style */
 .form-control {
-    background: var(--glass-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 2px solid var(--border-color);
+    border-radius: 0.25rem;
     color: var(--text-primary);
     padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .form-control::placeholder {
     color: var(--text-secondary);
+    opacity: 0.7;
 }
 
 /* Utility Classes */
@@ -161,8 +168,13 @@ body {
     }
     
     .aurora-bg {
-        width: 300vw;
-        height: 300vh;
+        width: 250vw;
+        height: 250vh;
+    }
+    
+    body {
+        font-size: 16px;
+        line-height: 1.7;
     }
 }
 

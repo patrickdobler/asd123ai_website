@@ -484,13 +484,15 @@ class UIController {
             maxWidth: '400px'
         });
 
-        // Set background color based on type
+        // Set background color based on type - E Ink theme
         const colors = {
-            error: '#ef4444',
-            success: '#22c55e',
-            info: '#4299e1'
+            error: 'rgba(60, 60, 60, 0.95)',
+            success: 'rgba(40, 40, 40, 0.95)',
+            info: 'rgba(50, 50, 50, 0.95)'
         };
         notification.style.backgroundColor = colors[type] || colors.info;
+        notification.style.color = '#e4e4dc';
+        notification.style.border = '2px solid rgba(10, 10, 10, 0.6)';
 
         // Add to document
         document.body.appendChild(notification);

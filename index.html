@@ -31,10 +31,7 @@
 <div class="relative z-10 flex flex-col min-h-screen">
 <header class="container mx-auto px-6 py-5">
 <nav class="flex items-center justify-between">
-<a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-<svg class="h-8 w-8 text-[var(--primary-color)]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
+<a href="index.html" class="hover:opacity-80 transition-opacity">
 <h1 class="text-2xl font-bold text-[var(--text-primary)]">ASD123.ai</h1>
 </a>
 <div class="flex items-center justify-center flex-1">
@@ -48,7 +45,7 @@
 </header>
 <main class="flex-grow flex flex-col items-center justify-center container mx-auto px-6 py-16 md:py-24">
 <div class="w-full text-center mb-12">
-<h2 class="main-title text-5xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-300 mb-4">
+<h2 class="main-title text-5xl md:text-7xl font-black tracking-tighter text-[var(--text-primary)] mb-4">
 AI Text Processing
 </h2>
 <p class="text-lg md:text-xl text-[var(--text-secondary)] max-w-3xl mx-auto">
@@ -58,7 +55,7 @@ AI Text Processing
 <div class="grid md:grid-cols-2 gap-8 w-full max-w-5xl">
 <a class="block" href="optimizer.html">
 <div class="liquid-glass p-8 md:p-12 h-full">
-<h3 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-[var(--secondary-color)] to-white mb-4">
+<h3 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4">
                                 Optimizer
                             </h3>
 <p class="text-md text-[var(--text-secondary)]">
@@ -70,10 +67,10 @@ AI Text Processing
 <a class="block" href="anonymizer.html">
 <div class="liquid-glass p-8 md:p-12 h-full">
 <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-<h3 class="min-w-0 text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-[var(--secondary-color)] to-white">
+<h3 class="min-w-0 text-3xl md:text-4xl font-bold text-[var(--text-primary)]">
                                 Anonymizer
                                 </h3>
-<span class="text-xs font-semibold uppercase tracking-wider bg-blue-400/20 text-blue-300 px-3 py-1 rounded-full whitespace-nowrap shrink-0">PREVIEW</span>
+<span class="text-xs font-bold uppercase tracking-wider bg-[rgba(10,10,10,0.08)] text-[var(--text-primary)] px-3 py-1 rounded-sm border-2 border-[var(--border-color)] whitespace-nowrap shrink-0">PREVIEW</span>
 </div>
 <p class="text-md text-[var(--text-secondary)]">
                                 Safeguard sensitive information with our upcoming PII anonymizer and deanonymizer tool. Confidently process text knowing your privacy is always paramount.
@@ -84,8 +81,8 @@ AI Text Processing
 <div class="mt-16 text-center max-w-3xl mx-auto">
 <div class="liquid-glass p-8">
 <div class="flex items-center justify-center mb-4">
-<svg class="h-10 w-10 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<svg class="h-10 w-10 text-[var(--text-primary)] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
 </svg>
 <h3 class="text-2xl font-bold text-[var(--text-primary)]">Made in Switzerland for Privacy</h3>
 </div>
