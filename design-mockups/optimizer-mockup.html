@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimizer - Modernized Mockup | ASD123.ai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           MODERNIZED E-INK DESIGN SYSTEM
+           ======================================== */
+
+        :root {
+            /* Base E-Ink Palette */
+            --bg-color: #e4e4dc;
+            --paper-texture: #f0f0e8;
+            --glass-bg: rgba(240, 240, 232, 0.9);
+            --border-color: rgba(60, 60, 60, 0.3);
+            --text-primary: #0a0a0a;
+            --text-secondary: #3a3a3a;
+            --primary-color: #1a1a1a;
+
+            /* Enhanced Semantic Colors */
+            --hover-bg: rgba(10, 10, 10, 0.04);
+            --active-bg: rgba(10, 10, 10, 0.08);
+            --focus-ring: rgba(10, 10, 10, 0.15);
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.16);
+
+            /* Spacing Scale */
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-12: 48px;
+            --space-16: 64px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .aurora-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200vw;
+            height: 200vh;
+            z-index: 0;
+            background-image:
+                radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.015) 0%, transparent 50%);
+            filter: blur(40px);
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            padding: var(--space-6) var(--space-8);
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            text-decoration: none;
+            transition: opacity 200ms ease;
+        }
+
+        .logo-link:hover {
+            opacity: 0.8;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 200ms ease;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: var(--space-12) var(--space-8);
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Page Title */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-12);
+        }
+
+        .page-title {
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-4);
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        main {
+            max-width: 1280px;
+        }
+
+        .page-subtitle strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Card Container */
+        .card {
+            background: var(--glass-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-8);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-sm), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Text Area Section */
+        .textarea-label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: var(--space-4);
+        }
+
+        .label-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .textarea-field {
+            width: 100%;
+            min-height: 400px;
+            padding: var(--space-4);
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            resize: vertical;
+            transition: all 150ms ease;
+        }
+
+        .textarea-field:focus {
+            outline: none;
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .textarea-field::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .textarea-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--space-3);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .privacy-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .privacy-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Button Group */
+        .button-group {
+            display: flex;
+            gap: var(--space-3);
+            justify-content: center;
+            margin-bottom: var(--space-6);
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 200ms ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--paper-texture);
+            border-color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background: #1a1a1a;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(60, 60, 60, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            color: #b91c1c;
+            border-color: rgba(185, 28, 28, 0.3);
+        }
+
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Control Panel */
+        .controls-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: var(--space-6);
+        }
+
+        /* Language Selector */
+        .form-group {
+            margin-bottom: var(--space-6);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: var(--space-2);
+        }
+
+        .select-field {
+            padding: 10px var(--space-4);
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 150ms ease;
+            min-width: 280px;
+        }
+
+        .select-field:focus {
+            outline: none;
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        /* Toggle Sections */
+        .toggle-section {
+            margin-bottom: var(--space-8);
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-3);
+            padding-left: var(--space-2);
+        }
+
+        .toggle-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-3);
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            transition: all 150ms ease;
+        }
+
+        .toggle-item:hover {
+            background: rgba(255, 255, 255, 0.7);
+            border-color: rgba(60, 60, 60, 0.35);
+        }
+
+        .toggle-content {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            flex: 1;
+        }
+
+        .toggle-label {
+            font-weight: 500;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .badge-experimental {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: rgba(10, 10, 10, 0.12);
+            color: var(--text-primary);
+            padding: 3px 8px;
+            border-radius: 3px;
+            border: 1.5px solid var(--text-primary);
+        }
+
+        .info-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+            cursor: help;
+            transition: color 150ms ease;
+        }
+
+        .info-icon:hover {
+            color: var(--text-primary);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .toggle-input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(200, 200, 200, 0.6);
+            border-radius: 28px;
+            border: 2px solid var(--border-color);
+            transition: all 200ms ease;
+        }
+
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            transition: all 200ms ease;
+        }
+
+        .toggle-input:checked + .toggle-slider {
+            background: var(--text-primary);
+            border-color: var(--text-primary);
+        }
+
+        .toggle-input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+            background: var(--paper-texture);
+        }
+
+        .toggle-input:focus-visible + .toggle-slider {
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        /* Divider */
+        .section-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: var(--space-6) 0;
+            opacity: 0.5;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 2px solid var(--border-color);
+            padding: var(--space-8);
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-6);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--space-6);
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 200ms ease;
+        }
+
+        .footer-link:hover {
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main {
+                padding: var(--space-8) var(--space-4);
+            }
+
+            .page-title {
+                font-size: 40px;
+            }
+
+            .page-subtitle {
+                font-size: 16px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .card {
+                padding: var(--space-6);
+            }
+
+            .toggle-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+
+            .toggle-content {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="aurora-bg"></div>
+
+    <div class="content-wrapper">
+        <header>
+            <nav>
+                <a href="index.html" class="logo-link">
+                    <span class="logo-text">ASD123.ai</span>
+                </a>
+
+                <div class="nav-links">
+                    <a href="documentation.html" class="nav-link">Documentation</a>
+                    <a href="about.html" class="nav-link">About</a>
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <div class="page-header">
+                <h1 class="page-title">Optimizer</h1>
+                <p class="page-subtitle">
+                    Clean up and standardize AI-generated text, fix encoding or character issues, and ensure smooth integration for any region or workflow. All processing happens <strong>securely in your browser</strong> — no text ever leaves your device.
+                </p>
+            </div>
+
+            <!-- Text Input Area -->
+            <div class="card">
+                <label class="textarea-label" for="text-input">
+                    <svg class="label-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                    </svg>
+                    Input Text
+                </label>
+                <textarea id="text-input" class="textarea-field" placeholder="Paste your AI-generated text here to clean and optimize it...
+
+Example text with issues:
+• Text with diacrítics and spëcial characters
+• **Bold markdown** and *italic* formatting
+• Citation references [1] and (Source: Example.com)
+• Fancy 𝐔𝐧𝐢𝐜𝐨𝐝𝐞 text styles
+• Long sentences with em dashes — that could be split
+
+All processing happens entirely in your browser for complete privacy."></textarea>
+                <div class="textarea-footer">
+                    <div class="privacy-badge">
+                        <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <span>Privacy-protected: Text never leaves your device</span>
+                    </div>
+                    <span>0 characters</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <button class="btn btn-primary">
+                    <!-- Lucide: Wand Icon -->
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 4V2"/>
+                        <path d="M15 16v-2"/>
+                        <path d="M8 9h2"/>
+                        <path d="M20 9h2"/>
+                        <path d="M17.8 11.8 19 13"/>
+                        <path d="M15 9h0"/>
+                        <path d="M17.8 6.2 19 5"/>
+                        <path d="m3 21 9-9"/>
+                        <path d="M12.2 6.2 11 5"/>
+                    </svg>
+                    Clean Text Now
+                </button>
+                <button class="btn btn-secondary">
+                    <!-- Lucide: Copy Icon -->
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                    </svg>
+                    Copy to Clipboard
+                </button>
+                <button class="btn btn-ghost">
+                    <!-- Lucide: X Icon -->
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18"/>
+                        <path d="m6 6 12 12"/>
+                    </svg>
+                    Clear Input
+                </button>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="card">
+                <h2 class="controls-header">Processing Options</h2>
+
+                <!-- Language Mapping -->
+                <div class="form-group">
+                    <label class="form-label" for="language-select">Language Mapping</label>
+                    <select id="language-select" class="select-field">
+                        <option value="swiss-german">Swiss German</option>
+                        <option value="german">German</option>
+                        <option value="french">French</option>
+                        <option value="italian">Italian</option>
+                        <option value="english-international">English (International)</option>
+                        <option value="english-us">English (US)</option>
+                    </select>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Character Processing Section -->
+                <div class="toggle-section">
+                    <div class="section-label">Character Processing</div>
+                    <div class="toggle-list">
+                        <div class="toggle-item">
+                            <div class="toggle-content">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" class="toggle-input">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Apply Language Character Mapping</span>
+                                <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4"/>
+                                    <path d="M12 8h.01"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-content">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" class="toggle-input">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Remove Diacritics</span>
+                                <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4"/>
+                                    <path d="M12 8h.01"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-content">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" class="toggle-input">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Remove Fancy Text Font</span>
+                                <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4"/>
+                                    <path d="M12 8h.01"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Content Cleaning Section -->
+                <div class="toggle-section">
+                    <div class="section-label">Content Cleaning</div>
+                    <div class="toggle-list">
+                        <div class="toggle-item">
+                            <div class="toggle-content">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" class="toggle-input">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Remove Citation References</span>
+                                <span class="badge-experimental">Experimental</span>
+                                <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4"/>
+                                    <path d="M12 8h.01"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-content">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" class="toggle-input">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Convert MD to Normal Text</span>
+                                <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4"/>
+                                    <path d="M12 8h.01"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="toggle-item">
+                            <div class="toggle-content">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" class="toggle-input">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Replace em dash with new sentence</span>
+                                <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4"/>
+                                    <path d="M12 8h.01"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+            </div>
+        </main>
+
+        <footer role="contentinfo">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>&copy; 2025 ASD123.ai. All rights reserved.</p>
+                    <div class="privacy-inline">
+                        <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                            <path d="m9 12 2 2 4-4"/>
+                        </svg>
+                        <span>100% Local Processing</span>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                    <a href="contact.html" class="footer-link">Contact</a>
+
+                    <div class="social-links">
+                        <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" target="_blank" rel="noopener" aria-label="X (Twitter)">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

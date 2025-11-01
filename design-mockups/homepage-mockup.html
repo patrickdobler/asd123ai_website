@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASD123.ai - Modernized Homepage Mockup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           MODERNIZED E-INK DESIGN SYSTEM
+           ======================================== */
+
+        :root {
+            /* Base E-Ink Palette */
+            --bg-color: #e4e4dc;
+            --paper-texture: #f0f0e8;
+            --glass-bg: rgba(240, 240, 232, 0.9);
+            --border-color: rgba(60, 60, 60, 0.3);
+            --text-primary: #0a0a0a;
+            --text-secondary: #3a3a3a;
+            --primary-color: #1a1a1a;
+
+            /* Enhanced Semantic Colors */
+            --hover-bg: rgba(10, 10, 10, 0.04);
+            --active-bg: rgba(10, 10, 10, 0.08);
+            --focus-ring: rgba(10, 10, 10, 0.15);
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.16);
+
+            /* Spacing Scale (4px base) */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-12: 48px;
+            --space-16: 64px;
+            --space-24: 96px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Subtle paper texture background */
+        .aurora-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200vw;
+            height: 200vh;
+            z-index: 0;
+            background-image:
+                radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.015) 0%, transparent 50%);
+            filter: blur(40px);
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ========================================
+           HEADER & NAVIGATION
+           ======================================== */
+
+        header {
+            padding: var(--space-6) var(--space-8);
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            text-decoration: none;
+            transition: opacity 200ms ease;
+        }
+
+        .logo-link:hover {
+            opacity: 0.8;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            color: var(--primary-color);
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-8);
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 200ms ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link:focus-visible {
+            outline: 2px solid var(--text-primary);
+            outline-offset: 4px;
+            border-radius: 2px;
+        }
+
+        /* ========================================
+           HERO SECTION
+           ======================================== */
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-24) var(--space-8);
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: var(--space-16);
+            max-width: 900px;
+        }
+
+        .hero-title {
+            font-size: 72px;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+        }
+
+        /* Subtle decorative element */
+        .title-underline {
+            width: 64px;
+            height: 2px;
+            background: var(--text-primary);
+            margin: var(--space-6) auto;
+            opacity: 0.3;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ========================================
+           FEATURE CARDS
+           ======================================== */
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-12);
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: var(--space-16);
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--space-12);
+            transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            box-shadow: var(--shadow-sm), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+            border-color: rgba(60, 60, 60, 0.4);
+            background: rgba(242, 242, 234, 0.92);
+        }
+
+        .feature-card:focus-visible {
+            outline: 2px solid var(--text-primary);
+            outline-offset: 4px;
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: var(--space-6);
+            gap: var(--space-4);
+        }
+
+        .feature-title-group {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            flex: 1;
+        }
+
+        .feature-icon {
+            width: 28px;
+            height: 28px;
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+
+        .feature-title {
+            font-size: 40px;
+            font-weight: 900;
+            color: var(--text-primary);
+            letter-spacing: -0.015em;
+        }
+
+        .feature-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: rgba(10, 10, 10, 0.08);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 3px;
+            border: 2px solid var(--border-color);
+            white-space: nowrap;
+            align-self: flex-start;
+        }
+
+        .feature-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ========================================
+           FOOTER
+           ======================================== */
+
+        footer {
+            border-top: 2px solid var(--border-color);
+            padding: var(--space-8) var(--space-8);
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-6);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+            flex-wrap: wrap;
+        }
+
+        .privacy-inline {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .privacy-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--space-6);
+            align-items: center;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 200ms ease;
+        }
+
+        .footer-link:hover {
+            color: var(--text-primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: var(--space-4);
+            margin-left: var(--space-6);
+        }
+
+        .social-link {
+            color: var(--text-secondary);
+            transition: color 200ms ease;
+        }
+
+        .social-link:hover {
+            color: var(--text-primary);
+        }
+
+        .social-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ========================================
+           RESPONSIVE DESIGN
+           ======================================== */
+
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: 56px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+
+            .feature-title {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: var(--space-4) var(--space-4);
+            }
+
+            main {
+                padding: var(--space-12) var(--space-4);
+            }
+
+            .nav-links {
+                gap: var(--space-4);
+            }
+
+            .hero-title {
+                font-size: 40px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-6);
+            }
+
+            .feature-card {
+                padding: var(--space-8);
+            }
+
+            .feature-title {
+                font-size: 32px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-left {
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ========================================
+           ACCESSIBILITY
+           ======================================== */
+
+        .skip-to-main {
+            position: absolute;
+            left: -9999px;
+            z-index: 999;
+            padding: var(--space-3) var(--space-4);
+            background: var(--text-primary);
+            color: var(--paper-texture);
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .skip-to-main:focus {
+            left: 50%;
+            transform: translateX(-50%);
+            top: var(--space-4);
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-to-main">Skip to main content</a>
+
+    <div class="aurora-bg"></div>
+
+    <div class="content-wrapper">
+        <header>
+            <nav role="navigation" aria-label="Main navigation">
+                <a href="index.html" class="logo-link" aria-label="ASD123.ai Home">
+                    <!-- Lucide: Zap Icon -->
+                    <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+                    </svg>
+                    <span class="logo-text">ASD123.ai</span>
+                </a>
+
+                <div class="nav-links">
+                    <a href="documentation.html" class="nav-link">Documentation</a>
+                    <a href="about.html" class="nav-link">About</a>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main" role="main">
+            <section class="hero-section">
+                <h1 class="hero-title">AI Text Processing</h1>
+                <div class="title-underline" aria-hidden="true"></div>
+                <p class="hero-subtitle">
+                    Tools to clean and adapt AI-generated text for your region. Built for privacy, speed, and reliability.
+                </p>
+            </section>
+
+            <div class="features-grid">
+                <a href="optimizer.html" class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-title-group">
+                            <!-- Lucide: Wand Icon -->
+                            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 4V2"/>
+                                <path d="M15 16v-2"/>
+                                <path d="M8 9h2"/>
+                                <path d="M20 9h2"/>
+                                <path d="M17.8 11.8 19 13"/>
+                                <path d="M15 9h0"/>
+                                <path d="M17.8 6.2 19 5"/>
+                                <path d="m3 21 9-9"/>
+                                <path d="M12.2 6.2 11 5"/>
+                            </svg>
+                            <h2 class="feature-title">Optimizer</h2>
+                        </div>
+                    </div>
+                    <p class="feature-description">
+                        Effortlessly clean up and standardize AI-generated text by replacing special characters, fixing encoding issues, and ensuring smooth integration for any region or workflow. Perfect for Swiss users, ready for the world.
+                    </p>
+                </a>
+
+                <a href="anonymizer.html" class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-title-group">
+                            <!-- Lucide: Shield Check Icon -->
+                            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                                <path d="m9 12 2 2 4-4"/>
+                            </svg>
+                            <h2 class="feature-title">Anonymizer</h2>
+                        </div>
+                        <span class="feature-badge">Preview</span>
+                    </div>
+                    <p class="feature-description">
+                        Safeguard sensitive information with our upcoming PII anonymizer and deanonymizer tool. Confidently process text knowing your privacy is always paramount.
+                    </p>
+                </a>
+            </div>
+        </main>
+
+        <footer role="contentinfo">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>&copy; 2025 ASD123.ai. All rights reserved.</p>
+                    <div class="privacy-inline">
+                        <!-- Lucide: Shield Check Icon -->
+                        <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                            <path d="m9 12 2 2 4-4"/>
+                        </svg>
+                        <span>100% Local Processing</span>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                    <a href="contact.html" class="footer-link">Contact</a>
+
+                    <div class="social-links">
+                        <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" target="_blank" rel="noopener" aria-label="X (Twitter)">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
