@@ -2,6 +2,11 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // Handle Chrome DevTools requests gracefully
+    if (url.pathname.startsWith('/.well-known/')) {
+      return new Response(null, { status: 204 });
+    }
+
     // Clean URL redirects
     const redirects = {
       '/index.html': '/',

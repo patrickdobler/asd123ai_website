@@ -13,11 +13,58 @@
     --highlight-color: #000000;
     --shadow-subtle: rgba(0, 0, 0, 0.12);
     --eink-refresh: rgba(0, 0, 0, 0.03);
+
+    /* Enhanced Semantic Colors */
+    --hover-bg: rgba(10, 10, 10, 0.04);
+    --active-bg: rgba(10, 10, 10, 0.08);
+    --focus-ring: rgba(10, 10, 10, 0.15);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.16);
+
+    /* Spacing Scale (4px base) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-24: 96px;
+
+    /* Typography Scale */
+    --text-5xl: 56px;
+    --text-4xl: 40px;
+    --text-3xl: 32px;
+    --text-2xl: 24px;
+    --text-xl: 20px;
+    --text-lg: 18px;
+    --text-base: 16px;
+    --text-sm: 14px;
+    --text-xs: 12px;
+    
+    /* Additional Spacing for E-Ink Design */
+    --border-radius: 8px;
+    --border-radius-sm: 6px;
+    --border-radius-xs: 4px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* E Ink Paper Background - Subtle texture */
@@ -74,6 +121,33 @@ body {
 
 .text-secondary {
     color: var(--text-secondary);
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Skip to Main Link */
+.skip-to-main {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: var(--space-3) var(--space-4);
+    background: var(--text-primary);
+    color: var(--paper-texture);
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.skip-to-main:focus {
+    left: 50%;
+    transform: translateX(-50%);
+    top: var(--space-4);
 }
 
 /* Buttons - E Ink matte style */

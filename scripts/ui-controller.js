@@ -155,6 +155,9 @@ class UIController {
         const viewToggleBtn2 = document.getElementById('viewToggleBtn2');
         
         if (viewToggleBtn2) {
+            // Initialize button with correct icon based on initial state
+            this.updateViewToggleButtons();
+            
             viewToggleBtn2.addEventListener('click', () => {
                 this.currentView = this.currentView === 'tiles' ? 'list' : 'tiles';
                 this.updateViewToggleButtons();
@@ -187,7 +190,22 @@ class UIController {
         const viewToggleBtn2 = document.getElementById('viewToggleBtn2');
         
         const newText = this.currentView === 'tiles' ? 'List View' : 'Tiles View';
-        const newIcon = this.currentView === 'tiles' ? '🔲' : '📋';
+        // SVG for list view
+        const listViewSVG = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" x2="21" y1="6" y2="6"/>
+            <line x1="8" x2="21" y1="12" y2="12"/>
+            <line x1="8" x2="21" y1="18" y2="18"/>
+            <line x1="3" x2="3.01" y1="6" y2="6"/>
+            <line x1="3" x2="3.01" y1="12" y2="12"/>
+            <line x1="3" x2="3.01" y1="18" y2="18"/>
+        </svg>`;
+        // SVG for tiles view
+        const tilesViewSVG = `<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="7" height="7" x="3" y="3" rx="1"/>
+            <rect width="7" height="7" x="14" y="3" rx="1"/>
+            <rect width="7" height="7" x="14" y="14" rx="1"/>
+            <rect width="7" height="7" x="3" y="14" rx="1"/>
+        </svg>`;
         
         if (viewToggleText2) {
             viewToggleText2.textContent = newText;
@@ -195,7 +213,11 @@ class UIController {
         
         if (viewToggleBtn2) {
             const icon = viewToggleBtn2.querySelector('.btn-icon');
-            if (icon) icon.textContent = newIcon;
+            if (icon) {
+                // Replace the SVG instead of using textContent
+                const newSVG = this.currentView === 'tiles' ? listViewSVG : tilesViewSVG;
+                icon.outerHTML = newSVG;
+            }
         }
     }
 
@@ -400,8 +422,10 @@ class UIController {
             if (show) {
                 statusElement.textContent = message;
                 statusElement.style.color = 'var(--primary-color)';
+                statusElement.style.display = 'block';
             } else {
                 statusElement.textContent = '';
+                statusElement.style.display = 'none';
             }
         }
     }
@@ -415,10 +439,10 @@ class UIController {
         if (anonymizeBtn) {
             if (show) {
                 anonymizeBtn.disabled = true;
-                anonymizeBtn.innerHTML = '<span class="btn-icon">⏳</span> Processing...';
+                anonymizeBtn.classList.add('processing');
             } else {
                 anonymizeBtn.disabled = false;
-                anonymizeBtn.innerHTML = '<span class="btn-icon">🛡️</span> Anonymize';
+                anonymizeBtn.classList.remove('processing');
             }
         }
     }
@@ -469,22 +493,23 @@ class UIController {
         notification.className = `notification notification-${type}`;
         notification.textContent = message;
 
-        // Style notification
+        // Style notification - smaller and consistent with optimizer
         Object.assign(notification.style, {
             position: 'fixed',
             top: '20px',
             right: '20px',
-            padding: '1rem 1.5rem',
-            borderRadius: '8px',
+            padding: '0.75rem 1rem',
+            borderRadius: '6px',
             color: 'white',
             fontWeight: '500',
+            fontSize: '14px',
             zIndex: '9999',
             animation: 'slideInRight 0.3s ease-out',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-            maxWidth: '400px'
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+            maxWidth: '350px'
         });
 
-        // Set background color based on type - E Ink theme
+        // Set background color based on type - E Ink theme (consistent)
         const colors = {
             error: 'rgba(60, 60, 60, 0.95)',
             success: 'rgba(40, 40, 40, 0.95)',
@@ -492,7 +517,7 @@ class UIController {
         };
         notification.style.backgroundColor = colors[type] || colors.info;
         notification.style.color = '#e4e4dc';
-        notification.style.border = '2px solid rgba(10, 10, 10, 0.6)';
+        notification.style.border = '1px solid rgba(10, 10, 10, 0.4)';
 
         // Add to document
         document.body.appendChild(notification);

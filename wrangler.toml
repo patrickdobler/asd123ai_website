@@ -16,5 +16,5 @@ name = "asd123-website-dev"
 
 routes = [{ pattern = "asd123.ai/*", zone_name = "asd123.ai" }]
 
-[build]
+[env.production.build]
 command = "npm run build"
