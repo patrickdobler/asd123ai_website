@@ -13,8 +13,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-# Install claude-code CLI globally
-RUN npm install -g @anthropic-ai/claude-code
+# Install claude-code and Google Gemini CLI globally
+RUN npm install -g @anthropic-ai/claude-code @google/gemini-cli
 
 # Create workspace directory and set ownership
 WORKDIR /workspace

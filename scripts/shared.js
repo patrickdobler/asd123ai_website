@@ -1,5 +1,54 @@
 // ASD123.ai AI Text Tools - Shared JavaScript
 
+// Theme Manager
+class ThemeManager {
+    constructor() {
+        this.theme = localStorage.getItem('theme') || 'light';
+        this.applyTheme(this.theme);
+        this.initToggle();
+    }
+
+    applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        this.updateToggleState(theme);
+    }
+
+    toggleTheme() {
+        const newTheme = this.theme === 'light' ? 'dark' : 'light';
+        this.theme = newTheme;
+        this.applyTheme(newTheme);
+    }
+
+    initToggle() {
+        // Wait for DOM to be ready to find the toggle
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.setupToggleListener());
+        } else {
+            this.setupToggleListener();
+        }
+    }
+
+    setupToggleListener() {
+        const toggle = document.getElementById('theme-toggle');
+        if (toggle) {
+            // Remove existing listener to prevent duplicates if called multiple times
+            const newToggle = toggle.cloneNode(true);
+            toggle.parentNode.replaceChild(newToggle, toggle);
+            
+            newToggle.addEventListener('change', () => this.toggleTheme());
+            this.updateToggleState(this.theme);
+        }
+    }
+
+    updateToggleState(theme) {
+        const toggle = document.getElementById('theme-toggle');
+        if (toggle) {
+            toggle.checked = theme === 'dark';
+        }
+    }
+}
+
 // Navigation Manager
 class NavigationManager {
     constructor() {
@@ -98,9 +147,15 @@ class PrivacyNotice {
 }
 
 // Initialize shared components when DOM is loaded
+// Initialize theme immediately to prevent flash
+const themeManager = new ThemeManager();
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize navigation
     new NavigationManager();
+    
+    // Re-initialize toggle listener in case it wasn't found earlier
+    themeManager.setupToggleListener();
     
     // Initialize character counter if elements exist
     if (document.getElementById('optimizer-textarea')) {
@@ -127,5 +182,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { NavigationManager, utils, CharacterCounter, PrivacyNotice };
+    module.exports = { NavigationManager, utils, CharacterCounter, PrivacyNotice, ThemeManager };
 }
