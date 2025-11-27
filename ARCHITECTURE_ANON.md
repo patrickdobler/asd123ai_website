@@ -15,10 +15,32 @@ Build a privacy-focused text anonymization tool that processes all data locally 
 - File upload support for `.txt`, `.docx`, `.pdf` files
 - Drag-and-drop functionality for files
 
-### 3. Processing Models
-- **Fast Mode** (Regex-based): "Quick Scan" - Instant pattern matching
-- **AI English**: Using `ai4privacy/llama-ai4privacy-english-anonymiser-openpii`
-- **AI Multilingual**: Using `ai4privacy/llama-ai4privacy-multilingual-anonymiser-openpii`
+### 3. Processing Models - CRITICAL DISTINCTION
+
+**IMPORTANT**: The three processing modes use fundamentally different detection approaches:
+
+#### Quick Scan (Pattern Matching) - FREE
+- **Technology**: Regex-based pattern matching
+- **Approach**: Predefined regular expression patterns for common PII types
+- **Speed**: Instant processing
+- **Accuracy**: High for structured data (emails, phones, SSNs), lower for names/context-dependent entities
+- **NO AI MODEL LOADING** - works immediately
+
+#### AI English (Advanced Detection) - PRO
+- **Technology**: Local LLM token classification using `@huggingface/transformers`
+- **Model**: `ai4privacy/llama-ai4privacy-english-anonymiser-openpii`
+- **Approach**: Token-level BIO tagging (B-PRIVATE, I-PRIVATE, O)
+- **Speed**: Requires initial model download (~50-100MB), then real-time processing
+- **Accuracy**: Superior context-aware detection, understands semantic meaning
+- **DOES NOT USE REGEX PATTERNS** - pure AI-based detection
+
+#### AI Multilingual (Multiple Languages) - PRO
+- **Technology**: Local LLM token classification using `@huggingface/transformers`
+- **Model**: `ai4privacy/llama-ai4privacy-multilingual-anonymiser-openpii`
+- **Approach**: Token-level BIO tagging (B-PRIVATE, I-PRIVATE, O)
+- **Speed**: Requires initial model download (~100-200MB), then real-time processing
+- **Accuracy**: Handles multiple languages with context-aware detection
+- **DOES NOT USE REGEX PATTERNS** - pure AI-based detection
 
 ### 4. Output Features
 - Anonymized text display with placeholder format: `[ENTITY_TYPE_N]`
@@ -162,75 +184,326 @@ class EntityManager {
 }
 ```
 
-#### AI Model Integration (from HuggingFace approach, enhanced)
+#### AI Model Integration - Token Classification Approach (CORRECTED)
+
+**IMPORTANT**: This section describes the **actual** AI-based PII detection using token classification.
+This is **completely different** from regex pattern matching. The AI models use BIO tagging
+(Beginning-Inside-Outside) to classify each token as sensitive or not.
+
+##### Model Architecture Overview
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    AI PII Detection Pipeline                        │
+├─────────────────────────────────────────────────────────────────────┤
+│  Input Text ──► Tokenization ──► Model Inference ──► BIO Tagging   │
+│                                                            │        │
+│                                                            ▼        │
+│  Output Text ◄── Text Masking ◄── Token Aggregation ◄── Softmax   │
+└─────────────────────────────────────────────────────────────────────┘
+
+BIO Tagging Classes:
+  - B-PRIVATE (0): Beginning of a private/sensitive entity
+  - I-PRIVATE (1): Inside/continuation of a private entity
+  - O (2): Outside - not sensitive information
+```
+
+##### Complete AIModelProcessor Implementation
 ```javascript
-// Model loader with transformers.js
-import { AutoModel, AutoTokenizer } from '@huggingface/transformers';
+// model-loader.js - AI Model Processor with Token Classification
+// Based on ai4privacy reference implementation
 
-class AIModelProcessor {
-  constructor() {
-    this.tokenizer = null;
-    this.model = null;
-    this.modelLoaded = false;
-    this.currentModel = null;
+import { AutoModel, AutoTokenizer } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0';
+
+let tokenizer, model;
+let isModelLoaded = false;
+let currentModelName = null;
+
+/**
+ * Load AI model for privacy detection
+ * @param {string} modelName - 'ai-english' or 'ai-multilingual'
+ */
+async function loadModel(modelName = 'ai-english') {
+  const modelPath = modelName === 'ai-english'
+    ? 'ai4privacy/llama-ai4privacy-english-anonymiser-openpii'
+    : 'ai4privacy/llama-ai4privacy-multilingual-anonymiser-openpii';
+  
+  try {
+    updateLoadingStatus('Loading tokenizer...');
+    tokenizer = await AutoTokenizer.from_pretrained(modelPath);
+    
+    updateLoadingStatus('Loading model (this may take a moment)...');
+    model = await AutoModel.from_pretrained(modelPath, { dtype: "q8" });
+    
+    isModelLoaded = true;
+    currentModelName = modelName;
+    updateLoadingStatus('Model ready');
+    
+  } catch (err) {
+    console.error("Error loading model:", err);
+    isModelLoaded = false;
+    updateLoadingStatus('Model loading failed');
+    throw err;
+  }
+}
+
+/**
+ * Process text using the AI model for PII detection
+ * This is the CORE FUNCTION that replaces regex-based detection for AI modes
+ *
+ * @param {string} text - Input text to analyze
+ * @param {number} threshold - Sensitivity threshold (0-1, default 0.3)
+ * @returns {Object} - { maskedText, replacements }
+ */
+async function processText(text, threshold = 0.3) {
+  if (!isModelLoaded) {
+    throw new Error('Model not loaded');
+  }
+  
+  // Step 1: Tokenize the input text
+  const inputs = await tokenizer(text);
+  const inputTokens = inputs.input_ids.data;
+  
+  // Step 2: Decode each token to its string representation
+  const tokenStrings = Array.from(inputTokens).map(id =>
+    tokenizer.decode([id], { skip_special_tokens: false })
+  );
+
+  // Step 3: Run model inference to get logits
+  const { logits } = await model(inputs);
+  const logitsData = Array.from(logits.data);
+  const numTokens = tokenStrings.length;
+  const numClasses = 3; // B-PRIVATE, I-PRIVATE, O
+
+  // Step 4: Reshape logits per token
+  const logitsPerToken = [];
+  for (let i = 0; i < numTokens; i++) {
+    logitsPerToken.push(logitsData.slice(i * numClasses, (i + 1) * numClasses));
   }
 
-  async loadModel(modelName) {
-    const modelPath = modelName === 'ai-english' 
-      ? 'ai4privacy/llama-ai4privacy-english-anonymiser-openpii'
-      : 'ai4privacy/llama-ai4privacy-multilingual-anonymiser-openpii';
+  // Step 5: Apply softmax and create token predictions
+  const tokenPredictions = tokenStrings.map((token, i) => {
+    const probs = softmax(logitsPerToken[i]);
+    const maxSensitive = Math.max(probs[0], probs[1]); // B-PRIVATE or I-PRIVATE
+    return {
+      token: token,
+      start: i,
+      end: i + 1,
+      probabilities: {
+        "B-PRIVATE": probs[0],
+        "I-PRIVATE": probs[1],
+        "O": probs[2]
+      },
+      maxSensitiveScore: maxSensitive
+    };
+  });
+
+  // Step 6: Aggregate consecutive privacy tokens into entities
+  const aggregated = aggregatePrivacyTokens(tokenPredictions, threshold);
+  
+  // Step 7: Create masked text with placeholders
+  const { maskedText, replacements } = maskText(tokenPredictions, aggregated);
+  
+  return { maskedText, replacements };
+}
+
+/**
+ * Softmax function to convert logits to probabilities
+ * @param {number[]} logits - Raw model output scores
+ * @returns {number[]} - Probability distribution
+ */
+function softmax(logits) {
+  const expLogits = logits.map(Math.exp);
+  const sumExp = expLogits.reduce((a, b) => a + b, 0);
+  return expLogits.map(exp => exp / sumExp);
+}
+
+/**
+ * Aggregate consecutive privacy tokens into entity groups
+ * This handles the BIO tagging logic - grouping B-PRIVATE followed by I-PRIVATE tokens
+ *
+ * @param {Array} tokenPredictions - Token predictions with probabilities
+ * @param {number} threshold - Minimum probability to consider as sensitive
+ * @returns {Array} - Grouped entity spans
+ */
+function aggregatePrivacyTokens(tokenPredictions, threshold) {
+  const aggregated = [];
+  let i = 0;
+  const n = tokenPredictions.length;
+  
+  while (i < n) {
+    const currentToken = tokenPredictions[i];
     
-    try {
-      // Show loading indicator
-      this.updateLoadingStatus('Loading AI model...');
+    // Skip special tokens
+    if (['[CLS]', '[SEP]'].includes(currentToken.token)) {
+      i++;
+      continue;
+    }
+    
+    // Check if token starts with space (word boundary) or is first word
+    const startsWithSpace = currentToken.token.startsWith(' ');
+    const isFirstWord = aggregated.length === 0 && i === 0;
+    
+    if (startsWithSpace || isFirstWord) {
+      // Start a new potential entity group
+      const group = {
+        tokens: [currentToken],
+        indices: [i],
+        scores: [currentToken.maxSensitiveScore],
+        startsWithSpace: startsWithSpace
+      };
       
-      this.tokenizer = await AutoTokenizer.from_pretrained(modelPath);
-      this.model = await AutoModel.from_pretrained(modelPath, { 
-        dtype: "q8",
-        progress_callback: (progress) => {
-          this.updateLoadingStatus(`Loading model: ${Math.round(progress * 100)}%`);
-        }
+      i++;
+      
+      // Continue aggregating tokens that don't start with space (subword tokens)
+      while (i < n &&
+             !tokenPredictions[i].token.startsWith(' ') &&
+             !['[CLS]', '[SEP]'].includes(tokenPredictions[i].token)) {
+        group.tokens.push(tokenPredictions[i]);
+        group.indices.push(i);
+        group.scores.push(tokenPredictions[i].maxSensitiveScore);
+        i++;
+      }
+      
+      // Only keep groups where max score exceeds threshold
+      if (Math.max(...group.scores) >= threshold) {
+        aggregated.push(group);
+      }
+    } else {
+      i++;
+    }
+  }
+  
+  return aggregated;
+}
+
+/**
+ * Create masked text by replacing detected entities with placeholders
+ *
+ * @param {Array} tokenPredictions - All token predictions
+ * @param {Array} aggregatedGroups - Grouped entity spans to mask
+ * @returns {Object} - { maskedText, replacements }
+ */
+function maskText(tokenPredictions, aggregatedGroups) {
+  const maskedTokens = [];
+  const replacements = [];
+  const maskedIndices = new Set();
+  let piiCounter = 1;
+  
+  // Mark all indices that belong to privacy groups
+  aggregatedGroups.forEach(group => {
+    group.indices.forEach(idx => maskedIndices.add(idx));
+  });
+
+  // Build the masked output
+  tokenPredictions.forEach((token, idx) => {
+    // Skip special tokens
+    if (['[CLS]', '[SEP]'].includes(token.token)) return;
+    
+    if (maskedIndices.has(idx)) {
+      // Check if this is the start of a group
+      const group = aggregatedGroups.find(g => g.indices[0] === idx);
+      if (group) {
+        // Reconstruct original text from tokens
+        const originalTokens = group.tokens.map(t => t.token);
+        const originalText = originalTokens
+          .map((token, i) => (i === 0 && group.startsWithSpace ? token.trimStart() : token))
+          .join('');
+        
+        // Create placeholder
+        const placeholder = `[PII_${piiCounter}]`;
+        replacements.push({
+          original: originalText,
+          placeholder: placeholder,
+          activation: Math.max(...group.scores)
+        });
+        piiCounter++;
+        
+        // Add masked token with proper spacing
+        const maskWithSpace = group.startsWithSpace ? ` ${placeholder}` : placeholder;
+        maskedTokens.push(maskWithSpace);
+      }
+    } else {
+      maskedTokens.push(token.token);
+    }
+  });
+
+  // Join tokens and clean up spacing
+  const joinedText = maskedTokens.join('');
+  const processedLines = joinedText.split('\n').map(line => line.replace(/[ \t]+/g, ' ').trim());
+  const maskedText = processedLines.join('\n').trim();
+  
+  return { maskedText, replacements };
+}
+
+/**
+ * Update UI with loading status
+ * @param {string} message - Status message to display
+ */
+function updateLoadingStatus(message) {
+  const statusElement = document.getElementById('modelStatus');
+  if (statusElement) {
+    statusElement.textContent = message;
+    statusElement.style.display = message ? 'inline' : 'none';
+  }
+}
+
+export { loadModel, processText, isModelLoaded, updateLoadingStatus };
+```
+
+##### Integration with EntityManager
+
+The AI model output format differs from regex detection. Here's how to adapt it:
+
+```javascript
+/**
+ * Convert AI model output to EntityManager format
+ * This bridges the AI detection output to the existing entity management system
+ *
+ * @param {Object} aiResult - Result from processText()
+ * @param {string} originalText - The original input text
+ * @returns {Array} - Entities in format compatible with applyAnonymization()
+ */
+function convertAIResultToEntities(aiResult, originalText) {
+  const entities = [];
+  
+  aiResult.replacements.forEach(replacement => {
+    // Find the position of this entity in the original text
+    const startPos = originalText.indexOf(replacement.original);
+    if (startPos !== -1) {
+      entities.push({
+        text: replacement.original,
+        type: 'PII', // AI model uses generic PII type
+        startPos: startPos,
+        endPos: startPos + replacement.original.length,
+        confidence: replacement.activation
       });
-      
-      this.modelLoaded = true;
-      this.currentModel = modelName;
-      this.updateLoadingStatus('Model ready');
-      
-    } catch (error) {
-      console.error('Model loading failed:', error);
-      this.updateLoadingStatus('Model loading failed');
-      throw error;
     }
-  }
+  });
+  
+  return entities;
+}
 
-  async processText(text, threshold = 0.3) {
-    if (!this.modelLoaded) {
-      throw new Error('Model not loaded');
-    }
-
-    const inputs = await this.tokenizer(text);
-    const { logits } = await this.model(inputs);
-    
-    // Process predictions
-    const predictions = this.extractEntities(logits, inputs, threshold);
-    return predictions;
-  }
-
-  extractEntities(logits, inputs, threshold) {
-    // Entity extraction logic
-    const entities = [];
-    // Process logits to identify entities
-    // Return array of {text, type, startPos, endPos}
-    return entities;
-  }
-
-  updateLoadingStatus(message) {
-    // Update UI with loading status
-    const statusElement = document.getElementById('modelStatus');
-    if (statusElement) {
-      statusElement.textContent = message;
-    }
-  }
+/**
+ * Alternative: Use AI output directly for display
+ * The AI model already produces masked text, so we can use it directly
+ * and just need to register entities with EntityManager
+ *
+ * @param {Object} aiResult - Result from processText()
+ * @param {EntityManager} entityManager - The entity manager instance
+ */
+function registerAIEntitiesWithManager(aiResult, entityManager) {
+  aiResult.replacements.forEach(replacement => {
+    // Convert [PII_N] format to [TYPE_N] format used by EntityManager
+    const placeholder = replacement.placeholder.replace('PII_', 'PII_');
+    entityManager.entityMap.set(placeholder, {
+      original: replacement.original,
+      type: 'PII',
+      index: parseInt(replacement.placeholder.match(/_(\d+)\]/)[1]),
+      isActive: true,
+      confidence: replacement.activation
+    });
+    entityManager.reverseLookup.set(replacement.original, placeholder);
+  });
 }
 ```
 
@@ -697,15 +970,24 @@ class AnonymizerApp {
       let detectedEntities = [];
 
       if (this.currentMode === 'regex') {
-        // Regex-based processing
+        // Regex-based processing - Quick Scan mode
         detectedEntities = this.processWithRegex(inputText);
+        // Apply anonymization using entity positions
+        anonymizedText = this.applyAnonymization(inputText, detectedEntities);
       } else {
-        // AI-based processing
-        detectedEntities = await this.aiProcessor.processText(inputText);
+        // AI-based processing - COMPLETELY DIFFERENT APPROACH
+        // DO NOT fall back to regex - AI mode must use AI only
+        const aiResult = await this.aiProcessor.processText(inputText);
+        
+        // AI returns pre-masked text and replacements directly
+        anonymizedText = aiResult.maskedText;
+        
+        // Register entities with EntityManager for deanonymization
+        this.registerAIEntities(aiResult.replacements);
+        
+        // Note: detectedEntities is not used in AI mode
+        // The masked text is already complete
       }
-
-      // Apply anonymization
-      anonymizedText = this.applyAnonymization(inputText, detectedEntities);
       
       // Update UI
       document.getElementById('outputText').value = anonymizedText;
@@ -1200,7 +1482,7 @@ class ErrorHandler {
 1. **No server communication** - All processing must be client-side
 2. **Memory management** - Clear large objects after use
 3. **Progressive enhancement** - Basic features work without AI models
-4. **Graceful degradation** - Fall back to regex if AI fails
+4. **NO FALLBACK TO REGEX FOR AI MODES** - When user selects AI mode, only AI detection is used. If AI fails to load, show error and keep mode selection at regex. Do NOT silently fall back.
 
 ### Code Style Guidelines
 1. Use ES6+ modules for organization
@@ -1246,3 +1528,98 @@ class ErrorHandler {
    - User documentation
 
 Remember to maintain consistency with the existing optimizer.html design system and follow the structure defined in architecture_plan.md throughout the implementation.
+
+---
+
+## CORRECTION SUMMARY: Processing Mode Architecture
+
+### ⚠️ CRITICAL: The Three Modes Are Fundamentally Different
+
+This section summarizes the key architectural differences that were **incorrectly implemented** in the original version.
+
+#### What Was Wrong
+
+The original implementation used this incorrect flow for ALL three modes:
+
+```
+[INCORRECT - DO NOT USE]
+User Input ──► Pattern Matching (Regex) ──► Entity Detection ──► Output
+     │                                              │
+     └──── AI Mode? Show loading, then ────────────┘
+          use same regex anyway
+```
+
+#### What Is Correct
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CORRECT ARCHITECTURE                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ QUICK SCAN (Free)                                                   │   │
+│  │ ──────────────────                                                   │   │
+│  │ User Input ──► Regex Pattern Matching ──► Entity Detection ──► Output│   │
+│  │                                                                       │   │
+│  │ • Uses predefined regex patterns                                      │   │
+│  │ • Instant processing, no model loading                                │   │
+│  │ • Good for structured PII like emails, phones, SSNs                  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ AI ENGLISH / AI MULTILINGUAL (Pro)                                   │   │
+│  │ ─────────────────────────────────────                                │   │
+│  │ User Input ──► Tokenization ──► LLM Inference ──► BIO Tagging ──►   │   │
+│  │            ──► Token Aggregation ──► Masked Output                   │   │
+│  │                                                                       │   │
+│  │ • Loads actual LLM model via transformers.js                         │   │
+│  │ • Token-level classification with 3 classes                          │   │
+│  │ • Context-aware semantic understanding                               │   │
+│  │ • NO REGEX PATTERNS USED                                             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Implementation Differences
+
+| Aspect | Quick Scan (Regex) | AI English / AI Multilingual |
+|--------|-------------------|------------------------------|
+| **Detection Method** | Regular expressions | Token classification LLM |
+| **Model Loading** | None required | Downloads ~50-200MB model |
+| **Processing** | Pattern matching | Neural network inference |
+| **Output** | Entities with positions | Pre-masked text + mappings |
+| **Fallback** | N/A | Show error, do NOT use regex |
+| **Entity Types** | Specific: EMAIL, PHONE, etc. | Generic: PII |
+| **Context Awareness** | None | Full semantic understanding |
+
+### Files Requiring Implementation Changes
+
+1. **`scripts/model-loader.js`** - MAJOR REWRITE REQUIRED
+   - Remove: `simulateModelLoading()` fake progress
+   - Remove: Empty `extractEntities()` stub
+   - Add: Actual transformers.js model loading from CDN
+   - Add: `processText()` with token classification
+   - Add: `softmax()`, `aggregatePrivacyTokens()`, `maskText()` functions
+
+2. **`scripts/anonymizer-core.js`** - MODIFY
+   - Change: `anonymizeText()` method to handle AI mode differently
+   - Remove: Fallback to regex when AI returns empty results
+   - Add: `registerAIEntities()` method for AI output integration
+
+### Reference Implementation
+
+See [`external_example/inference.js`](external_example/inference.js:1-148) for the complete working implementation that should be adapted for production use.
+
+### Testing Checklist
+
+Before considering AI modes complete, verify:
+
+- [ ] Model downloads successfully from HuggingFace CDN
+- [ ] `processText()` returns non-empty results for sample PII text
+- [ ] BIO tagging correctly identifies entity boundaries
+- [ ] Token aggregation groups consecutive privacy tokens
+- [ ] Masked text contains `[PII_N]` placeholders
+- [ ] Replacements array contains original text mappings
+- [ ] NO regex patterns are used in AI processing path
+- [ ] Error handling shows user-friendly messages for model failures

@@ -1,6 +1,32 @@
 // AIModelProcessor - Handles AI model loading and processing
 // Part of ASD123.ai Anonymizer - Privacy-First Text Protection
 // Uses Hugging Face Transformers.js for local AI processing
+//
+// IMPORTANT: This implementation uses token classification with BIO tagging
+// (B-PRIVATE, I-PRIVATE, O) - NOT regex pattern matching.
+
+// Import transformers.js from CDN for browser compatibility
+import { AutoModel, AutoTokenizer } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0';
+
+/**
+ * Model configuration map - defines all available AI models
+ * Each model has specific settings for loading and processing
+ */
+const MODEL_CONFIG = {
+    // AI4Privacy Models (Token Classification)
+    'ai-english': {
+        path: 'ai4privacy/llama-ai4privacy-english-anonymiser-openpii',
+        type: 'token-classification',
+        numClasses: 3,
+        description: 'AI4Privacy - English'
+    },
+    'ai-multilingual': {
+        path: 'ai4privacy/llama-ai4privacy-multilingual-anonymiser-openpii',
+        type: 'token-classification',
+        numClasses: 3,
+        description: 'AI4Privacy - Multilingual'
+    }
+};
 
 class AIModelProcessor {
     constructor() {
@@ -8,117 +34,253 @@ class AIModelProcessor {
         this.model = null;
         this.modelLoaded = false;
         this.currentModel = null;
+        this.currentConfig = null;
         this.loadingCallbacks = [];
     }
 
     /**
-     * Load AI model for entity detection
-     * @param {string} modelName - 'ai-english' or 'ai-multilingual'
+     * Get available models list
+     * @returns {Object} - Model configuration map
+     */
+    static getAvailableModels() {
+        return MODEL_CONFIG;
+    }
+
+    /**
+     * Load AI model for PII detection using token classification
+     * @param {string} modelName - Model identifier from dropdown
      * @returns {Promise<void>}
      */
     async loadModel(modelName) {
-        const modelPath = modelName === 'ai-english' 
-            ? 'ai4privacy/llama-ai4privacy-english-anonymiser-openpii'
-            : 'ai4privacy/llama-ai4privacy-multilingual-anonymiser-openpii';
+        const config = MODEL_CONFIG[modelName];
+        
+        if (!config) {
+            throw new Error(`Unknown model: ${modelName}. Available models: ${Object.keys(MODEL_CONFIG).join(', ')}`);
+        }
+
+        const modelPath = config.path;
         
         try {
             // Show loading indicator
-            this.updateLoadingStatus('Initializing AI model...');
+            this.updateLoadingStatus(`Loading ${config.description} tokenizer...`);
             
-            // Note: Transformers.js would be loaded here
-            // For now, we'll implement a placeholder that falls back to regex
-            // The actual implementation would use:
-            // import { AutoTokenizer, AutoModelForTokenClassification } from '@xenova/transformers';
+            // Load tokenizer from HuggingFace
+            this.tokenizer = await AutoTokenizer.from_pretrained(modelPath);
             
-            this.updateLoadingStatus('Loading AI model... This may take a few moments');
+            this.updateLoadingStatus(`Loading ${config.description} model (this may take a moment)...`);
             
-            // Simulate model loading (in production, this would load the actual model)
-            await this.simulateModelLoading(modelPath);
+            // Load model with appropriate settings
+            const modelOptions = { dtype: "q8" };
+            
+            // ONNX models may need different loading
+            if (config.onnx) {
+                modelOptions.device = 'wasm'; // Use WebAssembly for ONNX models
+            }
+            
+            this.model = await AutoModel.from_pretrained(modelPath, modelOptions);
             
             this.modelLoaded = true;
             this.currentModel = modelName;
-            this.updateLoadingStatus('Model ready');
+            this.currentConfig = config;
+            this.updateLoadingStatus(`${config.description} ready`);
             
         } catch (error) {
             console.error('Model loading failed:', error);
-            this.updateLoadingStatus('Model loading failed - falling back to pattern matching');
+            this.modelLoaded = false;
+            this.currentConfig = null;
+            this.updateLoadingStatus(`Failed to load ${config.description}`);
             throw error;
         }
     }
 
     /**
-     * Simulate model loading progress
-     * @param {string} modelPath - The model path
-     * @returns {Promise<void>}
-     */
-    async simulateModelLoading(modelPath) {
-        // This is a placeholder for the actual model loading
-        // In production, this would use Transformers.js
-        return new Promise((resolve) => {
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 10;
-                this.updateLoadingStatus(`Loading model: ${progress}%`);
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    resolve();
-                }
-            }, 200);
-        });
-    }
-
-    /**
-     * Process text with AI model
-     * @param {string} text - The text to process
-     * @param {number} threshold - Confidence threshold (0-1)
-     * @returns {Promise<Array>} - Array of detected entities
+     * Process text using the AI model for PII detection
+     * This is the CORE FUNCTION - uses token classification, NOT regex
+     * 
+     * @param {string} text - Input text to analyze
+     * @param {number} threshold - Sensitivity threshold (0-1, default 0.3)
+     * @returns {Promise<Object>} - { maskedText, replacements }
      */
     async processText(text, threshold = 0.3) {
         if (!this.modelLoaded) {
             throw new Error('Model not loaded');
         }
 
-        try {
-            // In production, this would use the actual AI model
-            // For now, we'll return a placeholder that indicates AI processing
-            // would happen here
-            
-            // The actual implementation would look like:
-            // const inputs = await this.tokenizer(text);
-            // const { logits } = await this.model(inputs);
-            // const predictions = this.extractEntities(logits, inputs, threshold);
-            // return predictions;
-            
-            // Placeholder: Return empty array to fall back to regex
-            console.log('AI model processing not yet implemented - using regex fallback');
-            return [];
-            
-        } catch (error) {
-            console.error('AI processing error:', error);
-            throw error;
+        // Step 1: Tokenize the input text
+        const inputs = await this.tokenizer(text);
+        const inputTokens = inputs.input_ids.data;
+        
+        // Step 2: Decode each token to its string representation
+        const tokenStrings = Array.from(inputTokens).map(id => 
+            this.tokenizer.decode([id], { skip_special_tokens: false })
+        );
+
+        // Step 3: Run model inference to get logits
+        const { logits } = await this.model(inputs);
+        const logitsData = Array.from(logits.data);
+        const numTokens = tokenStrings.length;
+        const numClasses = this.currentConfig?.numClasses || 3; // B-PRIVATE, I-PRIVATE, O (default 3)
+
+        // Step 4: Reshape logits per token
+        const logitsPerToken = [];
+        for (let i = 0; i < numTokens; i++) {
+            logitsPerToken.push(logitsData.slice(i * numClasses, (i + 1) * numClasses));
         }
+
+        // Step 5: Apply softmax and create token predictions
+        const tokenPredictions = tokenStrings.map((token, i) => {
+            const probs = this.softmax(logitsPerToken[i]);
+            const maxSensitive = Math.max(probs[0], probs[1]); // B-PRIVATE or I-PRIVATE
+            return {
+                token: token,
+                start: i,
+                end: i + 1,
+                probabilities: {
+                    "B-PRIVATE": probs[0],
+                    "I-PRIVATE": probs[1],
+                    "O": probs[2]
+                },
+                maxSensitiveScore: maxSensitive
+            };
+        });
+
+        // Step 6: Aggregate consecutive privacy tokens into entities
+        const aggregated = this.aggregatePrivacyTokens(tokenPredictions, threshold);
+        
+        // Step 7: Create masked text with placeholders
+        const { maskedText, replacements } = this.maskText(tokenPredictions, aggregated);
+        
+        return { maskedText, replacements };
     }
 
     /**
-     * Extract entities from model predictions
-     * @param {Object} logits - Model output logits
-     * @param {Object} inputs - Tokenized inputs
-     * @param {number} threshold - Confidence threshold
-     * @returns {Array} - Array of detected entities
+     * Softmax function to convert logits to probabilities
+     * @param {number[]} logits - Raw model output scores
+     * @returns {number[]} - Probability distribution
      */
-    extractEntities(logits, inputs, threshold) {
-        // This would process the model output to extract entities
-        // with their positions and confidence scores
-        const entities = [];
+    softmax(logits) {
+        const expLogits = logits.map(Math.exp);
+        const sumExp = expLogits.reduce((a, b) => a + b, 0);
+        return expLogits.map(exp => exp / sumExp);
+    }
+
+    /**
+     * Aggregate consecutive privacy tokens into entity groups
+     * This handles the BIO tagging logic - grouping B-PRIVATE followed by I-PRIVATE tokens
+     * 
+     * @param {Array} tokenPredictions - Token predictions with probabilities
+     * @param {number} threshold - Minimum probability to consider as sensitive
+     * @returns {Array} - Grouped entity spans
+     */
+    aggregatePrivacyTokens(tokenPredictions, threshold) {
+        const aggregated = [];
+        let i = 0;
+        const n = tokenPredictions.length;
         
-        // Entity extraction logic would be implemented here
-        // For each token prediction above threshold:
-        // 1. Identify entity type
-        // 2. Group consecutive tokens of same entity
-        // 3. Convert token positions to character positions
-        // 4. Return array of {text, type, startPos, endPos, confidence}
+        while (i < n) {
+            const currentToken = tokenPredictions[i];
+            
+            // Skip special tokens
+            if (['[CLS]', '[SEP]'].includes(currentToken.token)) {
+                i++;
+                continue;
+            }
+            
+            // Check if token starts with space (word boundary) or is first word
+            const startsWithSpace = currentToken.token.startsWith(' ');
+            const isFirstWord = aggregated.length === 0 && i === 0;
+            
+            if (startsWithSpace || isFirstWord) {
+                // Start a new potential entity group
+                const group = {
+                    tokens: [currentToken],
+                    indices: [i],
+                    scores: [currentToken.maxSensitiveScore],
+                    startsWithSpace: startsWithSpace
+                };
+                
+                i++;
+                
+                // Continue aggregating tokens that don't start with space (subword tokens)
+                while (i < n && 
+                       !tokenPredictions[i].token.startsWith(' ') && 
+                       !['[CLS]', '[SEP]'].includes(tokenPredictions[i].token)) {
+                    group.tokens.push(tokenPredictions[i]);
+                    group.indices.push(i);
+                    group.scores.push(tokenPredictions[i].maxSensitiveScore);
+                    i++;
+                }
+                
+                // Only keep groups where max score exceeds threshold
+                if (Math.max(...group.scores) >= threshold) {
+                    aggregated.push(group);
+                }
+            } else {
+                i++;
+            }
+        }
         
-        return entities;
+        return aggregated;
+    }
+
+    /**
+     * Create masked text by replacing detected entities with placeholders
+     * 
+     * @param {Array} tokenPredictions - All token predictions
+     * @param {Array} aggregatedGroups - Grouped entity spans to mask
+     * @returns {Object} - { maskedText, replacements }
+     */
+    maskText(tokenPredictions, aggregatedGroups) {
+        const maskedTokens = [];
+        const replacements = [];
+        const maskedIndices = new Set();
+        let piiCounter = 1;
+        
+        // Mark all indices that belong to privacy groups
+        aggregatedGroups.forEach(group => {
+            group.indices.forEach(idx => maskedIndices.add(idx));
+        });
+
+        // Build the masked output
+        tokenPredictions.forEach((token, idx) => {
+            // Skip special tokens
+            if (['[CLS]', '[SEP]'].includes(token.token)) return;
+            
+            if (maskedIndices.has(idx)) {
+                // Check if this is the start of a group
+                const group = aggregatedGroups.find(g => g.indices[0] === idx);
+                if (group) {
+                    // Reconstruct original text from tokens
+                    const originalTokens = group.tokens.map(t => t.token);
+                    const originalText = originalTokens
+                        .map((token, i) => (i === 0 && group.startsWithSpace ? token.trimStart() : token))
+                        .join('');
+                    
+                    // Create placeholder
+                    const placeholder = `[PII_${piiCounter}]`;
+                    replacements.push({ 
+                        original: originalText, 
+                        placeholder: placeholder,
+                        activation: Math.max(...group.scores)
+                    });
+                    piiCounter++;
+                    
+                    // Add masked token with proper spacing
+                    const maskWithSpace = group.startsWithSpace ? ` ${placeholder}` : placeholder;
+                    maskedTokens.push(maskWithSpace);
+                }
+            } else {
+                maskedTokens.push(token.token);
+            }
+        });
+
+        // Join tokens and clean up spacing
+        const joinedText = maskedTokens.join('');
+        // For each line, collapse only spaces and tabs
+        const processedLines = joinedText.split('\n').map(line => line.replace(/[ \t]+/g, ' ').trim());
+        const maskedText = processedLines.join('\n').trim();
+        
+        return { maskedText, replacements };
     }
 
     /**
@@ -129,6 +291,7 @@ class AIModelProcessor {
         const statusElement = document.getElementById('modelStatus');
         if (statusElement) {
             statusElement.textContent = message;
+            statusElement.style.display = message ? 'inline' : 'none';
         }
         
         // Call registered callbacks
@@ -172,7 +335,8 @@ class AIModelProcessor {
         return {
             name: this.currentModel,
             loaded: this.modelLoaded,
-            type: this.currentModel === 'ai-english' ? 'English' : 'Multilingual'
+            config: this.currentConfig,
+            description: this.currentConfig?.description || 'Unknown'
         };
     }
 }

@@ -454,7 +454,9 @@ class AnonymizerApp {
                 this.uiController.showLoading(false);
                 this.uiController.showSuccess('AI model loaded successfully');
             } catch (error) {
-                this.uiController.showError('Failed to load AI model - using pattern matching');
+                // IMPORTANT: Do NOT silently fall back to regex
+                // Show error and reset to regex mode explicitly
+                this.uiController.showError('Failed to load AI model. Please try again or use Quick Scan.');
                 this.currentMode = 'regex';
                 document.getElementById('modelSelect').value = 'regex';
                 this.uiController.showLoading(false);
@@ -477,28 +479,29 @@ class AnonymizerApp {
 
         try {
             let anonymizedText = inputText;
-            let detectedEntities = [];
 
             if (this.currentMode === 'regex') {
-                // Regex-based processing
-                detectedEntities = this.processWithRegex(inputText);
+                // ===== QUICK SCAN MODE: Regex-based processing =====
+                const detectedEntities = this.processWithRegex(inputText);
+                // Apply anonymization using entity positions
+                anonymizedText = this.applyAnonymization(inputText, detectedEntities);
             } else {
-                // AI-based processing
-                try {
-                    detectedEntities = await this.aiProcessor.processText(inputText);
-                    // If AI returns no results, fall back to regex
-                    if (detectedEntities.length === 0) {
-                        this.uiController.showInfo('AI model returned no results - using pattern matching');
-                        detectedEntities = this.processWithRegex(inputText);
-                    }
-                } catch (error) {
-                    this.uiController.showError('AI processing failed - using pattern matching');
-                    detectedEntities = this.processWithRegex(inputText);
+                // ===== AI MODE: Token classification (COMPLETELY DIFFERENT) =====
+                // DO NOT fall back to regex - AI mode must use AI only
+                const aiResult = await this.aiProcessor.processText(inputText);
+                
+                // AI returns pre-masked text and replacements directly
+                // The maskedText already contains [PII_N] placeholders
+                anonymizedText = aiResult.maskedText;
+                
+                // Register entities with EntityManager for deanonymization
+                this.registerAIEntities(aiResult.replacements);
+                
+                // Note: No regex fallback - if AI found nothing, that's the result
+                if (aiResult.replacements.length === 0) {
+                    this.uiController.showInfo('AI model detected no sensitive information in the text');
                 }
             }
-
-            // Apply anonymization
-            anonymizedText = this.applyAnonymization(inputText, detectedEntities);
             
             // Update UI
             document.getElementById('outputText').value = anonymizedText;
@@ -509,11 +512,45 @@ class AnonymizerApp {
             
         } catch (error) {
             console.error('Anonymization error:', error);
+            // Do NOT fall back to regex on AI error - show the error clearly
             this.uiController.showError('Anonymization failed: ' + error.message);
         } finally {
             this.isProcessing = false;
             this.uiController.showProcessing(false);
         }
+    }
+
+    /**
+     * Register AI-detected entities with the EntityManager
+     * This bridges the AI model output format to the existing entity management system
+     *
+     * @param {Array} replacements - Array of {original, placeholder, activation} from AI
+     */
+    registerAIEntities(replacements) {
+        replacements.forEach(replacement => {
+            // Extract the index from [PII_N] format
+            const indexMatch = replacement.placeholder.match(/_(\d+)\]/);
+            const index = indexMatch ? parseInt(indexMatch[1]) : 1;
+            
+            // Register with entity manager
+            this.entityManager.entityMap.set(replacement.placeholder, {
+                original: replacement.original,
+                type: 'PII', // AI model uses generic PII type
+                index: index,
+                isActive: true,
+                confidence: replacement.activation
+            });
+            this.entityManager.reverseLookup.set(replacement.original, replacement.placeholder);
+            
+            // Update counter
+            if (!this.entityManager.entityCounters['PII']) {
+                this.entityManager.entityCounters['PII'] = 0;
+            }
+            this.entityManager.entityCounters['PII'] = Math.max(
+                this.entityManager.entityCounters['PII'],
+                index
+            );
+        });
     }
 
     processWithRegex(text) {

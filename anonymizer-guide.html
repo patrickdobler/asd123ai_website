@@ -55,7 +55,7 @@
 <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h3>
 <div class="grid md:grid-cols-2 gap-3 text-sm">
 <a href="#getting-started" class="text-[var(--primary-color)] hover:underline">→ Getting Started</a>
-<a href="#processing-modes" class="text-[var(--primary-color)] hover:underline">→ Processing Modes</a>
+<a href="#processing-modes" class="text-[var(--primary-color)] hover:underline">→ Detection Methods</a>
 <a href="#basic-workflow" class="text-[var(--primary-color)] hover:underline">→ Basic Workflow</a>
 <a href="#file-upload" class="text-[var(--primary-color)] hover:underline">→ File Upload</a>
 <a href="#entity-management" class="text-[var(--primary-color)] hover:underline">→ Entity Management</a>
@@ -95,48 +95,59 @@ The Anonymizer is a privacy-first tool that detects and anonymizes Personally Id
 <!-- Processing Modes -->
 <div id="processing-modes" class="mb-12">
 <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-<span class="text-[var(--primary-color)]">2.</span> Processing Modes
+<span class="text-[var(--primary-color)]">2.</span> Detection Methods
 </h3>
+<p class="text-[var(--text-secondary)] mb-6 leading-relaxed">
+The Anonymizer offers three detection methods. Choose based on your needs for speed, accuracy, and language support:
+</p>
 <div class="grid md:grid-cols-3 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <div class="flex items-center gap-2 mb-2">
 <span class="text-2xl">⚡</span>
-<h4 class="font-bold text-[var(--text-primary)]">Quick Scan</h4>
+<h4 class="font-bold text-[var(--text-primary)]">Regex - Pattern Matching</h4>
 </div>
-<p class="text-sm text-[var(--text-secondary)] mb-2">Pattern matching (Regex)</p>
+<p class="text-sm text-[var(--text-secondary)] mb-2">Fast pattern-based detection</p>
 <ul class="text-xs text-[var(--text-secondary)] space-y-1">
 <li>✓ Instant results</li>
-<li>✓ Works offline</li>
-<li>✓ Free to use</li>
-<li>✓ Good accuracy</li>
+<li>✓ Works completely offline</li>
+<li>✓ No model download required</li>
+<li>✓ Good for structured data (emails, phones, SSNs)</li>
 </ul>
+<p class="text-xs text-[var(--text-secondary)] mt-3 italic">Best for: Quick checks, structured formats</p>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <div class="flex items-center gap-2 mb-2">
 <span class="text-2xl">🤖</span>
-<h4 class="font-bold text-[var(--text-primary)]">AI English</h4>
+<h4 class="font-bold text-[var(--text-primary)]">AI4Privacy - English</h4>
 </div>
-<p class="text-sm text-[var(--text-secondary)] mb-2">Advanced AI detection</p>
+<p class="text-sm text-[var(--text-secondary)] mb-2">AI-powered token classification</p>
 <ul class="text-xs text-[var(--text-secondary)] space-y-1">
-<li>✓ Context-aware</li>
-<li>✓ Higher accuracy</li>
-<li>✓ English only</li>
-<li>⚠ Requires internet</li>
+<li>✓ Context-aware detection</li>
+<li>✓ Understands natural language</li>
+<li>✓ Catches names in context</li>
+<li>⚠ First load downloads model (~50MB)</li>
 </ul>
+<p class="text-xs text-[var(--text-secondary)] mt-3 italic">Best for: English documents, complex text</p>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <div class="flex items-center gap-2 mb-2">
 <span class="text-2xl">🌍</span>
-<h4 class="font-bold text-[var(--text-primary)]">AI Multilingual</h4>
+<h4 class="font-bold text-[var(--text-primary)]">AI4Privacy - Multilingual</h4>
 </div>
-<p class="text-sm text-[var(--text-secondary)] mb-2">Multi-language support</p>
+<p class="text-sm text-[var(--text-secondary)] mb-2">AI detection for multiple languages</p>
 <ul class="text-xs text-[var(--text-secondary)] space-y-1">
-<li>✓ Multiple languages</li>
-<li>✓ High accuracy</li>
-<li>✓ Context-aware</li>
-<li>⚠ Slower processing</li>
+<li>✓ Supports many languages</li>
+<li>✓ Context-aware detection</li>
+<li>✓ Best for non-English text</li>
+<li>⚠ Larger model, slower first load</li>
 </ul>
+<p class="text-xs text-[var(--text-secondary)] mt-3 italic">Best for: Non-English or mixed-language content</p>
 </div>
+</div>
+<div class="mt-4 p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
+<p class="text-sm text-[var(--text-secondary)]">
+<strong class="text-[var(--text-primary)]">💡 How AI Detection Works:</strong> The AI4Privacy models use token classification with BIO tagging. The model analyzes each word in context and assigns a probability score for being sensitive information. This means it can detect names like "John" even without a surname, based on surrounding context.
+</p>
 </div>
 </div>
 
@@ -160,8 +171,8 @@ Example: "My name is John Smith, email john@example.com, phone (555) 123-4567"
 <div class="flex items-start gap-4">
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">2</div>
 <div class="flex-1">
-<h4 class="font-bold text-[var(--text-primary)] mb-2">Select Processing Mode</h4>
-<p class="text-sm text-[var(--text-secondary)]">Choose from the dropdown: <strong>Quick Scan</strong> (recommended), <strong>AI English</strong>, or <strong>AI Multilingual</strong>.</p>
+<h4 class="font-bold text-[var(--text-primary)] mb-2">Select Detection Method</h4>
+<p class="text-sm text-[var(--text-secondary)]">Choose from the dropdown: <strong>Regex - Pattern Matching</strong> for instant results, or <strong>AI4Privacy - English/Multilingual</strong> for context-aware AI detection.</p>
 </div>
 </div>
 
@@ -461,7 +472,7 @@ Preserve your entity mappings for later use or share them with trusted recipient
 <span>🎯</span> For Best Accuracy
 </h4>
 <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
-<li>• Use AI mode for complex text</li>
+<li>• Use AI4Privacy modes for complex text</li>
 <li>• Review detected entities manually</li>
 <li>• Format text properly (standard dates/phones)</li>
 <li>• Remove false positives from entity list</li>
@@ -472,7 +483,7 @@ Preserve your entity mappings for later use or share them with trusted recipient
 <span>⚡</span> For Performance
 </h4>
 <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
-<li>• Use Quick Scan (Regex) for speed</li>
+<li>• Use Regex mode for instant results</li>
 <li>• Process large docs in batches</li>
 <li>• Close unused browser tabs</li>
 <li>• Desktop browsers work best</li>
