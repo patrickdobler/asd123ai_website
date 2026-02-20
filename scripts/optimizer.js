@@ -8,61 +8,61 @@
  * These are overridden by fetched JSON if available at runtime.
  */
 const EMBEDDED_MAPPINGS = {
-  'swiss-german': {
-    ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-    '-': '-', '‐': '-', '‑': '-', '–': '-', '—': '-',
-    '„': '"', '“': '"', '”': '"',
-    '‚': '\'', '‘': '\'', '’': '\'',
-    '‹': '\'', '›': '\'',
-    '«': '"', '»': '"',
-    'ß': 'ss',
-    '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'', '×': 'x'
-  },
-  'german': {
-    ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-    '‐': '-', '‑': '-', '–': '-', '—': '-',
-    '«': '"', '»': '"',
-    '„': '"', '“': '"', '”': '"', '‚': '\'', '‘': '\'', '’': '\'',
-    'œ': 'oe', 'Œ': 'Oe',
-    'æ': 'ae', 'Æ': 'Ae',
-    '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-    '×': 'x'
-  },
-  'french': {
-    ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-    '‐': '-', '‑': '-', '–': '-', '—': '-',
-    '«': '"', '»': '"',
-    '„': '"', '“': '"', '”': '"', '‚': '\'', '‘': '\'', '’': '\'',
-    'œ': 'oe', 'Œ': 'Oe',
-    'æ': 'ae', 'Æ': 'Ae',
-    '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-    '×': 'x'
-  },
-  'italian': {
-    ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-    '‐': '-', '‑': '-', '–': '-', '—': '-',
-    '«': '"', '»': '"',
-    '„': '"', '“': '"', '”': '"', '‚': '\'', '‘': '\'', '’': '\'',
-    '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-    '×': 'x'
-  },
-  'english-international': {
-    ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-    '‐': '-', '‑': '-', '–': '-', '—': '-',
-    '“': '"', '”': '"', '„': '"', '‘': '\'', '’': '\'',
-    '«': '"', '»': '"',
-    '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-    'œ': 'oe', 'Œ': 'Oe', 'æ': 'ae', 'Æ': 'Ae',
-    '×': 'x'
-  },
-  'english-us': {
-    ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-    '‐': '-', '‑': '-', '–': '-', '—': '-',
-    '“': '"', '”': '"', '‘': '\'', '’': '\'',
-    '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-    'œ': 'oe', 'Œ': 'Oe', 'æ': 'ae', 'Æ': 'Ae',
-    '×': 'x'
-  }
+    'swiss-german': {
+        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
+        '-': '-', '‐': '-', '‑': '-', '–': '-', '—': '-',
+        '„': '"', '“': '"', '”': '"',
+        '‚': '\'', '‘': '\'', '’': '\'',
+        '‹': '\'', '›': '\'',
+        '«': '"', '»': '"',
+        'ß': 'ss',
+        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'', '×': 'x'
+    },
+    'german': {
+        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
+        '‐': '-', '‑': '-', '–': '-', '—': '-',
+        '«': '"', '»': '"',
+        '„': '"', '“': '"', '”': '"', '‚': '\'', '‘': '\'', '’': '\'',
+        'œ': 'oe', 'Œ': 'Oe',
+        'æ': 'ae', 'Æ': 'Ae',
+        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
+        '×': 'x'
+    },
+    'french': {
+        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
+        '‐': '-', '‑': '-', '–': '-', '—': '-',
+        '«': '"', '»': '"',
+        '„': '"', '“': '"', '”': '"', '‚': '\'', '‘': '\'', '’': '\'',
+        'œ': 'oe', 'Œ': 'Oe',
+        'æ': 'ae', 'Æ': 'Ae',
+        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
+        '×': 'x'
+    },
+    'italian': {
+        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
+        '‐': '-', '‑': '-', '–': '-', '—': '-',
+        '«': '"', '»': '"',
+        '„': '"', '“': '"', '”': '"', '‚': '\'', '‘': '\'', '’': '\'',
+        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
+        '×': 'x'
+    },
+    'english-international': {
+        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
+        '‐': '-', '‑': '-', '–': '-', '—': '-',
+        '“': '"', '”': '"', '„': '"', '‘': '\'', '’': '\'',
+        '«': '"', '»': '"',
+        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
+        'œ': 'oe', 'Œ': 'Oe', 'æ': 'ae', 'Æ': 'Ae',
+        '×': 'x'
+    },
+    'english-us': {
+        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
+        '‐': '-', '‑': '-', '–': '-', '—': '-',
+        '“': '"', '”': '"', '‘': '\'', '’': '\'',
+        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
+        'œ': 'oe', 'Œ': 'Oe', 'æ': 'ae', 'Æ': 'Ae',
+        '×': 'x'
+    }
 };
 class TextOptimizer {
     constructor() {
@@ -75,10 +75,10 @@ class TextOptimizer {
             replaceEmDash: false,
             languageMapping: 'swiss-german'
         };
-        
+
         this.languageMappings = { ...EMBEDDED_MAPPINGS };
         this.isInitialized = false;
-        
+
         // Initialize the optimizer
         this.initialize();
     }
@@ -316,10 +316,10 @@ class TextOptimizer {
     removeCitations(text) {
         // Split by lines to preserve line breaks
         const lines = text.split('\n');
-        
+
         const processedLines = lines.map(line => {
             let result = line;
-            
+
             // Remove full markdown-style citation links: [label](url) -> completely removed
             // This handles cases like [business.uq.edu](https://business.uq.edu.au/...)
             result = result.replace(/\[[^\]]*\]\(https?:\/\/[^)]*\)/g, '');
@@ -327,32 +327,35 @@ class TextOptimizer {
             // Remove markdown-style links where URL is not http (e.g. [text](path))
             // Only if it looks like a citation (label contains a dot or is short)
             result = result.replace(/\[[^\]]*\]\([^)]*\)/g, '');
-            
+
+            // Remove standalone bracketed domains or sources: e.g. [business.uq.edu]
+            result = result.replace(/\[[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\]/g, '');
+
             // Remove numbered citations: [1], [2], [123], etc.
             result = result.replace(/\[\d+\]/g, '');
-            
+
             // Remove parenthetical citations: (1), (2), (123), etc.
             result = result.replace(/\(\d+\)/g, '');
-            
+
             // Remove source citations: (Source: XYZ), (Quelle: ABC), etc.
             result = result.replace(/\((Source|Quelle|Fonte|Fuente):\s*[^)]+\)/gi, '');
-            
+
             // Remove URL citations in parentheses: (https://example.com)
             result = result.replace(/\(https?:\/\/[^)]+\)/g, '');
-            
+
             // Remove reference markers: ¹, ², ³, etc.
             result = result.replace(/[¹²³⁴⁵⁶⁷⁸⁹⁰]/g, '');
-            
+
             // Remove superscript numbers (Unicode superscripts)
             result = result.replace(/[\u2070-\u209F]/g, '');
-            
+
             // Clean up extra spaces left by removed citations (within the line only)
             result = result.replace(/\s{2,}/g, ' ');
             result = result.replace(/\s+([.!?])/g, '$1');
-            
+
             return result.trim();
         });
-        
+
         return processedLines.join('\n');
     }
 
@@ -367,50 +370,50 @@ class TextOptimizer {
 
         // Remove headers: # ## ### #### ##### ######
         result = result.replace(/^#{1,6}\s+(.+)$/gm, '$1');
-        
+
         // Remove bold: **text** or __text__
         result = result.replace(/\*\*([^*]+)\*\*/g, '$1');
         result = result.replace(/__([^_]+)__/g, '$1');
-        
+
         // Remove italic: *text* or _text_ (be careful not to match list items)
         result = result.replace(/(?<!\n)\*([^*\n]+)\*/g, '$1');
         result = result.replace(/(?<!\n)_([^_\n]+)_/g, '$1');
-        
+
         // Remove strikethrough: ~~text~~
         result = result.replace(/~~([^~]+)~~/g, '$1');
-        
+
         // Remove code blocks: ```code```
         result = result.replace(/```[\s\S]*?```/g, '');
-        
+
         // Remove inline code: `code`
         result = result.replace(/`([^`]+)`/g, '$1');
-        
+
         // Remove links: [text](url) -> text
         result = result.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-        
+
         // Remove reference-style links: [text][ref] -> text
         result = result.replace(/\[([^\]]+)\]\[[^\]]*\]/g, '$1');
-        
+
         // Remove images: ![alt](url) -> alt
         result = result.replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1');
-        
+
         // Remove horizontal rules: --- or ***
         result = result.replace(/^[-*]{3,}$/gm, '');
-        
+
         // Remove blockquotes: > text
         result = result.replace(/^>\s*(.+)$/gm, '$1');
-        
+
         // Remove list markers: - item, * item, + item, 1. item
         result = result.replace(/^[\s]*[-*+]\s+(.+)$/gm, '$1');
         result = result.replace(/^[\s]*\d+\.\s+(.+)$/gm, '$1');
-        
+
         // Clean up extra blank lines (but preserve intentional line breaks)
         result = result.replace(/\n{3,}/g, '\n\n');
-        
+
         // Clean up spaces within lines only
         const lines = result.split('\n');
         const cleanedLines = lines.map(line => line.replace(/\s{2,}/g, ' ').trim());
-        
+
         return cleanedLines.join('\n');
     }
 
@@ -468,28 +471,28 @@ class TextOptimizer {
     replaceEmDash(text) {
         // Process line by line to preserve line breaks
         const lines = text.split('\n');
-        
+
         const processedLines = lines.map(line => {
             let result = line;
-            
+
             // Replace em dash with period (no space before the period)
             result = result.replace(/\s*—\s*/g, '. ');
-            
+
             // Clean up any double spaces (but only within the line)
             result = result.replace(/\s{2,}/g, ' ');
-            
+
             // Clean up double periods (except ellipsis)
             result = result.replace(/\.{2}(?!\.)/g, '.');
-            
+
             // Capitalize first letter after periods (basic sentence case)
             result = result.replace(/\.\s+([a-z])/g, (match, letter) => '. ' + letter.toUpperCase());
-            
+
             // Clean up any space before punctuation
             result = result.replace(/\s+([.!?,;:])/g, '$1');
-            
+
             return result;
         });
-        
+
         return processedLines.join('\n');
     }
 
@@ -515,7 +518,7 @@ class OptimizerUI {
         this.cleanButton = null;
         this.copyButton = null;
         this.clearButton = null;
-        
+
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.initialize());
@@ -641,7 +644,7 @@ class OptimizerUI {
             }
 
             const result = this.optimizer.processText(inputText);
-            
+
             if (result.changed) {
                 this.textarea.value = result.text;
                 this.updateCharCount();
@@ -677,7 +680,7 @@ class OptimizerUI {
 
     handleClearText() {
         if (!this.textarea) return;
-        
+
         if (this.textarea.value.trim()) {
             this.textarea.value = '';
             this.updateCharCount();
