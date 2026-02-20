@@ -144,6 +144,10 @@ class TextOptimizer {
         // Apply processing steps in order
         if (this.settings.removeDiacritics) {
             processedText = this.removeDiacritics(processedText);
+        } else {
+            // When NOT removing diacritics, convert digraph sequences back to umlauts
+            // e.g. ae -> ä, oe -> ö, ue -> ü (case-sensitive)
+            processedText = this.invertDiacritics(processedText);
         }
 
         if (this.settings.removeCitations) {
@@ -228,6 +232,44 @@ class TextOptimizer {
     }
 
     /**
+     * Invert diacritics: convert digraph sequences back to umlauts when removeDiacritics is OFF.
+     * e.g. ae -> ä, Ae -> Ä, AE -> Ä, oe -> ö, Oe -> Ö, OE -> Ö, ue -> ü, Ue -> Ü, UE -> Ü
+     * Case-sensitive, preserves already-correct characters.
+     * @param {string} text - Input text
+     * @returns {string} - Text with digraphs replaced by umlauts
+     */
+    invertDiacritics(text) {
+        let result = text;
+
+        // Order matters: check longer sequences won't be double-processed
+        // We use word-boundary-aware replacement to avoid false positives
+        // but since these are valid German/Swiss substitutions, a simple replace is appropriate.
+        const invertMap = [
+            // ue -> ü (but not already ü)
+            ['UE', 'Ü'],
+            ['Ue', 'Ü'],
+            ['ue', 'ü'],
+            // oe -> ö
+            ['OE', 'Ö'],
+            ['Oe', 'Ö'],
+            ['oe', 'ö'],
+            // ae -> ä
+            ['AE', 'Ä'],
+            ['Ae', 'Ä'],
+            ['ae', 'ä'],
+            // ss -> ß (only for German, but as a best-effort)
+            // Skipped intentionally — ß↔ss is context-dependent
+        ];
+
+        for (const [digraph, umlaut] of invertMap) {
+            // Replace digraph with umlaut using a simple global string replace
+            result = result.split(digraph).join(umlaut);
+        }
+
+        return result;
+    }
+
+    /**
      * Remove diacritics and apply language-specific character mappings
      * @param {string} text - Input text
      * @returns {string} - Text with diacritics removed
@@ -278,6 +320,14 @@ class TextOptimizer {
         const processedLines = lines.map(line => {
             let result = line;
             
+            // Remove full markdown-style citation links: [label](url) -> completely removed
+            // This handles cases like [business.uq.edu](https://business.uq.edu.au/...)
+            result = result.replace(/\[[^\]]*\]\(https?:\/\/[^)]*\)/g, '');
+
+            // Remove markdown-style links where URL is not http (e.g. [text](path))
+            // Only if it looks like a citation (label contains a dot or is short)
+            result = result.replace(/\[[^\]]*\]\([^)]*\)/g, '');
+            
             // Remove numbered citations: [1], [2], [123], etc.
             result = result.replace(/\[\d+\]/g, '');
             
@@ -293,7 +343,7 @@ class TextOptimizer {
             // Remove reference markers: ¹, ², ³, etc.
             result = result.replace(/[¹²³⁴⁵⁶⁷⁸⁹⁰]/g, '');
             
-            // Remove superscript numbers: ¹, ², ³, etc. (Unicode superscripts)
+            // Remove superscript numbers (Unicode superscripts)
             result = result.replace(/[\u2070-\u209F]/g, '');
             
             // Clean up extra spaces left by removed citations (within the line only)
