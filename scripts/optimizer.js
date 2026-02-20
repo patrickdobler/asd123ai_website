@@ -69,6 +69,7 @@ class TextOptimizer {
         this.settings = {
             applyLanguageMapping: false,  // New setting for language character replacement
             removeDiacritics: false,
+            reverseDiacritics: false,
             removeCitations: false,
             convertMarkdown: false,
             removeFancyFont: false,
@@ -144,8 +145,8 @@ class TextOptimizer {
         // Apply processing steps in order
         if (this.settings.removeDiacritics) {
             processedText = this.removeDiacritics(processedText);
-        } else {
-            // When NOT removing diacritics, convert digraph sequences back to umlauts
+        } else if (this.settings.reverseDiacritics) {
+            // When reverse diacritics is toggled on, convert digraph sequences back to umlauts
             // e.g. ae -> ä, oe -> ö, ue -> ü (case-sensitive)
             processedText = this.invertDiacritics(processedText);
         }
@@ -241,11 +242,46 @@ class TextOptimizer {
     invertDiacritics(text) {
         let result = text;
 
-        // Order matters: check longer sequences won't be double-processed
-        // We use word-boundary-aware replacement to avoid false positives
-        // but since these are valid German/Swiss substitutions, a simple replace is appropriate.
+        // --- Exceptions List ---
+        // Patterns and words that should NOT be converted.
+        // This list can be expanded as needed!
+        const exceptions = [
+            // 1. Specific letter patterns for 'ue'
+            /([qQ]ue)/g,               // catches Quelle, bequem, Konsequenz, etc.
+            /([aAeEiIoOuUäöüÄÖÜ]ue)/g, // catches vowels before 'ue': neue, Bauer, Abenteuer, Reue
+
+            // 2. Words with '-uell' / '-uel'
+            /\b([a-zA-Z]*(?:akt|act|man|event|individ|virt|vis|sex|spirit|text|rit|konzept|d|sam|eman)uell?[a-zA-Z]*)\b/gi,
+
+            // 3. Further specific exceptions with 'ue'
+            /\b(Statue[n]?)\b/gi,
+            /\b(Menuett[e]?)\b/gi,
+            /\b(Silhouette[n]?)\b/gi,
+            /\b(Pirouette[n]?)\b/gi,
+
+            // 4. Exceptions for 'oe'
+            /\b([Pp]oe[st][a-z]*)\b/gi,     // Poet, Poesie
+            /\b([Kk]oeffizient[a-z]*)\b/gi, // Koeffizient
+            /\b([Aa]loe)\b/gi,              // Aloe
+
+            // 5. Exceptions for 'ae'
+            /\b([Mm]ichael|[Rr]a[fp]hael|[Ii]srael)\b/gi, // Names
+            /\b([Aa]ero[a-z]*)\b/gi,                      // aerodynamisch, Aerosol
+            /\b(Paella)\b/gi                              // Paella
+        ];
+
+        // Protect these exceptions by temporarily replacing them with a placeholder
+        const protectedWords = [];
+        exceptions.forEach((regex) => {
+            result = result.replace(regex, (match) => {
+                const placeholder = `__PROTECTED_${protectedWords.length}__`;
+                protectedWords.push(match);
+                return placeholder;
+            });
+        });
+
         const invertMap = [
-            // ue -> ü (but not already ü)
+            // ue -> ü
             ['UE', 'Ü'],
             ['Ue', 'Ü'],
             ['ue', 'ü'],
@@ -256,15 +292,18 @@ class TextOptimizer {
             // ae -> ä
             ['AE', 'Ä'],
             ['Ae', 'Ä'],
-            ['ae', 'ä'],
-            // ss -> ß (only for German, but as a best-effort)
-            // Skipped intentionally — ß↔ss is context-dependent
+            ['ae', 'ä']
+            // ss -> ß is intentionally ignored as it is highly context-dependent
         ];
 
         for (const [digraph, umlaut] of invertMap) {
-            // Replace digraph with umlaut using a simple global string replace
             result = result.split(digraph).join(umlaut);
         }
+
+        // Restore protected words
+        protectedWords.forEach((word, index) => {
+            result = result.replace(`__PROTECTED_${index}__`, word);
+        });
 
         return result;
     }
@@ -597,6 +636,7 @@ class OptimizerUI {
         const settingMap = {
             'apply-language-mapping': 'applyLanguageMapping',
             'remove-diacritics': 'removeDiacritics',
+            'reverse-diacritics': 'reverseDiacritics',
             'remove-citations': 'removeCitations',
             'convert-markdown': 'convertMarkdown',
             'remove-fancy-font': 'removeFancyFont',
@@ -759,6 +799,7 @@ class OptimizerUI {
         const toggleMap = {
             'applyLanguageMapping': 'apply-language-mapping',
             'removeDiacritics': 'remove-diacritics',
+            'reverseDiacritics': 'reverse-diacritics',
             'removeCitations': 'remove-citations',
             'convertMarkdown': 'convert-markdown',
             'removeFancyFont': 'remove-fancy-font',
@@ -789,6 +830,7 @@ class StorageManager {
             optimizer: {
                 applyLanguageMapping: false,
                 removeDiacritics: false,
+                reverseDiacritics: false,
                 removeCitations: false,
                 convertMarkdown: false,
                 removeFancyFont: false,
