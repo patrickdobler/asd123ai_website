@@ -74,7 +74,9 @@ class TextOptimizer {
             convertMarkdown: false,
             removeFancyFont: false,
             replaceEmDash: false,
-            languageMapping: 'swiss-german'
+            languageMapping: 'swiss-german',
+            targetSystem: 'auto',         // 'auto' | 'windows' | 'linux' | 'macos'
+            removeLineBreaks: false        // Remove all line breaks (default off)
         };
 
         this.languageMappings = { ...EMBEDDED_MAPPINGS };
@@ -142,6 +144,9 @@ class TextOptimizer {
         let processedText = inputText;
         const originalText = inputText;
 
+        // Cross-platform normalization runs FIRST
+        processedText = this.normalizeForTargetSystem(processedText);
+
         // Apply processing steps in order
         if (this.settings.removeDiacritics) {
             processedText = this.removeDiacritics(processedText);
@@ -171,6 +176,11 @@ class TextOptimizer {
         // Apply language mapping AFTER em dash replacement
         if (this.settings.applyLanguageMapping) {
             processedText = this.applyLanguageCharacterMapping(processedText);
+        }
+
+        // Line break removal runs LAST
+        if (this.settings.removeLineBreaks) {
+            processedText = this.removeAllLineBreaks(processedText);
         }
 
         return {
@@ -536,6 +546,142 @@ class TextOptimizer {
     }
 
     /**
+     * Normalize text for cross-platform compatibility.
+     * Fixes BOM, line endings, mojibake (CP-1252 to UTF-8), invisible characters,
+     * and non-breaking spaces.
+     * @param {string} text - Input text
+     * @returns {string} - Normalized text
+     */
+    normalizeForTargetSystem(text) {
+        let result = text;
+
+        // 1. Remove BOM (Byte Order Mark) from start and mid-text
+        result = result.replace(/\uFEFF/g, '');
+
+        // 2. Fix common CP-1252 to UTF-8 mojibake patterns
+        // These occur when text encoded as UTF-8 is misinterpreted as CP-1252
+        const mojibakeMap = [
+            ['\u00C3\u00A4', '\u00E4'],   // ä
+            ['\u00C3\u00B6', '\u00F6'],   // ö
+            ['\u00C3\u00BC', '\u00FC'],   // ü
+            ['\u00C3\u0084', '\u00C4'],   // Ä
+            ['\u00C3\u0096', '\u00D6'],   // Ö
+            ['\u00C3\u009C', '\u00DC'],   // Ü
+            ['\u00C3\u00A9', '\u00E9'],   // é
+            ['\u00C3\u00A8', '\u00E8'],   // è
+            ['\u00C3\u00AA', '\u00EA'],   // ê
+            ['\u00C3\u00AB', '\u00EB'],   // ë
+            ['\u00C3\u00A0', '\u00E0'],   // à
+            ['\u00C3\u00A1', '\u00E1'],   // á
+            ['\u00C3\u00A2', '\u00E2'],   // â
+            ['\u00C3\u00A3', '\u00E3'],   // ã
+            ['\u00C3\u00A5', '\u00E5'],   // å
+            ['\u00C3\u00AD', '\u00ED'],   // í
+            ['\u00C3\u00AC', '\u00EC'],   // ì
+            ['\u00C3\u00AE', '\u00EE'],   // î
+            ['\u00C3\u00AF', '\u00EF'],   // ï
+            ['\u00C3\u00B3', '\u00F3'],   // ó
+            ['\u00C3\u00B2', '\u00F2'],   // ò
+            ['\u00C3\u00B4', '\u00F4'],   // ô
+            ['\u00C3\u00B5', '\u00F5'],   // õ
+            ['\u00C3\u00BA', '\u00FA'],   // ú
+            ['\u00C3\u00B9', '\u00F9'],   // ù
+            ['\u00C3\u00BB', '\u00FB'],   // û
+            ['\u00C3\u00B1', '\u00F1'],   // ñ
+            ['\u00C3\u0091', '\u00D1'],   // Ñ
+            ['\u00C3\u00A7', '\u00E7'],   // ç
+            ['\u00C3\u0087', '\u00C7'],   // Ç
+            ['\u00C3\u009F', '\u00DF'],   // ß (Latin-1/ISO-8859-1 interpretation)
+            ['\u00C3\u0178', '\u00DF'],   // ß (CP-1252 interpretation where 0x9F → Ÿ)
+            ['\u00C3\u00A6', '\u00E6'],   // æ
+            ['\u00C3\u0086', '\u00C6'],   // Æ
+            ['\u00C2\u00AB', '\u00AB'],   // «
+            ['\u00C2\u00BB', '\u00BB'],   // »
+            ['\u00C2\u00B0', '\u00B0'],   // °
+            ['\u00C2\u00A7', '\u00A7'],   // §
+            ['\u00C2\u00A9', '\u00A9'],   // ©
+            ['\u00C2\u00AE', '\u00AE'],   // ®
+            ['\u00C2\u00B2', '\u00B2'],   // ²
+            ['\u00C2\u00B3', '\u00B3'],   // ³
+            ['\u00C2\u00BD', '\u00BD'],   // ½
+            ['\u00C2\u00BC', '\u00BC'],   // ¼
+            ['\u00C2\u00BE', '\u00BE'],   // ¾
+            ['\u00C2\u00AD', ''],          // soft hyphen mojibake (remove)
+            ['\u00C2\u00A0', ' '],         // non-breaking space mojibake
+            ['\u00E2\u0080\u0093', '\u2013'],  // en-dash
+            ['\u00E2\u0080\u0094', '\u2014'],  // em-dash
+            ['\u00E2\u0080\u009C', '\u201C'],  // left double quote
+            ['\u00E2\u0080\u009D', '\u201D'],  // right double quote
+            ['\u00E2\u0080\u0098', '\u2018'],  // left single quote
+            ['\u00E2\u0080\u0099', '\u2019'],  // right single quote
+            ['\u00E2\u0080\u00A6', '\u2026'],  // ellipsis
+            ['\u00E2\u0080\u00A2', '\u2022'],  // bullet
+        ];
+
+        for (const [garbled, correct] of mojibakeMap) {
+            if (!garbled) continue;
+            const parts = result.split(garbled);
+            if (parts.length > 1) {
+                result = parts.join(correct);
+            }
+        }
+
+        // 3. Remove invisible/zero-width characters
+        result = result.replace(/[\u200B\u200C\u200D]/g, '');  // Zero-width space/joiner/non-joiner
+        result = result.replace(/\u00AD/g, '');                 // Soft hyphen
+
+        // 4. Replace non-breaking spaces with regular spaces
+        result = result.replace(/\u00A0/g, ' ');
+
+        // 5. Replace other unusual whitespace with normal space
+        // Thin space, hair space, en space, em space, figure space, narrow no-break space
+        result = result.replace(/[\u2000-\u200A\u202F\u205F]/g, ' ');
+
+        // 6. Normalize line endings based on target system
+        const target = this.settings.targetSystem;
+        // First, normalize all line endings to LF
+        result = result.replace(/\r\n/g, '\n');
+        result = result.replace(/\r/g, '\n');
+
+        if (target === 'windows') {
+            // Convert LF to CRLF for Windows
+            result = result.replace(/\n/g, '\r\n');
+        }
+        // 'linux', 'macos', and 'auto' all use LF — already done
+
+        return result;
+    }
+
+    /**
+     * Remove all line breaks from text, joining into a single paragraph.
+     * @param {string} text - Input text
+     * @returns {string} - Text with line breaks removed
+     */
+    removeAllLineBreaks(text) {
+        let result = text;
+
+        // Normalize line breaks to \n for easier processing
+        result = result.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+        // If there's 1 line break, replace with space
+        // If there are multiple, remove one line break (e.g. \n\n becomes \n)
+        result = result.replace(/\n+/g, (match) => {
+            if (match.length === 1) return ' ';
+            return '\n'.repeat(match.length - 1);
+        });
+
+        // Collapse multiple spaces into one
+        result = result.replace(/ {2,}/g, ' ');
+
+        // If target system is Windows, restore \r\n
+        if (this.settings && this.settings.targetSystem === 'windows') {
+            result = result.replace(/\n/g, '\r\n');
+        }
+
+        return result.trim();
+    }
+
+    /**
      * Escape special regex characters
      * @param {string} string - String to escape
      * @returns {string} - Escaped string
@@ -580,6 +726,7 @@ class OptimizerUI {
         this.copyButton = document.getElementById('copy-text-btn');
         this.clearButton = document.getElementById('clear-text-btn');
         this.languageSelect = document.getElementById('language-select');
+        this.targetSystemButtons = document.querySelectorAll('#target-system-buttons button');
     }
 
     setupEventListeners() {
@@ -607,6 +754,13 @@ class OptimizerUI {
         // Language selection
         if (this.languageSelect) {
             this.languageSelect.addEventListener('change', (e) => this.handleLanguageChange(e.target.value));
+        }
+
+        // Target system selection
+        if (this.targetSystemButtons) {
+            this.targetSystemButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => this.handleTargetSystemChange(e.currentTarget.dataset.system));
+            });
         }
 
         // Toggle switches
@@ -640,7 +794,8 @@ class OptimizerUI {
             'remove-citations': 'removeCitations',
             'convert-markdown': 'convertMarkdown',
             'remove-fancy-font': 'removeFancyFont',
-            'replace-em-dash': 'replaceEmDash'
+            'replace-em-dash': 'replaceEmDash',
+            'remove-line-breaks': 'removeLineBreaks'
         };
 
         const settingKey = settingMap[toggleId];
@@ -653,6 +808,25 @@ class OptimizerUI {
     handleLanguageChange(language) {
         this.optimizer.updateSettings({ languageMapping: language });
         this.saveUserSettings();
+    }
+
+    handleTargetSystemChange(targetSystem) {
+        this.optimizer.updateSettings({ targetSystem: targetSystem });
+        this.updateTargetSystemUI(targetSystem);
+        this.saveUserSettings();
+    }
+
+    updateTargetSystemUI(targetSystem) {
+        if (!this.targetSystemButtons) return;
+        this.targetSystemButtons.forEach(btn => {
+            if (btn.dataset.system === targetSystem) {
+                btn.className = 'btn btn-primary';
+                btn.style.padding = '10px 20px';
+            } else {
+                btn.className = 'btn btn-secondary';
+                btn.style.padding = '10px 20px';
+            }
+        });
     }
 
     async handleTextProcess() {
@@ -803,7 +977,8 @@ class OptimizerUI {
             'removeCitations': 'remove-citations',
             'convertMarkdown': 'convert-markdown',
             'removeFancyFont': 'remove-fancy-font',
-            'replaceEmDash': 'replace-em-dash'
+            'replaceEmDash': 'replace-em-dash',
+            'removeLineBreaks': 'remove-line-breaks'
         };
 
         for (const [settingKey, toggleId] of Object.entries(toggleMap)) {
@@ -816,6 +991,11 @@ class OptimizerUI {
         // Apply language selection
         if (this.languageSelect && settings.languageMapping) {
             this.languageSelect.value = settings.languageMapping;
+        }
+
+        // Apply target system selection
+        if (this.targetSystemButtons && settings.targetSystem) {
+            this.updateTargetSystemUI(settings.targetSystem);
         }
     }
 }
@@ -835,7 +1015,9 @@ class StorageManager {
                 convertMarkdown: false,
                 removeFancyFont: false,
                 replaceEmDash: false,
-                languageMapping: 'swiss-german'
+                languageMapping: 'swiss-german',
+                targetSystem: 'auto',
+                removeLineBreaks: false
             },
             ui: {
                 textareaHeight: '300px'
