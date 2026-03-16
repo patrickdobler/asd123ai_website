@@ -10,15 +10,15 @@ import { UIController } from './ui-controller.js';
 // Comprehensive pattern definitions from internet sources
 const entityPatterns = {
     PERSON_NAME: {
-        pattern: /\b([A-Z][a-z]{2,} ){1,3}[A-Z][a-z]{2,}\b/g,
+        pattern: /\b([A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]{2,}(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]{2,})? ){1,3}[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]{2,}(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]{2,})?\b/g,
         priority: 80
     },
     PERSON_FULL: {
-        pattern: /\b[A-Z][a-z]{2,}(?:\s+[A-Z]\.?\s+)?[A-Z][a-z]{2,}\b/g,
+        pattern: /\b[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]{2,}(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]{2,})?(?:\s+[A-ZÀ-ÖØ-Þ]\.?\s+)?[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]{2,}(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]{2,})?\b/g,
         priority: 81
     },
     PERSON_TITLE: {
-        pattern: /\b(?:Mr\.?|Mrs\.?|Miss|Ms\.?|Sir|Madam|Dr\.?|Professor|Prof\.?|Reverend|Rev\.?|Captain|Capt\.?|Colonel|Col\.?|Lieutenant|Lt\.?|Sergeant|Sgt\.?|Officer|Officer\.?|Judge|Justice|Honorable|Hon\.?|Senator|Sen\.?|Rep\.?|Mayor|President|Pres\.?|Vice President|VP|CEO|CFO|CTO|Director|Officer|Chief)\s+[A-Z][a-z]+(?:\s+[A-Z]\.?)?(?:\s+[A-Z][a-z]+)?\b/gi,
+        pattern: /\b(?:Mr\.?|Mrs\.?|Miss|Ms\.?|Sir|Madam|Dr\.?\s?med\.?|Dr\.?\s?phil\.?|Dr\.?\s?jur\.?|Dr\.?\s?rer\.?\s?nat\.?|Dr\.?|Professor|Prof\.?\s?Dr\.?|Prof\.?|Herr|Frau|lic\.?\s?iur\.?|lic\.?\s?phil\.?|Reverend|Rev\.?|Captain|Capt\.?|Colonel|Col\.?|Lieutenant|Lt\.?|Sergeant|Sgt\.?|Officer|Officer\.?|Judge|Justice|Honorable|Hon\.?|Senator|Sen\.?|Rep\.?|Mayor|President|Pres\.?|Vice President|VP|CEO|CFO|CTO|Director|Officer|Chief)\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+)?(?:\s+[A-ZÀ-ÖØ-Þ]\.?)?(?:\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+)?)?\b/gi,
         priority: 3
     },
     EMAIL: {
@@ -74,7 +74,7 @@ const entityPatterns = {
         priority: 16
     },
     DATE: {
-        pattern: /\b(?:(?:\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})|(?:\d{4}[-\/]\d{1,2}[-\/]\d{1,2})|(?:\d{1,2}\.\d{1,2}\.\d{2,4})|(?:\d{4}\.\d{1,2}\.\d{1,2})|(?:\d{1,2}\s+\d{1,2}\s+\d{2,4})|(?:\d{4}\s+\d{1,2}\s+\d{1,2})|(?:(?:Jan\.?(?:uary)?|Feb\.?(?:ruary)?|Mar\.?(?:ch)?|Apr\.?(?:il)?|May\.?|Jun\.?(?:e)?|Jul\.?(?:y)?|Aug\.?(?:ust)?|Sep\.?(?:tember)?|Oct\.?(?:ober)?|Nov\.?(?:ember)?|Dec\.?(?:ember)?)\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4})|(?:\d{1,2}(?:st|nd|rd|th)?\s+(?:Jan\.?(?:uary)?|Feb\.?(?:ruary)?|Mar\.?(?:ch)?|Apr\.?(?:il)?|May\.?|Jun\.?(?:e)?|Jul\.?(?:y)?|Aug\.?(?:ust)?|Sep\.?(?:tember)?|Oct\.?(?:ober)?|Nov\.?(?:ember)?|Dec\.?(?:ember)?)\.?,?\s+\d{4}))\b/gi,
+        pattern: /\b(?:(?:\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})|(?:\d{4}[-\/]\d{1,2}[-\/]\d{1,2})|(?:\d{1,2}\.\d{1,2}\.\d{2,4})|(?:\d{4}\.\d{1,2}\.\d{1,2})|(?:\d{1,2}\s+\d{1,2}\s+\d{2,4})|(?:\d{4}\s+\d{1,2}\s+\d{1,2})|(?:(?:Jan\.?(?:uary)?|Feb\.?(?:ruary)?|Mar\.?(?:ch)?|Apr\.?(?:il)?|May\.?|Jun\.?(?:e)?|Jul\.?(?:y)?|Aug\.?(?:ust)?|Sep\.?(?:tember)?|Oct\.?(?:ober)?|Nov\.?(?:ember)?|Dec\.?(?:ember)?|Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4})|(?:\d{1,2}(?:st|nd|rd|th)?\.?\s+(?:Jan\.?(?:uary)?|Feb\.?(?:ruary)?|Mar\.?(?:ch)?|Apr\.?(?:il)?|May\.?|Jun\.?(?:e)?|Jul\.?(?:y)?|Aug\.?(?:ust)?|Sep\.?(?:tember)?|Oct\.?(?:ober)?|Nov\.?(?:ember)?|Dec\.?(?:ember)?|Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\.?,?\s+\d{4}))\b/gi,
         priority: 17
     },
     URL: {
@@ -206,12 +206,12 @@ const entityPatterns = {
         priority: 50
     },
     CH_PHONE_MOBILE: {
-        pattern: /\b(?:\+41|0041|0)\s?7[5-9]\d\s?\d{3}\s?\d{2}\s?\d{2}\b/g,
-        priority: 51
+        pattern: /(?:^|[\s(])(?:\+41|0041|0)\s?7[5-9]\s?\d\s?\d{2,3}\s?\d{2}\s?\d{2}\b/g,
+        priority: 2
     },
     CH_PHONE_LANDLINE: {
-        pattern: /\b(?:\+41|0041|0)\s?(?:[1-9]\d{1,2})\s?\d{3}\s?\d{2}\s?\d{2}\b/g,
-        priority: 52
+        pattern: /(?:^|[\s(])(?:\+41|0041|0)\s?(?:[1-9]\d{1})\s?\d{3}\s?\d{2}\s?\d{2}\b/g,
+        priority: 2
     },
     CH_PASSPORT_NUMBER: {
         pattern: /\b[A-Z]\d{7}\b/g,
@@ -222,20 +222,20 @@ const entityPatterns = {
         priority: 54
     },
     CH_POSTAL_CODE: {
-        pattern: /(?:^|\s)(?:CH-)?[1-9]\d{3}(?=\s|$)/g,
+        pattern: /(?:^|[,\s])(?:CH-)?[1-9]\d{3}(?=\s+[A-ZÀ-ÖØ-Þa-zà-öø-ÿ])/g,
         priority: 90
     },
     CH_TAX_AHV_NUMBER: {
         pattern: /\b756(?:\.\d{4}){2}\.\d{2}\b|\b756\d{10}\b/g,
-        priority: 56
+        priority: 1
     },
     CH_SOCIAL_SECURITY_OASI: {
         pattern: /(?:AHV|AVS|OASI)\s*(?:Nr\.?|Number|Nummer)?\s*[:#]?\s*(?:756(?:\.\d{4}){2}\.\d{2}|756\d{10})/gi,
         priority: 57
     },
     CH_BANK_IBAN: {
-        pattern: /\bCH\d{2}[0-9A-Z]{17}\b/g,
-        priority: 58
+        pattern: /\bCH\d{2}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{1}\b|\bCH\d{2}[0-9A-Z]{17}\b/g,
+        priority: 2
     },
     CH_DRIVER_LICENSE: {
         pattern: /(?:Führerausweis|Fuehrerausweis|Permis de conduire|Licenza di condurre)\s*[:#]?\s*[A-Z0-9]{6,10}\b/gi,
@@ -304,6 +304,18 @@ const entityPatterns = {
     DE_HEALTH_INSURANCE_NUMBER: {
         pattern: /(?:Versichertennummer|Gesundheitskarte|Krankenversicherungsnummer)\s*[:#]?\s*[A-Z]\d{9}[A-Z]\b/gi,
         priority: 75
+    },
+    DE_CH_ADDRESS: {
+        pattern: /\b[A-ZÀ-ÖØ-Þa-zà-öø-ÿß]+(?:strasse|straße|str\.|gasse|weg|platz|allee|ring|damm|ufer|steig|pfad|rain|graben)\s+\d{1,5}[a-zA-Z]?\b/gi,
+        priority: 2
+    },
+    CH_LICENSE_PLATE: {
+        pattern: /\b(?:AG|AI|AR|BE|BL|BS|FR|GE|GL|GR|JU|LU|NE|NW|OW|SG|SH|SO|SZ|TG|TI|UR|VD|VS|ZG|ZH)\s?\d{1,3}\s?\d{3}\b/g,
+        priority: 2
+    },
+    CH_INSURANCE_NUMBER: {
+        pattern: /(?:Versicherungsnummer|Policen?(?:-?Nr\.?|-?nummer)?|Police\s*Nr\.?)\s*(?:[:.]|\s|lautet)\s*[\w\d][\w\d-]{3,20}\b|\b\d{4}-CH-\d{4}\b/gi,
+        priority: 2
     }
 };
 
@@ -557,6 +569,64 @@ class AnonymizerApp {
         const allMatches = [];
         const occupiedRanges = [];
         
+        // German/French stopwords that commonly start with capital letters
+        // and should NOT be detected as person names
+        const germanStopwords = new Set([
+            'Ich', 'Du', 'Er', 'Sie', 'Es', 'Wir', 'Ihr', 'Mein', 'Meine', 'Meiner', 'Meinem', 'Meinen',
+            'Dein', 'Deine', 'Deiner', 'Deinem', 'Deinen', 'Sein', 'Seine', 'Seiner', 'Seinem', 'Seinen',
+            'Ihre', 'Ihrer', 'Ihrem', 'Ihren', 'Unser', 'Unsere', 'Unserer', 'Unserem', 'Unseren',
+            'Euer', 'Eure', 'Eurer', 'Eurem', 'Euren', 'Dieser', 'Diese', 'Dieses', 'Diesem', 'Diesen',
+            'Jener', 'Jene', 'Jenes', 'Jenem', 'Jenen', 'Welcher', 'Welche', 'Welches', 'Welchem', 'Welchen',
+            'Der', 'Die', 'Das', 'Dem', 'Den', 'Des', 'Ein', 'Eine', 'Eines', 'Einem', 'Einen', 'Einer',
+            'Und', 'Oder', 'Aber', 'Denn', 'Weil', 'Wenn', 'Dass', 'Ob', 'Als', 'Wie', 'Bis', 'Seit',
+            'Vor', 'Nach', 'Für', 'Mit', 'Von', 'Aus', 'Bei', 'Über', 'Unter', 'Zwischen', 'Neben',
+            'Sehr', 'Viel', 'Mehr', 'Noch', 'Schon', 'Auch', 'Nur', 'Nicht', 'Kein', 'Keine', 'Keiner',
+            'Hier', 'Dort', 'Heute', 'Morgen', 'Gestern', 'Jetzt', 'Dann', 'Bitte', 'Danke',
+            'Bitte', 'Guten', 'Gute', 'Guter', 'Gutem', 'Gutes',
+            'Jahren', 'Jahr', 'Tage', 'Tagen', 'Wochen', 'Monate', 'Monaten',
+            'Kunde', 'Kunden', 'Konto', 'Konten', 'Rechnung', 'Rechnungen',
+            'Fahrzeug', 'Fahrzeuge', 'Fahrzeugen', 'Auto', 'Autos',
+            'Diabetes', 'Krebs', 'Asthma', 'Allergie', 'Typ',
+            'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag',
+            'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember',
+            'Anfrage', 'Betreff', 'Datum', 'Anhang', 'Absender', 'Empfänger',
+            'Kundendienst', 'Support', 'Versicherung', 'Versicherungsnummer',
+            'Versandapotheke', 'Apotheke', 'Lieferung', 'Präparate', 'Verordnung',
+            'Kostengutsprache', 'Abrechnung', 'Prämie',
+            'Mobiltelefon', 'Telefon', 'Geschäftsnummer', 'Rückruf', 'Rückfragen',
+            'Buchhalter', 'Sitzungen', 'Arbeit',
+            'Kennzeichen', 'Zusatzversichert',
+            'Freundliche', 'Grüsse', 'Grüße',
+            'Enthaltene', 'Kategorien',
+            'Drittperson', 'Ärztin', 'Arzt',
+            'Krankenversicherungspolice', 'Krankenversicherung', 'Krankenkasse',
+            'Unstimmigkeit', 'Angelegenheit',
+            'Name', 'Geburtsdatum', 'Geburtsort', 'Adresse', 'Beruf', 'Arbeitgeber',
+            'Gesundheitsdaten', 'Telefonnummer',
+            'Text', 'Textil', 'Behandelnder',
+            'Allerdings', 'Alternativ', 'Ebenfalls', 'Gleichzeitig', 'Baldmöglichst',
+            'Damen', 'Herren', 'Herrn',
+            'Leitender', 'Leitende',
+            'Tagsüber', 'Deshalb',
+            'Enthielt', 'Erhalten', 'Erreichbar',
+            'Jedoch', 'Regelmässig', 'Regelmäßig',
+            'Vollständige', 'Vollständig',
+            'Bereits', 'Darüber', 'Ausgestellt', 'Nachreichen',
+            'Prüfen', 'Kontaktieren',
+            'Korrekt', 'Abgerechnet'
+        ]);
+        
+        // Helper function to check if a PERSON_NAME match is likely a false positive
+        const isNameFalsePositive = (matchText) => {
+            const words = matchText.trim().split(/\s+/);
+            // If all words in the match are stopwords, it's a false positive
+            return words.every(word => {
+                // Also check hyphenated parts
+                const parts = word.split('-');
+                return parts.every(part => germanStopwords.has(part));
+            });
+        };
+        
         // Helper function to check if a range overlaps with existing ranges
         const hasOverlap = (start, end) => {
             return occupiedRanges.some(range => {
@@ -573,20 +643,39 @@ class AnonymizerApp {
             const matches = [...text.matchAll(config.pattern)];
             
             for (const match of matches) {
+                const matchText = match[0];
+                
+                // Filter out false positive person names
+                if ((type === 'PERSON_NAME' || type === 'PERSON_FULL') && isNameFalsePositive(matchText)) {
+                    continue;
+                }
+                
+                // For patterns that use leading whitespace/punctuation in lookahead,
+                // trim leading whitespace from the match for cleaner output
+                let startPos = match.index;
+                let cleanText = matchText;
+                if (type === 'CH_PHONE_MOBILE' || type === 'CH_PHONE_LANDLINE' || type === 'CH_POSTAL_CODE') {
+                    const leadingWhitespace = cleanText.match(/^[\s,(]+/);
+                    if (leadingWhitespace) {
+                        startPos += leadingWhitespace[0].length;
+                        cleanText = cleanText.substring(leadingWhitespace[0].length);
+                    }
+                }
+                
                 allMatches.push({
-                    text: match[0],
+                    text: cleanText,
                     type: type,
-                    startPos: match.index,
-                    endPos: match.index + match[0].length,
+                    startPos: startPos,
+                    endPos: startPos + cleanText.length,
                     priority: config.priority
                 });
             }
         }
         
-        // Sort all matches by their position in the text (ascending order)
-        allMatches.sort((a, b) => a.startPos - b.startPos);
+        // Sort all matches by priority first (lower = higher priority), then by position
+        allMatches.sort((a, b) => a.priority - b.priority || a.startPos - b.startPos);
         
-        // Second pass: process matches in text order, checking for overlaps
+        // Second pass: process matches in priority order, checking for overlaps
         const entities = [];
         for (const match of allMatches) {
             // Check if this position overlaps with already accepted entities
@@ -602,6 +691,9 @@ class AnonymizerApp {
                 occupiedRanges.push({ start: match.startPos, end: match.endPos });
             }
         }
+        
+        // Sort final entities by position for correct output order
+        entities.sort((a, b) => a.startPos - b.startPos);
         
         return entities;
     }
