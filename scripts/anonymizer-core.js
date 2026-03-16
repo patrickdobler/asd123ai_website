@@ -66,7 +66,7 @@ const entityPatterns = {
         priority: 14
     },
     ADDRESS: {
-        pattern: /\d{1,5}\s+[\w\s]{1,50}\s+(Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Circle|Cir|Plaza|Pl)\b/gi,
+        pattern: /\d{1,5}\s+[\w\s]{1,50}\s+(Street|St\.|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Circle|Cir|Plaza|Pl)\b/gi,
         priority: 15
     },
     STREET_ADDRESS: {

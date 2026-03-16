@@ -15,6 +15,12 @@ class EntityManager {
      * @returns {string} - The generated placeholder
      */
     generatePlaceholder(type, originalText) {
+        // Deduplicate: if the exact same text was already anonymized, reuse its placeholder
+        const existingPlaceholder = this.reverseLookup.get(originalText);
+        if (existingPlaceholder) {
+            return existingPlaceholder;
+        }
+
         if (!this.entityCounters[type]) {
             this.entityCounters[type] = 0;
         }
