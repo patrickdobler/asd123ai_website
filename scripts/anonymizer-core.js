@@ -461,18 +461,22 @@ class AnonymizerApp {
         
         if (modelType !== 'regex') {
             try {
-                this.uiController.showLoading(true, `Loading ${modelType} model...`);
+                const models = AIModelProcessor.getAvailableModels();
+                const modelLabel = models[modelType]?.description || modelType;
+                this.uiController.showLoading(true, `Loading ${modelLabel} model...`);
                 await this.aiProcessor.loadModel(modelType);
                 this.uiController.showLoading(false);
-                this.uiController.showSuccess('AI model loaded successfully');
+                this.uiController.showSuccess(`${modelLabel} loaded successfully`);
             } catch (error) {
                 // IMPORTANT: Do NOT silently fall back to regex
                 // Show error and reset to regex mode explicitly
-                this.uiController.showError('Failed to load AI model. Please try again or use Quick Scan.');
+                this.uiController.showError(`Failed to load AI model: ${error.message}`);
                 this.currentMode = 'regex';
                 document.getElementById('modelSelect').value = 'regex';
                 this.uiController.showLoading(false);
             }
+        } else {
+            this.aiProcessor.unload();
         }
     }
 
@@ -503,8 +507,10 @@ class AnonymizerApp {
                 const aiResult = await this.aiProcessor.processText(inputText);
                 
                 // AI returns pre-masked text and replacements directly
-                // The maskedText already contains [PII_N] placeholders
-                anonymizedText = aiResult.maskedText;
+                // The maskedText already contains placeholders
+                anonymizedText = this.isRedactMode
+                    ? this.convertAIPlaceholdersToRedactions(aiResult.maskedText, aiResult.replacements)
+                    : aiResult.maskedText;
                 
                 // Register entities with EntityManager for deanonymization
                 this.registerAIEntities(aiResult.replacements);
@@ -540,14 +546,15 @@ class AnonymizerApp {
      */
     registerAIEntities(replacements) {
         replacements.forEach(replacement => {
-            // Extract the index from [PII_N] format
+            // Extract the index from typed placeholders such as [EMAIL_1] or [PII_1]
             const indexMatch = replacement.placeholder.match(/_(\d+)\]/);
             const index = indexMatch ? parseInt(indexMatch[1]) : 1;
+            const entityType = replacement.type || 'PII';
             
             // Register with entity manager
             this.entityManager.entityMap.set(replacement.placeholder, {
                 original: replacement.original,
-                type: 'PII', // AI model uses generic PII type
+                type: entityType,
                 index: index,
                 isActive: true,
                 confidence: replacement.activation
@@ -555,14 +562,24 @@ class AnonymizerApp {
             this.entityManager.reverseLookup.set(replacement.original, replacement.placeholder);
             
             // Update counter
-            if (!this.entityManager.entityCounters['PII']) {
-                this.entityManager.entityCounters['PII'] = 0;
+            if (!this.entityManager.entityCounters[entityType]) {
+                this.entityManager.entityCounters[entityType] = 0;
             }
-            this.entityManager.entityCounters['PII'] = Math.max(
-                this.entityManager.entityCounters['PII'],
+            this.entityManager.entityCounters[entityType] = Math.max(
+                this.entityManager.entityCounters[entityType],
                 index
             );
         });
+    }
+
+    convertAIPlaceholdersToRedactions(maskedText, replacements) {
+        return replacements.reduce((text, replacement) => {
+            const placeholderRegex = new RegExp(
+                replacement.placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+                'g'
+            );
+            return text.replace(placeholderRegex, '[redacted]');
+        }, maskedText);
     }
 
     processWithRegex(text) {

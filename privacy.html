@@ -59,7 +59,7 @@
                     <div class="prose prose-invert max-w-none">
 
                         <div style="margin-bottom: var(--space-8); padding: var(--space-4); background: rgba(240, 240, 232, 0.5); border: 2px solid var(--border-color); border-radius: 8px;">
-                            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;"><strong>Last updated:</strong> January 23, 2025</p>
+                            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;"><strong>Last updated:</strong> April 25, 2026</p>
                             <p style="font-size: 14px; color: var(--text-secondary);"><strong>Effective date:</strong> January 23, 2025</p>
                         </div>
 
@@ -78,6 +78,13 @@
                             <li>All processing happens locally in your browser</li>
                             <li>We cannot access, view, or store your text data</li>
                         </ul>
+                        <h4 style="font-size: var(--text-xl); font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">Optional AI Model Downloads</h4>
+                        <p style="color: var(--text-secondary); margin-bottom: var(--space-4); line-height: 1.6;">
+                            Some optional AI detection modes, including OpenAI Privacy Filter, use Hugging Face Transformers.js to download model files into your browser. When you select one of these modes, your browser may request the model weights, tokenizer, and related configuration files from Hugging Face or a content delivery network. For OpenAI Privacy Filter, the first download is approximately 950 MB.
+                        </p>
+                        <p style="color: var(--text-secondary); margin-bottom: var(--space-6); line-height: 1.6;">
+                            These downloads are one-way model downloads: your input text, uploaded files, detected entities, anonymization mappings, and generated output are not sent to Hugging Face, OpenAI, ASD123.ai servers, or any other remote processing service by the anonymizer. The model runs locally in your browser after it has been downloaded. Hugging Face or the content delivery network may still receive standard technical request data, such as your IP address, browser information, and the requested model file URL, as part of serving the model files.
+                        </p>
 
                         <h3 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">3. Data We Collect</h3>
 

@@ -2,36 +2,56 @@
 // Part of ASD123.ai Anonymizer - Privacy-First Text Protection
 // Uses Hugging Face Transformers.js for local AI processing
 //
-// IMPORTANT: This implementation uses token classification with BIO tagging
-// (B-PRIVATE, I-PRIVATE, O) - NOT regex pattern matching.
+// IMPORTANT: This implementation uses local token classification models,
+// not server-side processing or regex pattern matching.
 
 // Import transformers.js from CDN for browser compatibility
-import { AutoModel, AutoTokenizer } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0';
+import { AutoModel, AutoTokenizer, pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2';
 
 /**
  * Model configuration map - defines all available AI models
  * Each model has specific settings for loading and processing
  */
 const MODEL_CONFIG = {
+    'openai-privacy-filter': {
+        path: 'openai/privacy-filter',
+        type: 'pipeline-token-classification',
+        description: 'OpenAI Privacy Filter',
+        dtype: 'q4',
+        device: 'webgpu',
+        largeDownload: true
+    },
     // AI4Privacy Models (Token Classification)
     'ai-english': {
         path: 'ai4privacy/llama-ai4privacy-english-anonymiser-openpii',
         type: 'token-classification',
         numClasses: 3,
-        description: 'AI4Privacy - English'
+        description: 'AI4Privacy - English (Legacy PoC)'
     },
     'ai-multilingual': {
         path: 'ai4privacy/llama-ai4privacy-multilingual-anonymiser-openpii',
         type: 'token-classification',
         numClasses: 3,
-        description: 'AI4Privacy - Multilingual'
+        description: 'AI4Privacy - Multilingual (Legacy PoC)'
     }
+};
+
+const PRIVACY_FILTER_LABELS = {
+    account_number: 'ACCOUNT_NUMBER',
+    private_address: 'ADDRESS',
+    private_email: 'EMAIL',
+    private_person: 'PERSON_NAME',
+    private_phone: 'PHONE',
+    private_url: 'URL',
+    private_date: 'DATE',
+    secret: 'SECRET'
 };
 
 class AIModelProcessor {
     constructor() {
         this.tokenizer = null;
         this.model = null;
+        this.classifier = null;
         this.modelLoaded = false;
         this.currentModel = null;
         this.currentConfig = null;
@@ -58,9 +78,21 @@ class AIModelProcessor {
             throw new Error(`Unknown model: ${modelName}. Available models: ${Object.keys(MODEL_CONFIG).join(', ')}`);
         }
 
+        if (this.modelLoaded && this.currentModel === modelName) {
+            this.updateLoadingStatus(`${config.description} ready`);
+            return;
+        }
+
+        this.unload();
+
         const modelPath = config.path;
         
         try {
+            if (config.type === 'pipeline-token-classification') {
+                await this.loadPipelineModel(modelName, config);
+                return;
+            }
+
             // Show loading indicator
             this.updateLoadingStatus(`Loading ${config.description} tokenizer...`);
             
@@ -93,6 +125,29 @@ class AIModelProcessor {
         }
     }
 
+    async loadPipelineModel(modelName, config) {
+        if (config.device === 'webgpu' && !navigator.gpu) {
+            throw new Error(`${config.description} requires a browser with WebGPU support. Please use Chrome/Edge or the Regex mode.`);
+        }
+
+        const sizeHint = config.largeDownload ? ' The first load downloads about 950 MB and may take a while.' : '';
+        this.updateLoadingStatus(`Loading ${config.description} from Hugging Face.${sizeHint}`);
+
+        this.classifier = await pipeline(
+            'token-classification',
+            config.path,
+            {
+                device: config.device || 'wasm',
+                dtype: config.dtype || 'q8'
+            }
+        );
+
+        this.modelLoaded = true;
+        this.currentModel = modelName;
+        this.currentConfig = config;
+        this.updateLoadingStatus(`${config.description} ready`);
+    }
+
     /**
      * Process text using the AI model for PII detection
      * This is the CORE FUNCTION - uses token classification, NOT regex
@@ -104,6 +159,10 @@ class AIModelProcessor {
     async processText(text, threshold = 0.3) {
         if (!this.modelLoaded) {
             throw new Error('Model not loaded');
+        }
+
+        if (this.currentConfig?.type === 'pipeline-token-classification') {
+            return this.processWithPipeline(text, threshold);
         }
 
         // Step 1: Tokenize the input text
@@ -151,6 +210,136 @@ class AIModelProcessor {
         const { maskedText, replacements } = this.maskText(tokenPredictions, aggregated);
         
         return { maskedText, replacements };
+    }
+
+    async processWithPipeline(text, threshold) {
+        const predictions = await this.classifier(text, {
+            aggregation_strategy: 'simple'
+        });
+        const spans = this.normalizePipelinePredictions(text, predictions, threshold);
+        return this.maskTextBySpans(text, spans);
+    }
+
+    normalizePipelinePredictions(text, predictions, threshold) {
+        const sortedPredictions = [...(Array.isArray(predictions) ? predictions : [])]
+            .filter(prediction => prediction && Number(prediction.score || 0) >= threshold)
+            .sort((a, b) => Number(b.score || 0) - Number(a.score || 0));
+        const spans = [];
+
+        for (const prediction of sortedPredictions) {
+            const label = prediction.entity_group || prediction.entity || prediction.label;
+            const type = this.mapPrivacyFilterLabel(label);
+            const located = this.locatePredictionSpan(text, prediction, spans);
+
+            if (!located) {
+                continue;
+            }
+
+            const { start, end } = located;
+            const overlapsExisting = spans.some(span => start < span.end && end > span.start);
+            if (overlapsExisting) {
+                continue;
+            }
+
+            spans.push({
+                start,
+                end,
+                type,
+                score: Number(prediction.score || 0),
+                original: text.slice(start, end)
+            });
+        }
+
+        return spans.sort((a, b) => a.start - b.start);
+    }
+
+    mapPrivacyFilterLabel(label) {
+        const normalizedLabel = String(label || 'PII')
+            .replace(/^[BIES]-/, '')
+            .toLowerCase();
+
+        return PRIVACY_FILTER_LABELS[normalizedLabel] || normalizedLabel.toUpperCase();
+    }
+
+    locatePredictionSpan(text, prediction, existingSpans) {
+        if (Number.isInteger(prediction.start) && Number.isInteger(prediction.end)) {
+            return this.trimSpanWhitespace(text, prediction.start, prediction.end);
+        }
+
+        const word = String(prediction.word || '').replace(/▁/g, ' ');
+        const candidates = [word, word.trim()].filter(Boolean);
+        let bestMatch = null;
+
+        for (const candidate of candidates) {
+            let searchFrom = 0;
+            while (searchFrom < text.length) {
+                const matchIndex = text.indexOf(candidate, searchFrom);
+                if (matchIndex === -1) {
+                    break;
+                }
+
+                const span = this.trimSpanWhitespace(text, matchIndex, matchIndex + candidate.length);
+                if (span && !existingSpans.some(existing => span.start < existing.end && span.end > existing.start)) {
+                    bestMatch = span;
+                    break;
+                }
+
+                searchFrom = matchIndex + Math.max(candidate.length, 1);
+            }
+
+            if (bestMatch) {
+                break;
+            }
+        }
+
+        return bestMatch;
+    }
+
+    trimSpanWhitespace(text, start, end) {
+        let cleanStart = Math.max(0, start);
+        let cleanEnd = Math.min(text.length, end);
+
+        while (cleanStart < cleanEnd && /\s/.test(text[cleanStart])) {
+            cleanStart++;
+        }
+        while (cleanEnd > cleanStart && /\s/.test(text[cleanEnd - 1])) {
+            cleanEnd--;
+        }
+
+        if (cleanStart >= cleanEnd) {
+            return null;
+        }
+
+        return { start: cleanStart, end: cleanEnd };
+    }
+
+    maskTextBySpans(text, spans) {
+        const counters = {};
+        const replacements = spans.map(span => {
+            counters[span.type] = (counters[span.type] || 0) + 1;
+            return {
+                ...span,
+                placeholder: `[${span.type}_${counters[span.type]}]`,
+                activation: span.score
+            };
+        });
+
+        let maskedText = text;
+        for (const replacement of [...replacements].sort((a, b) => b.start - a.start)) {
+            maskedText = maskedText.substring(0, replacement.start) +
+                replacement.placeholder +
+                maskedText.substring(replacement.end);
+        }
+
+        return {
+            maskedText,
+            replacements: replacements.map(({ original, placeholder, activation, type }) => ({
+                original,
+                placeholder,
+                activation,
+                type
+            }))
+        };
     }
 
     /**
@@ -322,8 +511,10 @@ class AIModelProcessor {
     unload() {
         this.tokenizer = null;
         this.model = null;
+        this.classifier = null;
         this.modelLoaded = false;
         this.currentModel = null;
+        this.currentConfig = null;
         this.updateLoadingStatus('');
     }
 
