@@ -6,6 +6,7 @@ compatibility_date = "2023-12-01"
 binding = "ASSETS"
 directory = "dist"
 html_handling = "auto-trailing-slash"
+run_worker_first = true
 
 [env.production]
 name = "asd123-website"

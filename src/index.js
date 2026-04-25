@@ -304,6 +304,19 @@ function wantsMarkdown(request) {
   return accept.toLowerCase().includes('text/markdown');
 }
 
+function addVaryAccept(headers) {
+  const current = headers.get('vary');
+  if (!current) {
+    headers.set('vary', 'Accept');
+    return;
+  }
+
+  const values = current.split(',').map(value => value.trim().toLowerCase());
+  if (!values.includes('accept')) {
+    headers.set('vary', `${current}, Accept`);
+  }
+}
+
 function addDiscoveryLinks(response, pathname) {
   if (pathname !== '/' && pathname !== '/index.html') {
     return response;
@@ -324,8 +337,18 @@ function addDiscoveryLinks(response, pathname) {
 
 async function maybeMarkdownResponse(request, response) {
   const contentType = response.headers.get('content-type') || '';
-  if (!wantsMarkdown(request) || !contentType.includes('text/html') || !response.ok) {
+  if (!contentType.includes('text/html') || !response.ok) {
     return response;
+  }
+
+  if (!wantsMarkdown(request)) {
+    const headers = new Headers(response.headers);
+    addVaryAccept(headers);
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers
+    });
   }
 
   const html = await response.text();
@@ -335,6 +358,7 @@ async function maybeMarkdownResponse(request, response) {
   const headers = new Headers(response.headers);
   headers.set('content-type', 'text/markdown; charset=utf-8');
   headers.set('x-markdown-tokens', String(tokens));
+  addVaryAccept(headers);
 
   return new Response(markdown, {
     status: response.status,

@@ -9,14 +9,14 @@
     "dev": "concurrently \"node build-dev.js\" \"wrangler dev\" --names \"watch,wrangler\" --prefix-colors \"blue,magenta\"",
     "dev:watch": "node build-dev.js",
     "dev:server": "wrangler dev",
-    "deploy": "npx -y wrangler@4.32.0 deploy --env production"
+    "deploy": "wrangler deploy --env production"
   },
   "devDependencies": {
     "clean-css": "^5.3.2",
     "concurrently": "^9.2.1",
     "html-minifier-terser": "^7.2.0",
     "terser": "^5.24.0",
-    "wrangler": "^4.32.0"
+    "wrangler": "^4.85.0"
   },
   "keywords": [
     "AI",
