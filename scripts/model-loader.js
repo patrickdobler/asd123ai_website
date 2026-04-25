@@ -6,7 +6,7 @@
 // not server-side processing or regex pattern matching.
 
 // Import transformers.js from CDN for browser compatibility
-import { AutoModel, AutoTokenizer, pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2';
+import { AutoModel, AutoTokenizer, pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';
 
 /**
  * Model configuration map - defines all available AI models
