@@ -1,52 +1,369 @@
+const SITE_ORIGIN = 'https://asd123.ai';
+
+const redirects = {
+  '/index.html': '/',
+  '/optimizer.html': '/optimizer',
+  '/anonymizer.html': '/anonymizer',
+  '/documentation.html': '/documentation',
+  '/about.html': '/about',
+  '/contact.html': '/contact',
+  '/privacy.html': '/privacy',
+  '/terms.html': '/terms',
+  '/test-optimizer.html': '/test',
+  '/anonymizer-guide.html': '/anonymizer-guide',
+  '/optimizer-guide.html': '/optimizer-guide'
+};
+
+const cleanUrls = {
+  '/optimizer': '/optimizer.html',
+  '/anonymizer': '/anonymizer.html',
+  '/documentation': '/documentation.html',
+  '/about': '/about.html',
+  '/contact': '/contact.html',
+  '/privacy': '/privacy.html',
+  '/terms': '/terms.html',
+  '/test': '/test-optimizer.html',
+  '/anonymizer-guide': '/anonymizer-guide.html',
+  '/optimizer-guide': '/optimizer-guide.html'
+};
+
+const skillArtifacts = {
+  'optimizer': `# ASD123.ai Optimizer
+
+Use this skill when an agent needs to clean, normalize, or standardize text with ASD123.ai in the browser.
+
+## Capabilities
+
+- Remove Markdown formatting from generated text
+- Remove citation references
+- Normalize fancy Unicode text
+- Normalize target line endings for Auto, Windows, Linux, and macOS
+- Apply language character mappings for Swiss German, German, French, Italian, English International, and English US
+- Remove or reverse German diacritics
+
+## Privacy
+
+All text processing runs locally in the browser. Text is not sent to ASD123.ai servers for processing.
+`,
+  'anonymizer': `# ASD123.ai Anonymizer
+
+Use this skill when an agent needs to help a user anonymize or redact personally identifiable information in the ASD123.ai browser tool.
+
+## Capabilities
+
+- Regex-based local PII detection
+- Optional OpenAI Privacy Filter model loaded through Hugging Face Transformers.js
+- Legacy AI4Privacy proof-of-concept models
+- Reversible placeholder mappings for deanonymization workflows
+- CSV import and export of entity mappings
+
+## Privacy
+
+Text, uploaded files, detected entities, and mappings remain in the local browser session. Optional AI modes download model files, but do not upload the user's text for processing.
+`
+};
+
+function jsonResponse(body, contentType = 'application/json') {
+  return new Response(JSON.stringify(body, null, 2), {
+    headers: {
+      'content-type': `${contentType}; charset=utf-8`,
+      'cache-control': 'public, max-age=300'
+    }
+  });
+}
+
+function textResponse(body, contentType = 'text/plain') {
+  return new Response(body, {
+    headers: {
+      'content-type': `${contentType}; charset=utf-8`,
+      'cache-control': 'public, max-age=300'
+    }
+  });
+}
+
+async function sha256Digest(text) {
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return `sha256:${[...new Uint8Array(hash)].map(byte => byte.toString(16).padStart(2, '0')).join('')}`;
+}
+
+async function agentSkillsIndex() {
+  const skills = await Promise.all(Object.entries(skillArtifacts).map(async ([name, content]) => ({
+    name,
+    type: 'skill-md',
+    description: name === 'optimizer'
+      ? 'Clean and normalize text locally with the ASD123.ai Optimizer.'
+      : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
+    url: `${SITE_ORIGIN}/.well-known/agent-skills/${name}/SKILL.md`,
+    digest: await sha256Digest(content)
+  })));
+
+  return jsonResponse({
+    '$schema': 'https://schemas.agentskills.io/discovery/0.2.0/schema.json',
+    skills
+  });
+}
+
+function apiCatalog() {
+  return jsonResponse({
+    linkset: [
+      {
+        anchor: `${SITE_ORIGIN}/.well-known`,
+        'service-desc': [
+          {
+            href: `${SITE_ORIGIN}/.well-known/openapi.json`,
+            type: 'application/vnd.oai.openapi+json'
+          }
+        ],
+        'service-doc': [
+          {
+            href: `${SITE_ORIGIN}/documentation`,
+            type: 'text/html'
+          }
+        ],
+        status: [
+          {
+            href: `${SITE_ORIGIN}/.well-known/health`,
+            type: 'application/json'
+          }
+        ]
+      }
+    ]
+  }, 'application/linkset+json');
+}
+
+function openApiSpec() {
+  return jsonResponse({
+    openapi: '3.1.0',
+    info: {
+      title: 'ASD123.ai Discovery API',
+      version: '1.0.0',
+      description: 'Machine-readable discovery endpoints for ASD123.ai. User text processing remains client-side in the browser.'
+    },
+    servers: [
+      { url: SITE_ORIGIN }
+    ],
+    paths: {
+      '/.well-known/api-catalog': {
+        get: {
+          summary: 'API catalog',
+          responses: {
+            '200': {
+              description: 'RFC 9727 API catalog',
+              content: {
+                'application/linkset+json': {
+                  schema: { type: 'object' }
+                }
+              }
+            }
+          }
+        }
+      },
+      '/.well-known/agent-skills/index.json': {
+        get: {
+          summary: 'Agent skills discovery index',
+          responses: {
+            '200': {
+              description: 'Agent Skills Discovery index',
+              content: {
+                'application/json': {
+                  schema: { type: 'object' }
+                }
+              }
+            }
+          }
+        }
+      },
+      '/.well-known/health': {
+        get: {
+          summary: 'Health status',
+          responses: {
+            '200': {
+              description: 'Service health',
+              content: {
+                'application/json': {
+                  schema: { type: 'object' }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }, 'application/vnd.oai.openapi+json');
+}
+
+function oauthProtectedResource() {
+  return jsonResponse({
+    resource: SITE_ORIGIN,
+    authorization_servers: [],
+    scopes_supported: [],
+    bearer_methods_supported: [],
+    resource_documentation: `${SITE_ORIGIN}/documentation`,
+    note: 'ASD123.ai currently exposes public browser tools and discovery metadata only. There are no protected APIs that require OAuth access tokens.'
+  });
+}
+
+function mcpServerCard() {
+  return jsonResponse({
+    serverInfo: {
+      name: 'ASD123.ai',
+      version: '1.0.0',
+      description: 'Privacy-first browser text tools. No remote MCP server is currently operated.'
+    },
+    transport: {
+      type: 'none',
+      endpoint: `${SITE_ORIGIN}/mcp`
+    },
+    capabilities: {
+      tools: [],
+      resources: [],
+      prompts: []
+    }
+  });
+}
+
+function markdownFromHtml(html, requestUrl) {
+  let markdown = html
+    .replace(/<head\b[^>]*>[\s\S]*?<\/head>/gi, '')
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<nav\b[^>]*>[\s\S]*?<\/nav>/gi, '')
+    .replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, '')
+    .replace(/<a\b(?=[^>]*class=(?:"[^"]*skip-to-main[^"]*"|'[^']*skip-to-main[^']*'|[^\s>]*skip-to-main[^\s>]*))[^>]*>[\s\S]*?<\/a>/gi, '')
+    .replace(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi, '\n# $1\n')
+    .replace(/<h2\b[^>]*>([\s\S]*?)<\/h2>/gi, '\n## $1\n')
+    .replace(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi, '\n### $1\n')
+    .replace(/<h4\b[^>]*>([\s\S]*?)<\/h4>/gi, '\n#### $1\n')
+    .replace(/<li\b[^>]*>([\s\S]*?)<\/li>/gi, '\n- $1')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_, href, text) => `[${text}](${new URL(href, requestUrl).toString()})`)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+\n/g, '\n')
+    .replace(/\n\s+/g, '\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  if (!markdown) {
+    markdown = `# ASD123.ai\n\nPrivacy-first browser text tools.\n`;
+  }
+
+  return `${markdown}\n`;
+}
+
+function wantsMarkdown(request) {
+  const accept = request.headers.get('accept') || '';
+  return accept.toLowerCase().includes('text/markdown');
+}
+
+function addDiscoveryLinks(response, pathname) {
+  if (pathname !== '/' && pathname !== '/index.html') {
+    return response;
+  }
+
+  const headers = new Headers(response.headers);
+  headers.append('link', '</.well-known/api-catalog>; rel="api-catalog"');
+  headers.append('link', '</.well-known/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"');
+  headers.append('link', '</documentation>; rel="service-doc"; type="text/html"');
+  headers.append('link', '</.well-known/agent-skills/index.json>; rel="describedby"; type="application/json"');
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
+async function maybeMarkdownResponse(request, response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!wantsMarkdown(request) || !contentType.includes('text/html') || !response.ok) {
+    return response;
+  }
+
+  const html = await response.text();
+  const markdown = markdownFromHtml(html, request.url);
+  const tokens = Math.ceil(markdown.trim().split(/\s+/).filter(Boolean).length * 1.35);
+
+  const headers = new Headers(response.headers);
+  headers.set('content-type', 'text/markdown; charset=utf-8');
+  headers.set('x-markdown-tokens', String(tokens));
+
+  return new Response(markdown, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
+async function wellKnownResponse(pathname) {
+  if (pathname === '/.well-known/api-catalog') {
+    return apiCatalog();
+  }
+  if (pathname === '/.well-known/openapi.json') {
+    return openApiSpec();
+  }
+  if (pathname === '/.well-known/health') {
+    return jsonResponse({ status: 'ok', service: 'ASD123.ai', timestamp: new Date().toISOString() });
+  }
+  if (pathname === '/.well-known/agent-skills/index.json') {
+    return agentSkillsIndex();
+  }
+  if (pathname === '/.well-known/oauth-protected-resource') {
+    return oauthProtectedResource();
+  }
+  if (pathname === '/.well-known/mcp/server-card.json') {
+    return mcpServerCard();
+  }
+
+  const skillMatch = pathname.match(/^\/\.well-known\/agent-skills\/([^/]+)\/SKILL\.md$/);
+  if (skillMatch && skillArtifacts[skillMatch[1]]) {
+    return textResponse(skillArtifacts[skillMatch[1]], 'text/markdown');
+  }
+
+  return null;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const originalPathname = url.pathname;
 
-    // Handle Chrome DevTools requests gracefully
+    const discoveryResponse = await wellKnownResponse(url.pathname);
+    if (discoveryResponse) {
+      return discoveryResponse;
+    }
+
+    // Handle Chrome DevTools requests gracefully without hiding real discovery endpoints.
     if (url.pathname.startsWith('/.well-known/')) {
       return new Response(null, { status: 204 });
     }
 
-    // Clean URL redirects
-    const redirects = {
-      '/index.html': '/',
-      '/optimizer.html': '/optimizer',
-      '/anonymizer.html': '/anonymizer',
-      '/documentation.html': '/documentation',
-      '/about.html': '/about',
-      '/contact.html': '/contact',
-      '/privacy.html': '/privacy',
-      '/terms.html': '/terms',
-      '/test-optimizer.html': '/test',
-      '/anonymizer-guide.html': '/anonymizer-guide',
-      '/optimizer-guide.html': '/optimizer-guide'
-    };
+    if (url.pathname === '/mcp') {
+      return jsonResponse({ error: 'mcp_server_not_available', message: 'ASD123.ai does not currently operate a remote MCP server.' }, 'application/json');
+    }
 
     if (redirects[url.pathname]) {
       url.pathname = redirects[url.pathname];
       return Response.redirect(url.toString(), 301);
     }
 
-    // Handle clean URLs by mapping them to .html files
-    const cleanUrls = {
-      '/optimizer': '/optimizer.html',
-      '/anonymizer': '/anonymizer.html',
-      '/documentation': '/documentation.html',
-      '/about': '/about.html',
-      '/contact': '/contact.html',
-      '/privacy': '/privacy.html',
-      '/terms': '/terms.html',
-      '/test': '/test-optimizer.html',
-      '/anonymizer-guide': '/anonymizer-guide.html',
-      '/optimizer-guide': '/optimizer-guide.html'
-    };
-
     if (cleanUrls[url.pathname]) {
       url.pathname = cleanUrls[url.pathname];
-      return env.ASSETS.fetch(new Request(url.toString(), request));
+      const response = await env.ASSETS.fetch(new Request(url.toString(), request));
+      const negotiated = await maybeMarkdownResponse(request, response);
+      return addDiscoveryLinks(negotiated, originalPathname);
     }
 
-    // Serve all static assets and HTML from the assets binding (dist/)
-    return env.ASSETS.fetch(request);
+    const response = await env.ASSETS.fetch(request);
+    const negotiated = await maybeMarkdownResponse(request, response);
+    return addDiscoveryLinks(negotiated, originalPathname);
   }
 };

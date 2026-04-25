@@ -146,6 +146,141 @@ class PrivacyNotice {
     }
 }
 
+// WebMCP Integration
+class WebMCPManager {
+    constructor() {
+        this.controller = new AbortController();
+        this.init();
+    }
+
+    init() {
+        const modelContext = navigator.modelContext;
+        if (!modelContext || (
+            typeof modelContext.registerTool !== 'function' &&
+            typeof modelContext.provideContext !== 'function'
+        )) {
+            return;
+        }
+
+        this.registerTool({
+            name: 'asd123_get_page_info',
+            description: 'Return basic information about the current ASD123.ai page and available local browser tools.',
+            inputSchema: {
+                type: 'object',
+                properties: {},
+                additionalProperties: false
+            },
+            execute: async () => ({
+                title: document.title,
+                url: window.location.href,
+                pathname: window.location.pathname,
+                tools: [
+                    'optimizer: local text cleanup and normalization',
+                    'anonymizer: local PII anonymization and redaction'
+                ],
+                privacy: 'ASD123.ai text tools run in the browser. User text is not sent to ASD123.ai servers for processing.'
+            })
+        });
+
+        this.registerTool({
+            name: 'asd123_navigate',
+            description: 'Navigate to a main ASD123.ai tool or documentation page.',
+            inputSchema: {
+                type: 'object',
+                properties: {
+                    page: {
+                        type: 'string',
+                        enum: ['home', 'optimizer', 'anonymizer', 'documentation', 'optimizer-guide', 'anonymizer-guide', 'privacy', 'terms']
+                    }
+                },
+                required: ['page'],
+                additionalProperties: false
+            },
+            execute: async ({ page }) => {
+                const routes = {
+                    home: '/',
+                    optimizer: '/optimizer',
+                    anonymizer: '/anonymizer',
+                    documentation: '/documentation',
+                    'optimizer-guide': '/optimizer-guide',
+                    'anonymizer-guide': '/anonymizer-guide',
+                    privacy: '/privacy',
+                    terms: '/terms'
+                };
+                window.location.href = routes[page] || '/';
+                return { navigatedTo: routes[page] || '/' };
+            }
+        });
+
+        this.registerTool({
+            name: 'asd123_fill_optimizer',
+            description: 'Fill the Optimizer input area with text on the optimizer page.',
+            inputSchema: {
+                type: 'object',
+                properties: {
+                    text: {
+                        type: 'string',
+                        description: 'Text to place into the optimizer input field.'
+                    }
+                },
+                required: ['text'],
+                additionalProperties: false
+            },
+            execute: async ({ text }) => {
+                const textarea = document.getElementById('optimizer-textarea');
+                if (!textarea) {
+                    return { ok: false, error: 'Optimizer input is not available on this page.' };
+                }
+                textarea.value = text;
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                textarea.focus();
+                return { ok: true, characters: text.length };
+            }
+        });
+
+        this.registerTool({
+            name: 'asd123_fill_anonymizer',
+            description: 'Fill the Anonymizer input area with text on the anonymizer page.',
+            inputSchema: {
+                type: 'object',
+                properties: {
+                    text: {
+                        type: 'string',
+                        description: 'Text to place into the anonymizer input field.'
+                    }
+                },
+                required: ['text'],
+                additionalProperties: false
+            },
+            execute: async ({ text }) => {
+                const textarea = document.getElementById('inputText');
+                if (!textarea) {
+                    return { ok: false, error: 'Anonymizer input is not available on this page.' };
+                }
+                textarea.value = text;
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                textarea.focus();
+                return { ok: true, characters: text.length };
+            }
+        });
+    }
+
+    registerTool(tool) {
+        try {
+            if (typeof navigator.modelContext.registerTool === 'function') {
+                navigator.modelContext.registerTool(tool, { signal: this.controller.signal });
+                return;
+            }
+
+            if (typeof navigator.modelContext.provideContext === 'function') {
+                navigator.modelContext.provideContext({ tools: [tool] }, { signal: this.controller.signal });
+            }
+        } catch (error) {
+            console.warn(`WebMCP tool registration failed for ${tool.name}:`, error);
+        }
+    }
+}
+
 // Initialize shared components when DOM is loaded
 // Initialize theme immediately to prevent flash
 const themeManager = new ThemeManager();
@@ -164,6 +299,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize privacy notice
     new PrivacyNotice();
+
+    // Register WebMCP tools when supported by the browser
+    new WebMCPManager();
     
     // Add smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -182,5 +320,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { NavigationManager, utils, CharacterCounter, PrivacyNotice, ThemeManager };
+    module.exports = { NavigationManager, utils, CharacterCounter, PrivacyNotice, ThemeManager, WebMCPManager };
 }

@@ -1,45 +1,59 @@
 User-agent: *
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 # AI and Search Engine Bots - Explicitly Allow
 User-agent: GPTBot
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: ClaudeBot
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: PerplexityBot
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: ChatGPT-User
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: Googlebot
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: Bingbot
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: Slurp
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: DuckDuckBot
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: Baiduspider
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: YandexBot
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: facebookexternalhit
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: Twitterbot
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 User-agent: LinkedInBot
 Allow: /
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
 # Sitemap
 Sitemap: https://asd123.ai/sitemap.xml
