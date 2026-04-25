@@ -204,6 +204,46 @@ function oauthProtectedResource() {
   });
 }
 
+function oauthAuthorizationServerMetadata() {
+  return jsonResponse({
+    issuer: SITE_ORIGIN,
+    authorization_endpoint: `${SITE_ORIGIN}/oauth/authorize`,
+    token_endpoint: `${SITE_ORIGIN}/oauth/token`,
+    jwks_uri: `${SITE_ORIGIN}/.well-known/jwks.json`,
+    registration_endpoint: `${SITE_ORIGIN}/oauth/register`,
+    service_documentation: `${SITE_ORIGIN}/documentation`,
+    grant_types_supported: [],
+    response_types_supported: [],
+    scopes_supported: [],
+    token_endpoint_auth_methods_supported: ['none'],
+    code_challenge_methods_supported: [],
+    note: 'ASD123.ai currently has no protected APIs and no OAuth login flow. These endpoints are discovery placeholders so agents can determine that authentication is not required for the public browser tools.'
+  });
+}
+
+function openIdConfiguration() {
+  return jsonResponse({
+    issuer: SITE_ORIGIN,
+    authorization_endpoint: `${SITE_ORIGIN}/oauth/authorize`,
+    token_endpoint: `${SITE_ORIGIN}/oauth/token`,
+    jwks_uri: `${SITE_ORIGIN}/.well-known/jwks.json`,
+    registration_endpoint: `${SITE_ORIGIN}/oauth/register`,
+    response_types_supported: [],
+    grant_types_supported: [],
+    subject_types_supported: ['public'],
+    id_token_signing_alg_values_supported: [],
+    scopes_supported: [],
+    claims_supported: [],
+    token_endpoint_auth_methods_supported: ['none'],
+    service_documentation: `${SITE_ORIGIN}/documentation`,
+    note: 'ASD123.ai currently has no protected APIs and no OpenID Connect login flow. Public browser tools do not require authentication.'
+  });
+}
+
+function jwks() {
+  return jsonResponse({ keys: [] });
+}
+
 function mcpServerCard() {
   return jsonResponse({
     serverInfo: {
@@ -319,6 +359,15 @@ async function wellKnownResponse(pathname) {
   if (pathname === '/.well-known/oauth-protected-resource') {
     return oauthProtectedResource();
   }
+  if (pathname === '/.well-known/oauth-authorization-server') {
+    return oauthAuthorizationServerMetadata();
+  }
+  if (pathname === '/.well-known/openid-configuration') {
+    return openIdConfiguration();
+  }
+  if (pathname === '/.well-known/jwks.json') {
+    return jwks();
+  }
   if (pathname === '/.well-known/mcp/server-card.json') {
     return mcpServerCard();
   }
@@ -348,6 +397,13 @@ export default {
 
     if (url.pathname === '/mcp') {
       return jsonResponse({ error: 'mcp_server_not_available', message: 'ASD123.ai does not currently operate a remote MCP server.' }, 'application/json');
+    }
+
+    if (url.pathname.startsWith('/oauth/')) {
+      return jsonResponse({
+        error: 'oauth_not_available',
+        message: 'ASD123.ai currently exposes public browser tools only. Authentication is not required and no OAuth flow is available.'
+      }, 'application/json');
     }
 
     if (redirects[url.pathname]) {
