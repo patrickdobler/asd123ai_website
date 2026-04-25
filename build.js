@@ -4,12 +4,11 @@ const { minify } = require('html-minifier-terser');
 const { minify: minifyJS } = require('terser');
 const CleanCSS = require('clean-css');
 
-// Create dist directory
+// Recreate dist directory so removed pages do not remain deployable as stale assets.
 const distDir = './dist';
 const srcDir = './src';
-if (!fs.existsSync(distDir)) {
-    fs.mkdirSync(distDir, { recursive: true });
-}
+fs.rmSync(distDir, { recursive: true, force: true });
+fs.mkdirSync(distDir, { recursive: true });
 if (!fs.existsSync(srcDir)) {
     fs.mkdirSync(srcDir, { recursive: true });
 }
@@ -69,7 +68,7 @@ async function minifyFile(inputFile, outputFile, type) {
 }
 
 async function copyAndMinifyFiles() {
-    // HTML files - including anonymizer_test.html, anonymizer-guide.html, and optimizer-guide.html
+    // HTML files
     const htmlFiles = [
         'index.html',
         'optimizer.html',
@@ -80,7 +79,6 @@ async function copyAndMinifyFiles() {
         'terms.html',
         'test-optimizer.html',
         'anonymizer.html',
-        'anonymizer_test.html',
         'anonymizer-guide.html',
         'optimizer-guide.html'
     ];

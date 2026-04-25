@@ -1,11 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-// Create dist directory
+// Recreate dist directory so deleted pages do not stay available during dev.
 const distDir = './dist';
-if (!fs.existsSync(distDir)) {
-    fs.mkdirSync(distDir, { recursive: true });
-}
+fs.rmSync(distDir, { recursive: true, force: true });
+fs.mkdirSync(distDir, { recursive: true });
 
 // Debounce map to prevent multiple rapid file copies
 const debounceTimers = new Map();
@@ -84,7 +83,6 @@ function initialBuild() {
         'terms.html',
         'test-optimizer.html',
         'anonymizer.html',
-        'anonymizer_test.html',
         'anonymizer-guide.html',
         'optimizer-guide.html'
     ];
@@ -196,7 +194,7 @@ function setupWatchers() {
     const htmlFiles = [
         'index.html', 'optimizer.html', 'documentation.html',
         'about.html', 'contact.html', 'privacy.html', 'terms.html',
-        'test-optimizer.html', 'anonymizer.html', 'anonymizer_test.html',
+        'test-optimizer.html', 'anonymizer.html',
         'anonymizer-guide.html', 'optimizer-guide.html'
     ];
     
