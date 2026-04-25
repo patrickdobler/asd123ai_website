@@ -367,6 +367,12 @@ async function maybeMarkdownResponse(request, response) {
   });
 }
 
+function assetRequest(request, pathname) {
+  const assetUrl = new URL(request.url);
+  assetUrl.pathname = pathname;
+  return new Request(assetUrl.toString(), request);
+}
+
 async function wellKnownResponse(pathname) {
   if (pathname === '/.well-known/api-catalog') {
     return apiCatalog();
@@ -436,8 +442,13 @@ export default {
     }
 
     if (cleanUrls[url.pathname]) {
-      url.pathname = cleanUrls[url.pathname];
-      const response = await env.ASSETS.fetch(new Request(url.toString(), request));
+      const response = await env.ASSETS.fetch(assetRequest(request, cleanUrls[url.pathname]));
+      const negotiated = await maybeMarkdownResponse(request, response);
+      return addDiscoveryLinks(negotiated, originalPathname);
+    }
+
+    if (url.pathname === '/') {
+      const response = await env.ASSETS.fetch(assetRequest(request, '/index.html'));
       const negotiated = await maybeMarkdownResponse(request, response);
       return addDiscoveryLinks(negotiated, originalPathname);
     }
