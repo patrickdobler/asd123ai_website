@@ -1556,6 +1556,23 @@ footer {
     flex-wrap: wrap;
 }
 
+.model-status-inline {
+    display: none;
+    color: var(--primary-color);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+.tool-note {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    margin: var(--space-3) auto 0;
+    max-width: 760px;
+}
+
 .model-label {
     font-weight: 600;
     color: var(--text-primary);
@@ -1577,6 +1594,34 @@ footer {
     outline: none;
     border-color: var(--text-primary);
     box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.sample-text-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: var(--space-2);
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.sample-text-btn {
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 5px 8px;
+    transition: all 150ms ease;
+}
+
+.sample-text-btn:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
 }
 
 /* Content Grid - Mockup Version */

@@ -79,7 +79,7 @@ class AIModelProcessor {
         }
 
         if (this.modelLoaded && this.currentModel === modelName) {
-            this.updateLoadingStatus(`${config.description} ready`);
+            this.updateLoadingStatus('Loaded');
             return;
         }
 
@@ -94,12 +94,12 @@ class AIModelProcessor {
             }
 
             // Show loading indicator
-            this.updateLoadingStatus(`Loading ${config.description} tokenizer...`);
+            this.updateLoadingStatus('Loading...');
             
             // Load tokenizer from HuggingFace
             this.tokenizer = await AutoTokenizer.from_pretrained(modelPath);
             
-            this.updateLoadingStatus(`Loading ${config.description} model (this may take a moment)...`);
+            this.updateLoadingStatus('Downloading...');
             
             // Load model with appropriate settings
             const modelOptions = { dtype: "q8" };
@@ -114,13 +114,13 @@ class AIModelProcessor {
             this.modelLoaded = true;
             this.currentModel = modelName;
             this.currentConfig = config;
-            this.updateLoadingStatus(`${config.description} ready`);
+            this.updateLoadingStatus('Loaded');
             
         } catch (error) {
             console.error('Model loading failed:', error);
             this.modelLoaded = false;
             this.currentConfig = null;
-            this.updateLoadingStatus(`Failed to load ${config.description}`);
+            this.updateLoadingStatus('Failed');
             throw error;
         }
     }
@@ -130,8 +130,7 @@ class AIModelProcessor {
             throw new Error(`${config.description} requires a browser with WebGPU support. Please use Chrome/Edge or the Regex mode.`);
         }
 
-        const sizeHint = config.largeDownload ? ' The first load downloads about 950 MB and may take a while.' : '';
-        this.updateLoadingStatus(`Loading ${config.description} from Hugging Face.${sizeHint}`);
+        this.updateLoadingStatus('Downloading...');
 
         this.classifier = await pipeline(
             'token-classification',
@@ -145,7 +144,7 @@ class AIModelProcessor {
         this.modelLoaded = true;
         this.currentModel = modelName;
         this.currentConfig = config;
-        this.updateLoadingStatus(`${config.description} ready`);
+        this.updateLoadingStatus('Loaded');
     }
 
     /**

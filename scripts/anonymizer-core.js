@@ -352,6 +352,14 @@ class AnonymizerApp {
             await this.switchModel(e.target.value);
         });
 
+        document.getElementById('loadGermanSampleBtn').addEventListener('click', () => {
+            this.loadSampleText('de');
+        });
+
+        document.getElementById('loadEnglishSampleBtn').addEventListener('click', () => {
+            this.loadSampleText('en');
+        });
+
         // Anonymize button
         document.getElementById('anonymizeBtn').addEventListener('click', async () => {
             this.isRedactMode = false;
@@ -463,9 +471,8 @@ class AnonymizerApp {
             try {
                 const models = AIModelProcessor.getAvailableModels();
                 const modelLabel = models[modelType]?.description || modelType;
-                this.uiController.showLoading(true, `Loading ${modelLabel} model...`);
+                this.uiController.showLoading(true, 'Loading...');
                 await this.aiProcessor.loadModel(modelType);
-                this.uiController.showLoading(false);
                 this.uiController.showSuccess(`${modelLabel} loaded successfully`);
             } catch (error) {
                 // IMPORTANT: Do NOT silently fall back to regex
@@ -478,6 +485,38 @@ class AnonymizerApp {
         } else {
             this.aiProcessor.unload();
         }
+    }
+
+    loadSampleText(language) {
+        const samples = {
+            de: `Sehr geehrte Damen und Herren
+
+Mein Name ist Dr. Anna Keller, geboren am 14. März 1987 in Zürich. Ich wohne an der Bahnhofstrasse 42, 8001 Zürich, Schweiz.
+
+Bitte kontaktieren Sie mich unter anna.keller@example.ch oder telefonisch unter +41 79 234 56 78. Meine Kundennummer lautet KD-2026-88421 und meine Versicherungsnummer ist 756.9217.0769.85.
+
+Für die Rückerstattung können Sie mein Konto verwenden: IBAN CH93 0076 2011 6238 5295 7 bei der Zürcher Kantonalbank.
+
+Mein Hausarzt ist Dr. Markus Meier, Praxis Sonnenhof, Seefeldstrasse 118, 8008 Zürich. Die letzte Behandlung fand am 22. April 2026 statt.
+
+Freundliche Grüsse
+Anna Keller`,
+            en: `Hello Support Team,
+
+My name is Michael Turner and I live at 221B Baker Street, London NW1 6XE, United Kingdom. I was born on September 18, 1982.
+
+You can reach me at michael.turner@example.com or +44 7700 900123. My customer ID is CUST-88421 and my account number is 9827346501.
+
+For the refund, please use IBAN GB29 NWBK 6016 1331 9268 19. My appointment with Dr. Sarah Collins at Northside Clinic took place on April 22, 2026.
+
+Best regards,
+Michael Turner`
+        };
+
+        const inputText = document.getElementById('inputText');
+        inputText.value = samples[language] || samples.de;
+        inputText.focus();
+        this.uiController.showInfo('Example text loaded');
     }
 
     async anonymizeText() {

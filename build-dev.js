@@ -81,6 +81,7 @@ function initialBuild() {
         'about.html',
         'contact.html',
         'privacy.html',
+        'terms.html',
         'test-optimizer.html',
         'anonymizer.html',
         'anonymizer_test.html',
@@ -194,7 +195,7 @@ function setupWatchers() {
     // Watch HTML files individually
     const htmlFiles = [
         'index.html', 'optimizer.html', 'documentation.html',
-        'about.html', 'contact.html', 'privacy.html',
+        'about.html', 'contact.html', 'privacy.html', 'terms.html',
         'test-optimizer.html', 'anonymizer.html', 'anonymizer_test.html',
         'anonymizer-guide.html', 'optimizer-guide.html'
     ];

@@ -422,7 +422,7 @@ class UIController {
             if (show) {
                 statusElement.textContent = message;
                 statusElement.style.color = 'var(--primary-color)';
-                statusElement.style.display = 'block';
+                statusElement.style.display = 'inline';
             } else {
                 statusElement.textContent = '';
                 statusElement.style.display = 'none';

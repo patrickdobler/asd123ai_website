@@ -11,10 +11,12 @@ export default {
     const redirects = {
       '/index.html': '/',
       '/optimizer.html': '/optimizer',
+      '/anonymizer.html': '/anonymizer',
       '/documentation.html': '/documentation',
       '/about.html': '/about',
       '/contact.html': '/contact',
       '/privacy.html': '/privacy',
+      '/terms.html': '/terms',
       '/test-optimizer.html': '/test',
       '/anonymizer-guide.html': '/anonymizer-guide',
       '/optimizer-guide.html': '/optimizer-guide'
@@ -28,10 +30,12 @@ export default {
     // Handle clean URLs by mapping them to .html files
     const cleanUrls = {
       '/optimizer': '/optimizer.html',
+      '/anonymizer': '/anonymizer.html',
       '/documentation': '/documentation.html',
       '/about': '/about.html',
       '/contact': '/contact.html',
       '/privacy': '/privacy.html',
+      '/terms': '/terms.html',
       '/test': '/test-optimizer.html',
       '/anonymizer-guide': '/anonymizer-guide.html',
       '/optimizer-guide': '/optimizer-guide.html'

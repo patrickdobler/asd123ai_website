@@ -57,12 +57,14 @@
 <a href="#getting-started" class="text-[var(--primary-color)] hover:underline">→ Getting Started</a>
 <a href="#processing-modes" class="text-[var(--primary-color)] hover:underline">→ Detection Methods</a>
 <a href="#basic-workflow" class="text-[var(--primary-color)] hover:underline">→ Basic Workflow</a>
+<a href="#sample-texts" class="text-[var(--primary-color)] hover:underline">→ Sample Texts</a>
 <a href="#file-upload" class="text-[var(--primary-color)] hover:underline">→ File Upload</a>
 <a href="#entity-management" class="text-[var(--primary-color)] hover:underline">→ Entity Management</a>
 <a href="#llm-integration" class="text-[var(--primary-color)] hover:underline">→ LLM Integration</a>
 <a href="#redact-mode" class="text-[var(--primary-color)] hover:underline">→ Redact Mode</a>
 <a href="#export-import" class="text-[var(--primary-color)] hover:underline">→ Export & Import</a>
 <a href="#privacy-security" class="text-[var(--primary-color)] hover:underline">→ Privacy & Security</a>
+<a href="#limits" class="text-[var(--primary-color)] hover:underline">→ Limits & Review</a>
 <a href="#best-practices" class="text-[var(--primary-color)] hover:underline">→ Best Practices</a>
 </div>
 </div>
@@ -74,11 +76,11 @@
 </h3>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
-The Anonymizer is a privacy-first tool that detects and anonymizes Personally Identifiable Information (PII) entirely within your browser. <strong class="text-[var(--text-primary)]">No data ever leaves your device</strong>, ensuring complete privacy.
+The Anonymizer is a privacy-first proof of concept that detects and anonymizes Personally Identifiable Information (PII) inside your browser. It is useful for exploring local PII workflows, but it is not a certified anonymization or compliance system.
 </p>
 <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
 <p class="text-sm text-[var(--text-secondary)]">
-<strong class="text-[var(--text-primary)]">🔒 Privacy Guarantee:</strong> All processing happens locally in your browser. Your text is never transmitted to any server.
+<strong class="text-[var(--text-primary)]">Privacy model:</strong> Your text and entity mappings stay local. Optional AI modes can download model files into your browser, but they do not send your text away for remote processing.
 </p>
 </div>
 <p><strong class="text-[var(--text-primary)]">What is detected?</strong> The Anonymizer recognizes <strong>75+ types of PII</strong> including:</p>
@@ -98,55 +100,52 @@ The Anonymizer is a privacy-first tool that detects and anonymizes Personally Id
 <span class="text-[var(--primary-color)]">2.</span> Detection Methods
 </h3>
 <p class="text-[var(--text-secondary)] mb-6 leading-relaxed">
-The Anonymizer offers three detection methods. Choose based on your needs for speed, accuracy, and language support:
+The Anonymizer offers several detection methods. Regex is the default and recommended starting point. OpenAI Privacy Filter is the advanced local AI option. AI4Privacy modes remain available as Legacy PoC options for comparison.
 </p>
 <div class="grid md:grid-cols-3 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <div class="flex items-center gap-2 mb-2">
-<span class="text-2xl">⚡</span>
 <h4 class="font-bold text-[var(--text-primary)]">Regex - Pattern Matching</h4>
 </div>
-<p class="text-sm text-[var(--text-secondary)] mb-2">Fast pattern-based detection</p>
+<p class="text-sm text-[var(--text-secondary)] mb-2">Default fast pattern-based detection</p>
 <ul class="text-xs text-[var(--text-secondary)] space-y-1">
-<li>✓ Instant results</li>
-<li>✓ Works completely offline</li>
-<li>✓ No model download required</li>
-<li>✓ Good for structured data (emails, phones, SSNs)</li>
+<li>Instant results</li>
+<li>Works completely offline</li>
+<li>No model download required</li>
+<li>Best for structured data such as emails, phones, IBANs, IDs, and URLs</li>
 </ul>
-<p class="text-xs text-[var(--text-secondary)] mt-3 italic">Best for: Quick checks, structured formats</p>
+<p class="text-xs text-[var(--text-secondary)] mt-3 italic">Best for: quick checks and standard workflows</p>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <div class="flex items-center gap-2 mb-2">
-<span class="text-2xl">🤖</span>
-<h4 class="font-bold text-[var(--text-primary)]">AI4Privacy - English</h4>
+<h4 class="font-bold text-[var(--text-primary)]">OpenAI Privacy Filter</h4>
 </div>
-<p class="text-sm text-[var(--text-secondary)] mb-2">AI-powered token classification</p>
+<p class="text-sm text-[var(--text-secondary)] mb-2">Advanced local AI detection</p>
 <ul class="text-xs text-[var(--text-secondary)] space-y-1">
-<li>✓ Context-aware detection</li>
-<li>✓ Understands natural language</li>
-<li>✓ Catches names in context</li>
-<li>⚠ First load downloads model (~50MB)</li>
+<li>Runs locally in WebGPU-capable browsers</li>
+<li>Downloads model files from Hugging Face on first use</li>
+<li>First load is about 950 MB</li>
+<li>May catch contextual PII that regex misses</li>
 </ul>
-<p class="text-xs text-[var(--text-secondary)] mt-3 italic">Best for: English documents, complex text</p>
+<p class="text-xs text-[var(--text-secondary)] mt-3 italic">Best for: deeper review when download size is acceptable</p>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <div class="flex items-center gap-2 mb-2">
-<span class="text-2xl">🌍</span>
-<h4 class="font-bold text-[var(--text-primary)]">AI4Privacy - Multilingual</h4>
+<h4 class="font-bold text-[var(--text-primary)]">AI4Privacy - Legacy PoC</h4>
 </div>
-<p class="text-sm text-[var(--text-secondary)] mb-2">AI detection for multiple languages</p>
+<p class="text-sm text-[var(--text-secondary)] mb-2">Older experimental AI modes</p>
 <ul class="text-xs text-[var(--text-secondary)] space-y-1">
-<li>✓ Supports many languages</li>
-<li>✓ Context-aware detection</li>
-<li>✓ Best for non-English text</li>
-<li>⚠ Larger model, slower first load</li>
+<li>English and multilingual variants remain selectable</li>
+<li>Kept for comparison and experimentation</li>
+<li>Not recommended as the primary AI path</li>
+<li>Use Regex or OpenAI Privacy Filter first</li>
 </ul>
-<p class="text-xs text-[var(--text-secondary)] mt-3 italic">Best for: Non-English or mixed-language content</p>
+<p class="text-xs text-[var(--text-secondary)] mt-3 italic">Best for: comparison only</p>
 </div>
 </div>
 <div class="mt-4 p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
 <p class="text-sm text-[var(--text-secondary)]">
-<strong class="text-[var(--text-primary)]">💡 How AI Detection Works:</strong> The AI4Privacy models use token classification with BIO tagging. The model analyzes each word in context and assigns a probability score for being sensitive information. This means it can detect names like "John" even without a surname, based on surrounding context.
+<strong class="text-[var(--text-primary)]">Model download note:</strong> When OpenAI Privacy Filter is selected, the browser downloads model weights, tokenizer, and configuration files. Your text, files, entities, mappings, and output are not sent to Hugging Face, OpenAI, or ASD123.ai for processing.
 </p>
 </div>
 </div>
@@ -172,7 +171,7 @@ Example: "My name is John Smith, email john@example.com, phone (555) 123-4567"
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">2</div>
 <div class="flex-1">
 <h4 class="font-bold text-[var(--text-primary)] mb-2">Select Detection Method</h4>
-<p class="text-sm text-[var(--text-secondary)]">Choose from the dropdown: <strong>Regex - Pattern Matching</strong> for instant results, or <strong>AI4Privacy - English/Multilingual</strong> for context-aware AI detection.</p>
+<p class="text-sm text-[var(--text-secondary)]">Choose from the dropdown: <strong>Regex - Pattern Matching</strong> for instant results, <strong>OpenAI Privacy Filter</strong> for advanced local AI detection, or <strong>AI4Privacy Legacy PoC</strong> for comparison.</p>
 </div>
 </div>
 
@@ -197,10 +196,32 @@ Result: "My name is [PERSON_NAME_1], email [EMAIL_1], phone [PHONE_1]"
 </div>
 </div>
 
+<!-- Sample Texts -->
+<div id="sample-texts" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">4.</span> Sample Texts
+</h3>
+<div class="space-y-4 text-[var(--text-secondary)]">
+<p class="leading-relaxed">
+Use the small <strong>DE</strong> and <strong>EN</strong> buttons under the input area to load example texts quickly. They are intentionally small so the main workflow buttons stay in focus.
+</p>
+<div class="grid md:grid-cols-2 gap-4">
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-2">German Example</h4>
+<p class="text-sm">Contains names, address, email, phone number, customer number, insurance number, IBAN, doctor, and treatment date.</p>
+</div>
+<div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+<h4 class="font-bold text-[var(--text-primary)] mb-2">English Example</h4>
+<p class="text-sm">Contains names, address, date of birth, email, phone number, customer ID, account number, IBAN, doctor, clinic, and appointment date.</p>
+</div>
+</div>
+</div>
+</div>
+
 <!-- File Upload -->
 <div id="file-upload" class="mb-12">
 <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-<span class="text-[var(--primary-color)]">4.</span> File Upload & Processing
+<span class="text-[var(--primary-color)]">5.</span> File Upload & Processing
 </h3>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
@@ -239,7 +260,7 @@ The Anonymizer supports multiple file formats for easy text extraction:
 <!-- Entity Management -->
 <div id="entity-management" class="mb-12">
 <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-<span class="text-[var(--primary-color)]">5.</span> Entity Management
+<span class="text-[var(--primary-color)]">6.</span> Entity Management
 </h3>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
@@ -283,7 +304,7 @@ The <strong class="text-[var(--text-primary)]">Detected Entities</strong> panel 
 <!-- LLM Integration -->
 <div id="llm-integration" class="mb-12">
 <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-<span class="text-[var(--primary-color)]">6.</span> LLM Integration & Deanonymization
+<span class="text-[var(--primary-color)]">7.</span> LLM Integration & Deanonymization
 </h3>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
@@ -330,7 +351,7 @@ Use the Anonymizer to safely process text with AI services like ChatGPT, Claude,
 <!-- Redact Mode -->
 <div id="redact-mode" class="mb-12">
 <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-<span class="text-[var(--primary-color)]">7.</span> Redact Mode
+<span class="text-[var(--primary-color)]">8.</span> Redact Mode
 </h3>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
@@ -370,7 +391,7 @@ For maximum privacy when sharing with untrusted parties, use <strong class="text
 <!-- Export & Import -->
 <div id="export-import" class="mb-12">
 <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-<span class="text-[var(--primary-color)]">8.</span> Export & Import Entities
+<span class="text-[var(--primary-color)]">9.</span> Export & Import Entities
 </h3>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
@@ -415,19 +436,19 @@ Preserve your entity mappings for later use or share them with trusted recipient
 <!-- Privacy & Security -->
 <div id="privacy-security" class="mb-12">
 <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-<span class="text-[var(--primary-color)]">9.</span> Privacy & Security
+<span class="text-[var(--primary-color)]">10.</span> Privacy & Security
 </h3>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <div class="p-6 bg-[rgba(60,60,60,0.15)] border-2 border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-3 text-lg">🔒 Privacy Guarantees</h4>
+<h4 class="font-bold text-[var(--text-primary)] mb-3 text-lg">Privacy Guarantees</h4>
 <ul class="space-y-2">
 <li class="flex items-start gap-2">
 <span class="text-[var(--text-primary)]">✓</span>
-<span><strong class="text-[var(--text-primary)]">100% Client-Side:</strong> All processing happens in your browser. Zero server communication.</span>
+<span><strong class="text-[var(--text-primary)]">Local Processing:</strong> Detection and anonymization run in your browser.</span>
 </li>
 <li class="flex items-start gap-2">
 <span class="text-[var(--text-primary)]">✓</span>
-<span><strong class="text-[var(--text-primary)]">No Data Transmission:</strong> Your text never leaves your device.</span>
+<span><strong class="text-[var(--text-primary)]">No Text Transmission:</strong> Your text and files are not sent away for remote processing.</span>
 </li>
 <li class="flex items-start gap-2">
 <span class="text-[var(--text-primary)]">✓</span>
@@ -435,7 +456,7 @@ Preserve your entity mappings for later use or share them with trusted recipient
 </li>
 <li class="flex items-start gap-2">
 <span class="text-[var(--text-primary)]">✓</span>
-<span><strong class="text-[var(--text-primary)]">No Cookies or Tracking:</strong> No localStorage, no cookies, no analytics for PII data.</span>
+<span><strong class="text-[var(--text-primary)]">Optional Model Downloads:</strong> OpenAI Privacy Filter downloads model files from Hugging Face, but not your text or mappings.</span>
 </li>
 </ul>
 </div>
@@ -450,10 +471,27 @@ Preserve your entity mappings for later use or share them with trusted recipient
 </div>
 </div>
 
+<!-- Limits -->
+<div id="limits" class="mb-12">
+<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<span class="text-[var(--primary-color)]">11.</span> Limits & Review
+</h3>
+<div class="space-y-4 text-[var(--text-secondary)]">
+<p class="leading-relaxed">
+The Anonymizer is an experimental proof of concept. It can miss sensitive information, classify harmless text as PII, or produce incomplete mappings. Always review the detected entities and the final output manually.
+</p>
+<div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
+<p class="text-sm text-[var(--text-secondary)]">
+<strong class="text-[var(--text-primary)]">Not a compliance guarantee:</strong> The tool does not certify GDPR, nDSG, HIPAA, legal, medical, financial, or other regulated workflows. Use it as a local aid, not as your only control.
+</p>
+</div>
+</div>
+</div>
+
 <!-- Best Practices -->
 <div id="best-practices" class="mb-12">
 <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-<span class="text-[var(--primary-color)]">10.</span> Best Practices & Tips
+<span class="text-[var(--primary-color)]">12.</span> Best Practices & Tips
 </h3>
 <div class="grid md:grid-cols-2 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
@@ -469,10 +507,11 @@ Preserve your entity mappings for later use or share them with trusted recipient
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-<span>🎯</span> For Best Accuracy
+<span>🎯</span> For Best Detection
 </h4>
 <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
-<li>• Use AI4Privacy modes for complex text</li>
+<li>• Start with Regex mode for structured PII</li>
+<li>• Use OpenAI Privacy Filter for deeper local AI review</li>
 <li>• Review detected entities manually</li>
 <li>• Format text properly (standard dates/phones)</li>
 <li>• Remove false positives from entity list</li>
@@ -548,7 +587,7 @@ Try the Anonymizer Now →
 
         <div class="footer-links">
             <a href="privacy.html" class="footer-link">Privacy Policy</a>
-            <a href="#" class="footer-link">Terms of Service</a>
+            <a href="terms.html" class="footer-link">Terms of Service</a>
             <a href="contact.html" class="footer-link">Contact</a>
 
             <div class="social-links">
