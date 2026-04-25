@@ -9,12 +9,11 @@ html_handling = "auto-trailing-slash"
 
 [env.production]
 name = "asd123-website"
+routes = [{ pattern = "asd123.ai/*", zone_name = "asd123.ai" }]
 
 
 [env.development]
 name = "asd123-website-dev"
-
-routes = [{ pattern = "asd123.ai/*", zone_name = "asd123.ai" }]
 
 [env.production.build]
 command = "npm run build"
