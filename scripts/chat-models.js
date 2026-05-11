@@ -15,8 +15,14 @@ const MODEL_REGISTRY = {
         label: 'Gemma 4 E2B',
         provider: 'Gemma',
         repo: 'onnx-community/gemma-4-E2B-it-ONNX',
-        className: 'Gemma4ForConditionalGeneration',
-        dtype: 'q4f16',
+        className: 'Gemma4ForCausalLM',
+        multimodalClassName: 'Gemma4ForConditionalGeneration',
+        dtype: {
+            audio_encoder: 'q4',
+            embed_tokens: 'q4',
+            vision_encoder: 'q4',
+            decoder_model_merged: 'q4'
+        },
         contextWindow: 131072,
         defaultContextWindow: 4096,
         multimodal: true,
@@ -27,8 +33,14 @@ const MODEL_REGISTRY = {
         label: 'Gemma 4 E4B',
         provider: 'Gemma',
         repo: 'onnx-community/gemma-4-E4B-it-ONNX',
-        className: 'Gemma4ForConditionalGeneration',
-        dtype: 'q4f16',
+        className: 'Gemma4ForCausalLM',
+        multimodalClassName: 'Gemma4ForConditionalGeneration',
+        dtype: {
+            audio_encoder: 'q4',
+            embed_tokens: 'q4',
+            vision_encoder: 'q4',
+            decoder_model_merged: 'q4'
+        },
         contextWindow: 131072,
         defaultContextWindow: 4096,
         multimodal: true,
@@ -39,10 +51,11 @@ const MODEL_REGISTRY = {
         label: 'Qwen3.5 0.8B',
         provider: 'Qwen',
         repo: 'onnx-community/Qwen3.5-0.8B-ONNX',
-        className: 'Qwen3_5ForConditionalGeneration',
+        className: 'Qwen3_5ForCausalLM',
+        multimodalClassName: 'Qwen3_5ForConditionalGeneration',
         dtype: {
             embed_tokens: 'q4',
-            vision_encoder: 'fp16',
+            vision_encoder: 'q4',
             decoder_model_merged: 'q4'
         },
         contextWindow: 131072,
@@ -55,10 +68,11 @@ const MODEL_REGISTRY = {
         label: 'Qwen3.5 2B',
         provider: 'Qwen',
         repo: 'onnx-community/Qwen3.5-2B-ONNX',
-        className: 'Qwen3_5ForConditionalGeneration',
+        className: 'Qwen3_5ForCausalLM',
+        multimodalClassName: 'Qwen3_5ForConditionalGeneration',
         dtype: {
             embed_tokens: 'q4',
-            vision_encoder: 'fp16',
+            vision_encoder: 'q4',
             decoder_model_merged: 'q4'
         },
         contextWindow: 131072,
@@ -71,10 +85,11 @@ const MODEL_REGISTRY = {
         label: 'Qwen3.5 4B',
         provider: 'Qwen',
         repo: 'onnx-community/Qwen3.5-4B-ONNX',
-        className: 'Qwen3_5ForConditionalGeneration',
+        className: 'Qwen3_5ForCausalLM',
+        multimodalClassName: 'Qwen3_5ForConditionalGeneration',
         dtype: {
             embed_tokens: 'q4',
-            vision_encoder: 'fp16',
+            vision_encoder: 'q4',
             decoder_model_merged: 'q4'
         },
         contextWindow: 131072,

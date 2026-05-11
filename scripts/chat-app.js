@@ -4,10 +4,10 @@ import {
     clampContextWindow,
     getContextLabel,
     getModelConfig
-} from './chat-models.js';
-import { ChatStorage } from './chat-storage.js';
-import { ChatFileProcessor } from './chat-files.js';
-import { OfflineModelResolver } from './chat-offline.js';
+} from './chat-models.js?v=20260511-text-q4';
+import { ChatStorage } from './chat-storage.js?v=20260511-text-q4';
+import { ChatFileProcessor } from './chat-files.js?v=20260511-text-q4';
+import { OfflineModelResolver } from './chat-offline.js?v=20260511-text-q4';
 
 const TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';
 const TRANSFORMERS_LOCAL = '../vendor/transformers.min.js';
@@ -29,12 +29,13 @@ class ChatModelRunner {
         this.hf = null;
         this.processor = null;
         this.model = null;
-        this.currentModelId = null;
+        this.currentModelKey = null;
         this.loading = false;
     }
 
-    async ensure(modelId) {
-        if (this.currentModelId === modelId && this.model && this.processor) {
+    async ensure(modelId, wantsMultimodal = false) {
+        const modelKey = `${modelId}:${wantsMultimodal ? 'multimodal' : 'text'}`;
+        if (this.currentModelKey === modelKey && this.model && this.processor) {
             return;
         }
 
@@ -53,9 +54,9 @@ class ChatModelRunner {
         try {
             this.hf = this.hf || await this.loadTransformers();
 
-            const ModelClass = this.resolveModelClass(config);
+            const ModelClass = this.resolveModelClass(config, wantsMultimodal);
             if (!ModelClass) {
-                throw new Error(`${config.className} is not available in the loaded Transformers.js runtime. Try clearing the browser cache and reloading /chat.`);
+                throw new Error(`${this.getClassName(config, wantsMultimodal)} is not available in the loaded Transformers.js runtime. Try clearing the browser cache and reloading /chat.`);
             }
 
             this.updateStatus(`Loading ${config.label} processor...`);
@@ -70,8 +71,12 @@ class ChatModelRunner {
                 progress_callback: info => this.handleProgress(info, config.label)
             });
 
-            this.currentModelId = modelId;
-            this.updateStatus(`${config.label} ready`);
+            this.currentModelKey = modelKey;
+            this.updateStatus(`${config.label} ${wantsMultimodal ? 'multimodal' : 'text'} ready`);
+        } catch (error) {
+            const message = this.describeLoadError(error);
+            this.updateStatus(message);
+            throw new Error(message);
         } finally {
             this.loading = false;
         }
@@ -95,7 +100,8 @@ class ChatModelRunner {
         }
 
         if (info.status === 'progress_total' && Number.isFinite(info.progress)) {
-            this.updateStatus(`${label} ${Math.round(info.progress)}%`);
+            const progress = Math.round(info.progress);
+            this.updateStatus(progress >= 100 ? `Preparing ${label} WebGPU session...` : `${label} ${progress}%`);
             return;
         }
 
@@ -115,24 +121,43 @@ class ChatModelRunner {
         }
     }
 
-    resolveModelClass(config) {
-        const preferred = this.hf[config.className];
+    getClassName(config, wantsMultimodal) {
+        return wantsMultimodal ? config.multimodalClassName || config.className : config.className;
+    }
+
+    resolveModelClass(config, wantsMultimodal) {
+        const className = this.getClassName(config, wantsMultimodal);
+        const preferred = this.hf[className];
         if (preferred) {
             return preferred;
         }
 
-        if (config.multimodal && this.hf.AutoModelForImageTextToText) {
+        if (wantsMultimodal && config.multimodal && this.hf.AutoModelForImageTextToText) {
             return this.hf.AutoModelForImageTextToText;
         }
 
         return this.hf.AutoModelForCausalLM || null;
     }
 
-    async generate({ modelId, messages, contextWindow, temperature, onToken }) {
-        await this.ensure(modelId);
+    describeLoadError(error) {
+        const message = error?.message || String(error || 'Unknown model load error');
 
+        if (message.includes('embed_tokens_q4f16.onnx_data')) {
+            return 'Model cache is still trying to use the older q4f16 embedding file. Reload /chat once; if this repeats, clear this site’s browser storage/model cache and load again.';
+        }
+
+        if (message.includes('Unknown error occurred in memory copy') || message.includes("Can't create a session")) {
+            return 'The browser could not create the WebGPU session for this model. Try Qwen3.5 0.8B first, close other heavy tabs, or reduce cached model data and reload.';
+        }
+
+        return message;
+    }
+
+    async generate({ modelId, messages, contextWindow, temperature, onToken }) {
         const modelMessages = this.buildModelMessages(messages, contextWindow);
         const imageAttachments = this.lastImageAttachments || [];
+        await this.ensure(modelId, imageAttachments.length > 0);
+
         const images = await this.loadImages(imageAttachments);
         const prompt = this.processor.apply_chat_template(modelMessages, {
             enable_thinking: false,
@@ -560,7 +585,11 @@ class LocalChatApp {
         if (!this.currentChat?.messages?.length) {
             const empty = document.createElement('div');
             empty.className = 'chat-empty-state';
-            empty.textContent = 'Start a local conversation';
+            const emptyTitle = document.createElement('strong');
+            emptyTitle.textContent = 'Start a local chat';
+            const emptyText = document.createElement('span');
+            emptyText.textContent = 'Choose a model, attach files if needed, and send a message.';
+            empty.append(emptyTitle, emptyText);
             this.elements.messageList.appendChild(empty);
             return;
         }
@@ -589,7 +618,7 @@ class LocalChatApp {
 
         const role = document.createElement('span');
         role.className = 'chat-message-role';
-        role.textContent = message.role === 'user' ? 'You' : 'ASD123.ai';
+        role.textContent = message.role === 'user' ? 'You' : 'Assistant';
         header.appendChild(role);
 
         if (message.role === 'user') {
@@ -686,6 +715,7 @@ class LocalChatApp {
         }
 
         article.textContent = '';
+        article.className = 'chat-message chat-message--editing';
 
         const editor = document.createElement('textarea');
         editor.className = 'chat-edit-input';
@@ -706,8 +736,12 @@ class LocalChatApp {
         cancel.textContent = 'Cancel';
         cancel.addEventListener('click', () => this.renderMessages());
 
+        const panel = document.createElement('div');
+        panel.className = 'chat-edit-panel';
+
         actions.append(save, cancel);
-        article.append(editor, actions);
+        panel.append(editor, actions);
+        article.appendChild(panel);
         editor.focus();
     }
 
