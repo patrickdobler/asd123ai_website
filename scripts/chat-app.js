@@ -9,7 +9,7 @@ import { ChatStorage } from './chat-storage.js';
 import { ChatFileProcessor } from './chat-files.js';
 import { OfflineModelResolver } from './chat-offline.js';
 
-const TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@next';
+const TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';
 const TRANSFORMERS_LOCAL = '../vendor/transformers.min.js';
 const DEFAULT_MODEL_ID = 'gemma-4-e2b';
 const DEFAULT_TEMPERATURE = 0.7;
@@ -53,9 +53,9 @@ class ChatModelRunner {
         try {
             this.hf = this.hf || await this.loadTransformers();
 
-            const ModelClass = this.hf[config.className];
+            const ModelClass = this.resolveModelClass(config);
             if (!ModelClass) {
-                throw new Error(`${config.className} is not available in the loaded Transformers.js runtime.`);
+                throw new Error(`${config.className} is not available in the loaded Transformers.js runtime. Try clearing the browser cache and reloading /chat.`);
             }
 
             this.updateStatus(`Loading ${config.label} processor...`);
@@ -115,6 +115,19 @@ class ChatModelRunner {
         }
     }
 
+    resolveModelClass(config) {
+        const preferred = this.hf[config.className];
+        if (preferred) {
+            return preferred;
+        }
+
+        if (config.multimodal && this.hf.AutoModelForImageTextToText) {
+            return this.hf.AutoModelForImageTextToText;
+        }
+
+        return this.hf.AutoModelForCausalLM || null;
+    }
+
     async generate({ modelId, messages, contextWindow, temperature, onToken }) {
         await this.ensure(modelId);
 
@@ -125,7 +138,7 @@ class ChatModelRunner {
             enable_thinking: false,
             add_generation_prompt: true
         });
-        const inputs = await this.prepareInputs(prompt, images);
+        const inputs = await this.prepareInputs(prompt, images, getModelConfig(modelId));
         let streamed = '';
 
         const streamer = new this.hf.TextStreamer(this.processor.tokenizer, {
@@ -233,16 +246,23 @@ class ChatModelRunner {
         return images;
     }
 
-    async prepareInputs(prompt, images) {
+    async prepareInputs(prompt, images, config) {
+        const options = { add_special_tokens: false };
+
+        if (config.provider === 'Gemma') {
+            const imageInput = images.length === 1 ? images[0] : images.length ? images : null;
+            return this.processor(prompt, imageInput, null, options);
+        }
+
         if (!images.length) {
-            return this.processor(prompt, { add_special_tokens: false });
+            return this.processor(prompt, undefined, options);
         }
 
         if (images.length === 1) {
-            return this.processor(prompt, images[0], { add_special_tokens: false });
+            return this.processor(prompt, images[0], options);
         }
 
-        return this.processor(prompt, images, { add_special_tokens: false });
+        return this.processor(prompt, images, options);
     }
 
     decodeOutputs(outputs, inputs) {
@@ -557,6 +577,13 @@ class LocalChatApp {
         article.className = `chat-message chat-message--${message.role}`;
         article.dataset.messageId = message.id;
 
+        const avatar = document.createElement('div');
+        avatar.className = 'chat-message-avatar';
+        avatar.textContent = message.role === 'user' ? 'Y' : 'A';
+
+        const content = document.createElement('div');
+        content.className = 'chat-message-content';
+
         const header = document.createElement('div');
         header.className = 'chat-message-header';
 
@@ -576,18 +603,59 @@ class LocalChatApp {
             header.appendChild(edit);
         }
 
-        const body = document.createElement('div');
-        body.className = 'chat-message-body';
-        body.textContent = message.content || '';
-
+        const body = this.renderMessageBody(message.content || '');
         const attachments = this.renderMessageAttachments(message.attachments || []);
-        article.append(header, body);
+        content.append(header, body);
 
         if (attachments) {
-            article.appendChild(attachments);
+            content.appendChild(attachments);
         }
 
+        article.append(avatar, content);
         return article;
+    }
+
+    renderMessageBody(text) {
+        const body = document.createElement('div');
+        body.className = 'chat-message-body';
+        const parts = String(text || '').split(/```([\w-]*)\n?([\s\S]*?)```/g);
+
+        for (let i = 0; i < parts.length; i += 3) {
+            this.appendTextBlocks(body, parts[i]);
+
+            if (i + 2 < parts.length) {
+                const language = parts[i + 1];
+                const code = parts[i + 2];
+                const pre = document.createElement('pre');
+                const codeElement = document.createElement('code');
+                if (language) {
+                    codeElement.dataset.language = language;
+                }
+                codeElement.textContent = code.trim();
+                pre.appendChild(codeElement);
+                body.appendChild(pre);
+            }
+        }
+
+        if (!body.childNodes.length) {
+            const paragraph = document.createElement('p');
+            paragraph.textContent = '';
+            body.appendChild(paragraph);
+        }
+
+        return body;
+    }
+
+    appendTextBlocks(container, text) {
+        String(text || '')
+            .split(/\n{2,}/)
+            .map(block => block.trim())
+            .filter(Boolean)
+            .forEach(block => {
+                const paragraph = document.createElement('p');
+                paragraph.textContent = block;
+                container.appendChild(paragraph);
+            });
     }
 
     renderMessageAttachments(attachments) {
@@ -744,7 +812,7 @@ class LocalChatApp {
 
         const body = article.querySelector('.chat-message-body');
         if (body) {
-            body.textContent = text;
+            body.replaceWith(this.renderMessageBody(text));
         }
         this.scrollMessagesToEnd();
     }

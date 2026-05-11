@@ -18,7 +18,7 @@ const MODEL_REGISTRY = {
         className: 'Gemma4ForConditionalGeneration',
         dtype: 'q4f16',
         contextWindow: 131072,
-        defaultContextWindow: 8192,
+        defaultContextWindow: 4096,
         multimodal: true,
         status: 'primary'
     },
@@ -30,7 +30,7 @@ const MODEL_REGISTRY = {
         className: 'Gemma4ForConditionalGeneration',
         dtype: 'q4f16',
         contextWindow: 131072,
-        defaultContextWindow: 8192,
+        defaultContextWindow: 4096,
         multimodal: true,
         status: 'primary'
     },
@@ -46,7 +46,7 @@ const MODEL_REGISTRY = {
             decoder_model_merged: 'q4'
         },
         contextWindow: 131072,
-        defaultContextWindow: 8192,
+        defaultContextWindow: 4096,
         multimodal: true,
         status: 'experimental'
     },
@@ -62,7 +62,7 @@ const MODEL_REGISTRY = {
             decoder_model_merged: 'q4'
         },
         contextWindow: 131072,
-        defaultContextWindow: 8192,
+        defaultContextWindow: 4096,
         multimodal: true,
         status: 'experimental'
     },
@@ -78,7 +78,7 @@ const MODEL_REGISTRY = {
             decoder_model_merged: 'q4'
         },
         contextWindow: 131072,
-        defaultContextWindow: 8192,
+        defaultContextWindow: 4096,
         multimodal: true,
         status: 'experimental'
     },
@@ -90,7 +90,7 @@ const MODEL_REGISTRY = {
         className: '',
         dtype: 'q4',
         contextWindow: 131072,
-        defaultContextWindow: 8192,
+        defaultContextWindow: 4096,
         multimodal: true,
         status: 'unavailable',
         disabledReason: 'No verified Transformers.js ONNX repository is enabled for v1.'

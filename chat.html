@@ -98,41 +98,43 @@
                             <small id="modelStatus">Ready</small>
                         </div>
 
-                        <div class="chat-settings-grid">
-                            <label class="chat-setting">
-                                <span>Model</span>
-                                <select id="modelSelect" class="select-field"></select>
-                            </label>
+                        <div class="chat-controls-row">
+                            <div class="chat-settings-grid">
+                                <label class="chat-setting">
+                                    <span>Model</span>
+                                    <select id="modelSelect" class="select-field"></select>
+                                </label>
 
-                            <label class="chat-setting">
-                                <span>Context</span>
-                                <select id="contextSelect" class="select-field"></select>
-                            </label>
+                                <label class="chat-setting">
+                                    <span>Context</span>
+                                    <select id="contextSelect" class="select-field"></select>
+                                </label>
 
-                            <label class="chat-setting chat-temp-setting">
-                                <span>Temperature <strong id="temperatureValue">0.7</strong></span>
-                                <input id="temperatureInput" type="range" min="0" max="1.5" step="0.1" value="0.7">
-                            </label>
-                        </div>
+                                <label class="chat-setting chat-temp-setting">
+                                    <span>Temperature <strong id="temperatureValue">0.7</strong></span>
+                                    <input id="temperatureInput" type="range" min="0" max="1.5" step="0.1" value="0.7">
+                                </label>
+                            </div>
 
-                        <div class="chat-toolbar-actions">
-                            <button id="loadModelBtn" type="button" class="btn btn-secondary btn-small">
-                                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2v10"/>
-                                    <path d="m16 6-4-4-4 4"/>
-                                    <path d="M20 16.5A4.5 4.5 0 0 1 15.5 21h-7A4.5 4.5 0 0 1 4 16.5"/>
-                                </svg>
-                                Load Model
-                            </button>
-                            <button id="offlineFolderBtn" type="button" class="btn btn-secondary btn-small">
-                                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
-                                    <path d="M12 11v5"/>
-                                    <path d="m9.5 13.5 2.5-2.5 2.5 2.5"/>
-                                </svg>
-                                Offline Folder
-                            </button>
-                            <span id="offlineStatus" class="chat-status-pill">Online model downloads enabled</span>
+                            <div class="chat-toolbar-actions">
+                                <button id="loadModelBtn" type="button" class="btn btn-secondary btn-small">
+                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2v10"/>
+                                        <path d="m16 6-4-4-4 4"/>
+                                        <path d="M20 16.5A4.5 4.5 0 0 1 15.5 21h-7A4.5 4.5 0 0 1 4 16.5"/>
+                                    </svg>
+                                    Load Model
+                                </button>
+                                <button id="offlineFolderBtn" type="button" class="btn btn-secondary btn-small">
+                                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+                                        <path d="M12 11v5"/>
+                                        <path d="m9.5 13.5 2.5-2.5 2.5 2.5"/>
+                                    </svg>
+                                    Offline Folder
+                                </button>
+                                <span id="offlineStatus" class="chat-status-pill">Online model downloads enabled</span>
+                            </div>
                         </div>
                     </div>
 
