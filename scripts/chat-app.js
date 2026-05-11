@@ -4,10 +4,10 @@ import {
     clampContextWindow,
     getContextLabel,
     getModelConfig
-} from './chat-models.js?v=20260511-text-q4';
-import { ChatStorage } from './chat-storage.js?v=20260511-text-q4';
-import { ChatFileProcessor } from './chat-files.js?v=20260511-text-q4';
-import { OfflineModelResolver } from './chat-offline.js?v=20260511-text-q4';
+} from './chat-models.js?v=20260511-md-template';
+import { ChatStorage } from './chat-storage.js?v=20260511-md-template';
+import { ChatFileProcessor } from './chat-files.js?v=20260511-md-template';
+import { OfflineModelResolver } from './chat-offline.js?v=20260511-md-template';
 
 const TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';
 const TRANSFORMERS_LOCAL = '../vendor/transformers.min.js';
@@ -159,10 +159,7 @@ class ChatModelRunner {
         await this.ensure(modelId, imageAttachments.length > 0);
 
         const images = await this.loadImages(imageAttachments);
-        const prompt = this.processor.apply_chat_template(modelMessages, {
-            enable_thinking: false,
-            add_generation_prompt: true
-        });
+        const prompt = this.formatPrompt(modelMessages, getModelConfig(modelId));
         const inputs = await this.prepareInputs(prompt, images, getModelConfig(modelId));
         let streamed = '';
 
@@ -186,6 +183,21 @@ class ChatModelRunner {
         const outputs = await this.model.generate(generationOptions);
         const decoded = this.decodeOutputs(outputs, inputs);
         return this.cleanAssistantText(decoded || streamed);
+    }
+
+    formatPrompt(modelMessages, config) {
+        try {
+            return this.processor.apply_chat_template(modelMessages, {
+                enable_thinking: false,
+                add_generation_prompt: true
+            });
+        } catch (error) {
+            if (config.provider === 'Gemma' && /trim|chat template|apply_chat_template/i.test(error?.message || '')) {
+                this.updateStatus(`${config.label} using compatible chat template`);
+                return this.formatGemmaPrompt(modelMessages);
+            }
+            throw error;
+        }
     }
 
     buildModelMessages(messages, contextWindow) {
@@ -212,7 +224,7 @@ class ChatModelRunner {
         return [
             {
                 role: 'system',
-                content: [{ type: 'text', text: SYSTEM_PROMPT }]
+                content: SYSTEM_PROMPT
             },
             ...selected.map(message => this.toModelMessage(message))
         ];
@@ -222,16 +234,12 @@ class ChatModelRunner {
         if (message.role === 'assistant') {
             return {
                 role: 'assistant',
-                content: [{ type: 'text', text: message.content }]
+                content: message.content || ''
             };
         }
 
-        const content = [];
         const attachments = Array.isArray(message.attachments) ? message.attachments : [];
-
-        attachments.filter(attachment => attachment.kind === 'image').forEach(() => {
-            content.push({ type: 'image' });
-        });
+        const hasImages = attachments.some(attachment => attachment.kind === 'image');
 
         const textAttachments = attachments
             .filter(attachment => attachment.kind === 'text' && attachment.text)
@@ -242,16 +250,61 @@ class ChatModelRunner {
                 return `\n\n[Attached file: ${attachment.name}]\n${trimmed}`;
             })
             .join('');
+        const text = `${message.content || ''}${textAttachments}`.trim();
 
-        content.push({
-            type: 'text',
-            text: `${message.content || ''}${textAttachments}`.trim()
+        if (!hasImages) {
+            return {
+                role: 'user',
+                content: text
+            };
+        }
+
+        const content = [];
+        attachments.filter(attachment => attachment.kind === 'image').forEach(() => {
+            content.push({ type: 'image' });
         });
+        content.push({ type: 'text', text });
 
         return {
             role: 'user',
             content
         };
+    }
+
+    formatGemmaPrompt(messages) {
+        const bos = this.processor?.tokenizer?.bos_token || '';
+        const turns = [bos];
+
+        messages.forEach(message => {
+            const role = message.role === 'assistant' ? 'model' : message.role;
+            turns.push(`<|turn>${role}\n`);
+            turns.push(this.flattenGemmaContent(message.content, role === 'model'));
+            turns.push('<turn|>\n');
+        });
+
+        turns.push('<|turn>model\n');
+        return turns.join('');
+    }
+
+    flattenGemmaContent(content, stripThinking = false) {
+        if (Array.isArray(content)) {
+            return content.map(item => {
+                if (item?.type === 'image') {
+                    return '\n\n<|image|>\n\n';
+                }
+                if (item?.type === 'audio') {
+                    return '<|audio|>';
+                }
+                if (item?.type === 'video') {
+                    return '\n\n<|video|>\n\n';
+                }
+                const text = item?.text || '';
+                return stripThinking ? this.cleanAssistantText(text) : String(text).trim();
+            }).join('');
+        }
+
+        const text = String(content || '');
+        return stripThinking ? this.cleanAssistantText(text) : text.trim();
     }
 
     async loadImages(attachments) {
@@ -647,10 +700,10 @@ class LocalChatApp {
     renderMessageBody(text) {
         const body = document.createElement('div');
         body.className = 'chat-message-body';
-        const parts = String(text || '').split(/```([\w-]*)\n?([\s\S]*?)```/g);
+        const parts = String(text || '').replace(/\r\n?/g, '\n').split(/```([\w-]*)\n?([\s\S]*?)```/g);
 
         for (let i = 0; i < parts.length; i += 3) {
-            this.appendTextBlocks(body, parts[i]);
+            this.appendMarkdownBlocks(body, parts[i]);
 
             if (i + 2 < parts.length) {
                 const language = parts[i + 1];
@@ -675,16 +728,266 @@ class LocalChatApp {
         return body;
     }
 
-    appendTextBlocks(container, text) {
-        String(text || '')
-            .split(/\n{2,}/)
-            .map(block => block.trim())
-            .filter(Boolean)
-            .forEach(block => {
-                const paragraph = document.createElement('p');
-                paragraph.textContent = block;
-                container.appendChild(paragraph);
+    appendMarkdownBlocks(container, text) {
+        const lines = String(text || '').split('\n');
+        let paragraph = [];
+        let list = null;
+
+        const flushParagraph = () => {
+            if (!paragraph.length) {
+                return;
+            }
+
+            const element = document.createElement('p');
+            this.appendInlineMarkdown(element, paragraph.join('\n'));
+            container.appendChild(element);
+            paragraph = [];
+        };
+
+        const closeList = () => {
+            list = null;
+        };
+
+        for (let index = 0; index < lines.length; index++) {
+            const line = lines[index];
+            const trimmed = line.trim();
+
+            if (!trimmed) {
+                flushParagraph();
+                closeList();
+                continue;
+            }
+
+            if (this.isMarkdownTable(lines, index)) {
+                flushParagraph();
+                closeList();
+                const result = this.createMarkdownTable(lines, index);
+                container.appendChild(result.table);
+                index = result.nextIndex - 1;
+                continue;
+            }
+
+            const horizontalRule = trimmed.match(/^([-*_])(?:\s*\1){2,}$/);
+            if (horizontalRule) {
+                flushParagraph();
+                closeList();
+                container.appendChild(document.createElement('hr'));
+                continue;
+            }
+
+            const heading = trimmed.match(/^(#{1,4})\s+(.+)$/);
+            if (heading) {
+                flushParagraph();
+                closeList();
+                const level = Math.min(heading[1].length + 1, 5);
+                const element = document.createElement(`h${level}`);
+                this.appendInlineMarkdown(element, heading[2].replace(/\s+#+$/, '').trim());
+                container.appendChild(element);
+                continue;
+            }
+
+            const quote = trimmed.match(/^>\s?(.*)$/);
+            if (quote) {
+                flushParagraph();
+                closeList();
+                const blockquote = document.createElement('blockquote');
+                this.appendInlineMarkdown(blockquote, quote[1]);
+                container.appendChild(blockquote);
+                continue;
+            }
+
+            const unordered = trimmed.match(/^[-*+]\s+(.+)$/);
+            const ordered = trimmed.match(/^\d+[.)]\s+(.+)$/);
+            if (unordered || ordered) {
+                flushParagraph();
+                const type = unordered ? 'ul' : 'ol';
+                if (!list || list.tagName.toLowerCase() !== type) {
+                    list = document.createElement(type);
+                    container.appendChild(list);
+                }
+
+                const item = document.createElement('li');
+                this.appendInlineMarkdown(item, (unordered || ordered)[1]);
+                list.appendChild(item);
+                continue;
+            }
+
+            closeList();
+            paragraph.push(trimmed);
+        }
+
+        flushParagraph();
+    }
+
+    appendInlineMarkdown(container, text) {
+        const source = String(text || '');
+        const patterns = [
+            {
+                type: 'code',
+                regex: /`([^`\n]+)`/
+            },
+            {
+                type: 'link',
+                regex: /\[([^\]\n]+)\]\(([^)\s]+)\)/
+            },
+            {
+                type: 'strong',
+                regex: /\*\*([^*]+)\*\*|__([^_]+)__/
+            },
+            {
+                type: 'em',
+                regex: /(^|[\s([{])\*([^*\n]+)\*|(^|[\s([{])_([^_\n]+)_/
+            }
+        ];
+
+        let remaining = source;
+        while (remaining) {
+            const next = this.findNextInlineMatch(remaining, patterns);
+            if (!next) {
+                container.appendChild(document.createTextNode(remaining));
+                break;
+            }
+
+            if (next.match.index > 0) {
+                container.appendChild(document.createTextNode(remaining.slice(0, next.match.index)));
+            }
+
+            const element = this.createInlineElement(next);
+            if (element) {
+                container.appendChild(element);
+            } else {
+                container.appendChild(document.createTextNode(next.match[0]));
+            }
+
+            remaining = remaining.slice(next.match.index + next.match[0].length);
+        }
+    }
+
+    findNextInlineMatch(text, patterns) {
+        return patterns.reduce((best, pattern) => {
+            const match = pattern.regex.exec(text);
+            if (!match) {
+                return best;
+            }
+
+            if (!best || match.index < best.match.index) {
+                return { ...pattern, match };
+            }
+
+            return best;
+        }, null);
+    }
+
+    createInlineElement(matchInfo) {
+        const { type, match } = matchInfo;
+
+        if (type === 'code') {
+            const code = document.createElement('code');
+            code.textContent = match[1];
+            return code;
+        }
+
+        if (type === 'link') {
+            const href = this.getSafeLink(match[2]);
+            if (!href) {
+                return null;
+            }
+
+            const link = document.createElement('a');
+            link.href = href;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = match[1];
+            return link;
+        }
+
+        if (type === 'strong') {
+            const strong = document.createElement('strong');
+            this.appendInlineMarkdown(strong, match[1] || match[2] || '');
+            return strong;
+        }
+
+        if (type === 'em') {
+            const prefix = match[1] || match[3] || '';
+            const emphasis = document.createElement('em');
+            this.appendInlineMarkdown(emphasis, match[2] || match[4] || '');
+
+            if (!prefix) {
+                return emphasis;
+            }
+
+            const fragment = document.createDocumentFragment();
+            fragment.appendChild(document.createTextNode(prefix));
+            fragment.appendChild(emphasis);
+            return fragment;
+        }
+
+        return null;
+    }
+
+    getSafeLink(value) {
+        try {
+            const url = new URL(value, window.location.origin);
+            if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) {
+                return null;
+            }
+            return url.href;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    isMarkdownTable(lines, index) {
+        if (index + 1 >= lines.length) {
+            return false;
+        }
+
+        const header = lines[index].trim();
+        const divider = lines[index + 1].trim();
+        return header.includes('|') && /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(divider);
+    }
+
+    createMarkdownTable(lines, startIndex) {
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const tbody = document.createElement('tbody');
+        const headerCells = this.parseTableRow(lines[startIndex]);
+        const headerRow = document.createElement('tr');
+
+        headerCells.forEach(cell => {
+            const th = document.createElement('th');
+            this.appendInlineMarkdown(th, cell);
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        let index = startIndex + 2;
+        while (index < lines.length && lines[index].trim().includes('|')) {
+            const row = document.createElement('tr');
+            this.parseTableRow(lines[index]).forEach(cell => {
+                const td = document.createElement('td');
+                this.appendInlineMarkdown(td, cell);
+                row.appendChild(td);
             });
+            tbody.appendChild(row);
+            index++;
+        }
+
+        if (tbody.childNodes.length) {
+            table.appendChild(tbody);
+        }
+
+        return { table, nextIndex: index };
+    }
+
+    parseTableRow(line) {
+        return line.trim()
+            .replace(/^\|/, '')
+            .replace(/\|$/, '')
+            .split('|')
+            .map(cell => cell.trim());
     }
 
     renderMessageAttachments(attachments) {

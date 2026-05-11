@@ -3454,6 +3454,76 @@ main#main.chat-main {
     margin: 0 0 11px;
 }
 
+.chat-message-body h2,
+.chat-message-body h3,
+.chat-message-body h4,
+.chat-message-body h5 {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1.35;
+    margin: 16px 0 8px;
+}
+
+.chat-message-body h2:first-child,
+.chat-message-body h3:first-child,
+.chat-message-body h4:first-child,
+.chat-message-body h5:first-child {
+    margin-top: 0;
+}
+
+.chat-message-body ul,
+.chat-message-body ol {
+    margin: 0 0 12px 20px;
+    padding: 0;
+}
+
+.chat-message-body li {
+    margin: 4px 0;
+    padding-left: 2px;
+}
+
+.chat-message-body blockquote {
+    border-left: 3px solid var(--chat-border-strong);
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+    padding: 3px 0 3px 12px;
+}
+
+.chat-message-body a {
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.chat-message-body hr {
+    border: 0;
+    border-top: 1px solid var(--chat-border);
+    margin: 14px 0;
+}
+
+.chat-message-body table {
+    border-collapse: collapse;
+    display: block;
+    margin: 0 0 12px;
+    overflow-x: auto;
+    width: 100%;
+}
+
+.chat-message-body th,
+.chat-message-body td {
+    border: 1px solid var(--chat-border);
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.chat-message-body th {
+    background: var(--chat-muted);
+    font-weight: 800;
+}
+
 .chat-message-body pre {
     background: var(--chat-muted);
     border: 1px solid var(--chat-border);
@@ -3467,8 +3537,36 @@ main#main.chat-main {
     border-color: rgba(255, 255, 255, 0.22);
 }
 
+.chat-message--user .chat-message-body code {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+[data-theme="dark"] .chat-message--user .chat-message-body code {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.16);
+}
+
 .chat-message-body code {
+    background: var(--chat-muted);
+    border: 1px solid var(--chat-border);
+    border-radius: 5px;
     font-size: 12px;
+    padding: 1px 5px;
+}
+
+.chat-message-body pre code {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    display: block;
+    padding: 0;
+}
+
+.chat-message--user .chat-message-body pre code {
+    background: transparent;
+    border: 0;
+    padding: 0;
 }
 
 .chat-message-attachments {
