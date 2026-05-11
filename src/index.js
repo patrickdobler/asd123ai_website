@@ -4,6 +4,7 @@ const redirects = {
   '/index.html': '/',
   '/optimizer.html': '/optimizer',
   '/anonymizer.html': '/anonymizer',
+  '/chat.html': '/chat',
   '/documentation.html': '/documentation',
   '/about.html': '/about',
   '/contact.html': '/contact',
@@ -17,6 +18,7 @@ const redirects = {
 const cleanUrls = {
   '/optimizer': '/optimizer.html',
   '/anonymizer': '/anonymizer.html',
+  '/chat': '/chat.html',
   '/documentation': '/documentation.html',
   '/about': '/about.html',
   '/contact': '/contact.html',

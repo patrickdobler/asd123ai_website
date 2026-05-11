@@ -78,6 +78,7 @@ async function copyAndMinifyFiles() {
         'privacy.html',
         'terms.html',
         'test-optimizer.html',
+        'chat.html',
         'anonymizer.html',
         'anonymizer-guide.html',
         'optimizer-guide.html'
