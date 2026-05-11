@@ -5,6 +5,10 @@ node_modules/
 dist/
 build/
 build.js
+offline-chat/models/
+offline-chat/**/*.onnx
+offline-chat/**/*.onnx_data
+model-downloads/
 
 # Logs
 *.log
