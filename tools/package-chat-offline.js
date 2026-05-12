@@ -72,13 +72,12 @@ function copyOfflineIndex() {
         .replace(/https:\/\/asd123\.ai\/chat/g, 'index.html')
         .replace(
             /<script type="module" src="scripts\/chat-app\.js[^"]*"><\/script>/,
-            '<script>window.asd123OfflineBundle = true;</script>\n    <script src="vendor/ort.webgpu.bundle.iife.js"></script>\n    <script src="vendor/transformers.iife.js"></script>\n    <script src="scripts/chat-offline-bundle.js"></script>'
+            '<script>window.asd123OfflineBundle = true;</script>\n    <script src="vendor/ort-wasm-paths.js"></script>\n    <script src="vendor/ort.webgpu.bundle.iife.js"></script>\n    <script src="vendor/transformers.iife.js"></script>\n    <script src="scripts/chat-offline-bundle.js"></script>'
         );
 
     html = html.replace(
-        '                </span>\n            </section>\n\n            <section class="chat-shell"',
-        `                </span>
-                <div class="chat-offline-theme" aria-label="Theme">
+        '            </section>\n\n            <section class="chat-shell"',
+        `                <div class="chat-offline-theme" aria-label="Theme">
                     <span class="chat-offline-theme-label">Theme</span>
                     <label class="toggle-switch" style="transform: scale(0.8);">
                         <input type="checkbox" id="theme-toggle">
@@ -133,12 +132,14 @@ function buildOfflineBundle() {
             'MODEL_REGISTRY',
             'getModelConfig',
             'getContextLabel',
+            'getModelOptionLabel',
+            'getContextOptionLabel',
             'clampContextWindow'
         ]),
         wrapScriptModule('chat-storage.js', ['ChatStorage']),
         wrapScriptModule('chat-files.js', ['ChatFileProcessor']),
         wrapScriptModule('chat-offline.js', ['OfflineModelResolver']),
-        `\n;(() => {\nconst {\n    CONTEXT_WINDOWS,\n    MODEL_REGISTRY,\n    clampContextWindow,\n    getContextLabel,\n    getModelConfig,\n    ChatStorage,\n    ChatFileProcessor,\n    OfflineModelResolver\n} = globalThis;\n${chatApp}\n})();\n`
+        `\n;(() => {\nconst {\n    CONTEXT_WINDOWS,\n    MODEL_REGISTRY,\n    clampContextWindow,\n    getContextOptionLabel,\n    getContextLabel,\n    getModelOptionLabel,\n    getModelConfig,\n    ChatStorage,\n    ChatFileProcessor,\n    OfflineModelResolver\n} = globalThis;\n${chatApp}\n})();\n`
     ].join('\n');
 
     fs.writeFileSync(path.join(outDir, 'scripts', 'chat-offline-bundle.js'), bundle);
@@ -246,6 +247,34 @@ function prepareOfflineVendor() {
     return fs.existsSync(localRuntime) && fs.existsSync(transformersIife);
 }
 
+function writeOrtWasmPaths() {
+    const vendorDir = path.join(outDir, 'vendor');
+    const wasmPath = path.join(vendorDir, 'ort-wasm-simd-threaded.asyncify.wasm');
+    const mjsPath = path.join(vendorDir, 'ort-wasm-simd-threaded.asyncify.mjs');
+    const target = path.join(vendorDir, 'ort-wasm-paths.js');
+
+    ensureDir(vendorDir);
+
+    if (!fs.existsSync(wasmPath)) {
+        fs.writeFileSync(target, 'window.asd123OrtWasmPaths = null;\n');
+        return false;
+    }
+
+    const payload = {
+        wasm: `data:application/wasm;base64,${fs.readFileSync(wasmPath).toString('base64')}`
+    };
+
+    if (fs.existsSync(mjsPath)) {
+        payload.mjs = `data:text/javascript;base64,${fs.readFileSync(mjsPath).toString('base64')}`;
+    }
+
+    fs.writeFileSync(
+        target,
+        `window.asd123OrtWasmPaths = ${JSON.stringify(payload)};\n`
+    );
+    return true;
+}
+
 function writeReadme() {
     const readme = `<!DOCTYPE html>
 <html lang="en">
@@ -267,7 +296,7 @@ function writeReadme() {
         <li><code>models/onnx-community--gemma-4-E2B-it-ONNX/config.json</code></li>
         <li><code>models/onnx-community/gemma-4-E2B-it-ONNX/config.json</code></li>
     </ul>
-    <p>No executable or local server is required. For full offline use, this bundle needs <code>vendor/transformers.iife.js</code>, <code>vendor/ort.webgpu.bundle.iife.js</code>, and the selected model files under <code>models</code>.</p>
+    <p>No executable or local server is required. For full offline use, this bundle needs <code>vendor/transformers.iife.js</code>, <code>vendor/ort.webgpu.bundle.iife.js</code>, <code>vendor/ort-wasm-paths.js</code>, and the selected model files under <code>models</code>.</p>
 </body>
 </html>
 `;
@@ -310,12 +339,16 @@ function main() {
     }
 
     const hasLocalVendor = prepareOfflineVendor();
+    const hasLocalWasm = writeOrtWasmPaths();
 
     writeReadme();
 
     console.log(`Offline chat bundle created at ${outDir}`);
     if (!hasLocalVendor) {
         console.log('Note: add a local Transformers.js browser runtime and ONNX WebGPU bundle to offline-chat/vendor for full offline use.');
+    }
+    if (!hasLocalWasm) {
+        console.log('Note: add ONNX Runtime WASM files to offline-chat/vendor for full offline use.');
     }
     if (!modelDir && !fs.existsSync(path.join(outDir, 'models'))) {
         console.log('Note: pass --models /path/to/model-root to include model files.');

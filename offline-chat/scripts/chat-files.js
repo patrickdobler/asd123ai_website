@@ -98,24 +98,9 @@ class ChatFileProcessor {
         await this.yieldToBrowser();
         const raw = new TextDecoder('latin1').decode(bytes);
         await this.yieldToBrowser();
-        const chunks = [];
-        const textObjectPattern = /\((?:\\.|[^\\)])*\)\s*Tj|\[(?:.|\n|\r)*?\]\s*TJ/g;
-        const literalPattern = /\((?:\\.|[^\\)])*\)/g;
-        let match;
-        let processed = 0;
-
-        while ((match = textObjectPattern.exec(raw)) !== null) {
-            const literals = match[0].match(literalPattern) || [];
-            const line = literals.map(value => this.decodePdfLiteral(value.slice(1, -1))).join('');
-            if (line.trim()) {
-                chunks.push(line.trim());
-            }
-
-            processed++;
-            if (processed % 120 === 0) {
-                await this.yieldToBrowser();
-            }
-        }
+        const streamTexts = await this.extractPdfStreamTexts(bytes, raw);
+        const streamChunks = streamTexts.flatMap(text => this.extractPdfTextChunks(text));
+        const chunks = streamChunks.length ? streamChunks : this.extractPdfTextChunks(raw);
 
         if (!chunks.length) {
             await this.yieldToBrowser();
@@ -136,17 +121,166 @@ class ChatFileProcessor {
         return chunks.join('\n');
     }
 
+    async extractPdfStreamTexts(bytes, raw) {
+        const texts = [];
+        const streamPattern = /<<(?:.|\n|\r)*?>>\s*stream(?:\r\n|\n|\r)?/g;
+        let match;
+        let processed = 0;
+
+        while ((match = streamPattern.exec(raw)) !== null) {
+            const dictionary = match[0];
+            const dataStart = streamPattern.lastIndex;
+            const endIndex = raw.indexOf('endstream', dataStart);
+
+            if (endIndex === -1) {
+                break;
+            }
+
+            let dataEnd = endIndex;
+            while (dataEnd > dataStart && (bytes[dataEnd - 1] === 10 || bytes[dataEnd - 1] === 13)) {
+                dataEnd--;
+            }
+
+            const streamBytes = bytes.slice(dataStart, dataEnd);
+            let text = '';
+
+            if (/\/FlateDecode\b/.test(dictionary)) {
+                text = await this.inflatePdfStream(streamBytes);
+            } else {
+                text = raw.slice(dataStart, dataEnd);
+            }
+
+            if (text && /(?:\bT[Jj]\b|\bBT\b|\bET\b)/.test(text)) {
+                texts.push(text);
+            }
+
+            streamPattern.lastIndex = endIndex + 'endstream'.length;
+            processed++;
+            if (processed % 24 === 0) {
+                await this.yieldToBrowser();
+            }
+        }
+
+        return texts;
+    }
+
+    async inflatePdfStream(bytes) {
+        if (!('DecompressionStream' in window)) {
+            return '';
+        }
+
+        for (const format of ['deflate', 'deflate-raw']) {
+            try {
+                const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(format));
+                const buffer = await new Response(stream).arrayBuffer();
+                return new TextDecoder('latin1').decode(new Uint8Array(buffer));
+            } catch (error) {
+                // Some PDFs use zlib-wrapped deflate, others raw deflate.
+            }
+        }
+
+        return '';
+    }
+
+    extractPdfTextChunks(content) {
+        const chunks = [];
+        const textObjectPattern = /(?:\((?:\\.|[^\\)])*\)|<[\dA-Fa-f\s]+>)\s*Tj|\[(?:.|\n|\r)*?\]\s*TJ/g;
+        let match;
+
+        while ((match = textObjectPattern.exec(content)) !== null) {
+            const line = this.extractPdfTextTokens(match[0]).join('').replace(/[ \t]{2,}/g, ' ').trim();
+            if (line) {
+                chunks.push(line);
+            }
+        }
+
+        return chunks;
+    }
+
+    extractPdfTextTokens(value) {
+        const tokens = [];
+        const tokenPattern = /\((?:\\.|[^\\)])*\)|<([\dA-Fa-f\s]+)>|-?\d+(?:\.\d+)?/g;
+        let match;
+
+        while ((match = tokenPattern.exec(value)) !== null) {
+            const token = match[0];
+
+            if (token.startsWith('(')) {
+                tokens.push(this.decodePdfLiteral(token.slice(1, -1)));
+                continue;
+            }
+
+            if (token.startsWith('<')) {
+                tokens.push(this.decodePdfHexString(token.slice(1, -1)));
+                continue;
+            }
+
+            const adjustment = Number(token);
+            if (Number.isFinite(adjustment) && adjustment < -120 && tokens.at(-1) !== ' ') {
+                tokens.push(' ');
+            }
+        }
+
+        return tokens;
+    }
+
     yieldToBrowser() {
         return new Promise(resolve => setTimeout(resolve, 0));
     }
 
     decodePdfLiteral(value) {
         return value
+            .replace(/\\\r?\n/g, '')
             .replace(/\\([nrtbf()\\])/g, (_, code) => {
                 const map = { n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', '(': '(', ')': ')', '\\': '\\' };
                 return map[code] || code;
             })
             .replace(/\\([0-7]{1,3})/g, (_, octal) => String.fromCharCode(parseInt(octal, 8)));
+    }
+
+    decodePdfHexString(value) {
+        let hex = String(value || '').replace(/\s+/g, '');
+        if (!hex) {
+            return '';
+        }
+        if (hex.length % 2) {
+            hex += '0';
+        }
+
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let index = 0; index < hex.length; index += 2) {
+            bytes[index / 2] = parseInt(hex.slice(index, index + 2), 16);
+        }
+
+        if (bytes[0] === 0xfe && bytes[1] === 0xff) {
+            return this.decodeUtf16Be(bytes.slice(2));
+        }
+
+        const zeroHighBytes = bytes.reduce((total, byte, index) => total + (index % 2 === 0 && byte === 0 ? 1 : 0), 0);
+        if (bytes.length > 3 && zeroHighBytes / Math.ceil(bytes.length / 2) > 0.35) {
+            return this.decodeUtf16Be(bytes);
+        }
+
+        try {
+            return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+        } catch (error) {
+            try {
+                return new TextDecoder('windows-1252').decode(bytes);
+            } catch (fallbackError) {
+                return new TextDecoder('latin1').decode(bytes);
+            }
+        }
+    }
+
+    decodeUtf16Be(bytes) {
+        let text = '';
+        for (let index = 0; index + 1 < bytes.length; index += 2) {
+            const code = (bytes[index] << 8) | bytes[index + 1];
+            if (code) {
+                text += String.fromCharCode(code);
+            }
+        }
+        return text;
     }
 
     async extractDocxText(file) {

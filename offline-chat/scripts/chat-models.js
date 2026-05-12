@@ -4,10 +4,14 @@ const CONTEXT_WINDOWS = [
     4096,
     8192,
     16384,
-    32768,
-    65536,
-    131072
+    32768
 ];
+
+const DEFAULT_CONTEXT_MEMORY_DELTA_GB = {
+    8192: 1,
+    16384: 2,
+    32768: 4
+};
 
 const MODEL_REGISTRY = {
     'gemma-4-e2b': {
@@ -15,22 +19,23 @@ const MODEL_REGISTRY = {
         label: 'Gemma 4 E2B',
         provider: 'Gemma',
         repo: 'onnx-community/gemma-4-E2B-it-ONNX',
-        className: 'Gemma4ForCausalLM',
+        className: 'Gemma4ForConditionalGeneration',
         multimodalClassName: 'Gemma4ForConditionalGeneration',
-        dtype: {
-            audio_encoder: 'fp16',
-            embed_tokens: 'q4f16',
-            vision_encoder: 'fp16',
-            decoder_model_merged: 'q4f16'
-        },
+        dtype: 'q4f16',
         contextWindow: 32768,
-        modelContextWindow: 131072,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
         maxNewTokens: 768,
         midContextMaxNewTokens: 384,
         longContextMaxNewTokens: 256,
-        prefillChunkTokens: 1024,
+        prefillChunkTokens: 4096,
         contextSafetyTokens: 512,
+        browserMemoryGb4k: 8,
+        contextMemoryDeltaGb: {
+            8192: 1,
+            16384: 3,
+            32768: 6
+        },
         multimodal: true,
         status: 'primary'
     },
@@ -39,22 +44,23 @@ const MODEL_REGISTRY = {
         label: 'Gemma 4 E4B',
         provider: 'Gemma',
         repo: 'onnx-community/gemma-4-E4B-it-ONNX',
-        className: 'Gemma4ForCausalLM',
+        className: 'Gemma4ForConditionalGeneration',
         multimodalClassName: 'Gemma4ForConditionalGeneration',
-        dtype: {
-            audio_encoder: 'fp16',
-            embed_tokens: 'q4f16',
-            vision_encoder: 'fp16',
-            decoder_model_merged: 'q4f16'
-        },
+        dtype: 'q4f16',
         contextWindow: 32768,
-        modelContextWindow: 131072,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
         maxNewTokens: 512,
         midContextMaxNewTokens: 256,
         longContextMaxNewTokens: 192,
-        prefillChunkTokens: 1024,
+        prefillChunkTokens: 4096,
         contextSafetyTokens: 512,
+        browserMemoryGb4k: 11,
+        contextMemoryDeltaGb: {
+            8192: 1.5,
+            16384: 4,
+            32768: 8
+        },
         multimodal: true,
         status: 'primary'
     },
@@ -67,14 +73,20 @@ const MODEL_REGISTRY = {
         multimodalClassName: 'Qwen3_5ForConditionalGeneration',
         dtype: {
             embed_tokens: 'q4',
-            vision_encoder: 'q4',
+            vision_encoder: 'fp16',
             decoder_model_merged: 'q4'
         },
-        contextWindow: 16384,
-        modelContextWindow: 131072,
+        contextWindow: 32768,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
+        browserMemoryGb4k: 3,
+        contextMemoryDeltaGb: {
+            8192: 0.5,
+            16384: 1.5,
+            32768: 3
+        },
         multimodal: true,
-        status: 'experimental'
+        status: 'primary'
     },
     'qwen-3-5-2b': {
         id: 'qwen-3-5-2b',
@@ -85,14 +97,20 @@ const MODEL_REGISTRY = {
         multimodalClassName: 'Qwen3_5ForConditionalGeneration',
         dtype: {
             embed_tokens: 'q4',
-            vision_encoder: 'q4',
+            vision_encoder: 'fp16',
             decoder_model_merged: 'q4'
         },
-        contextWindow: 8192,
-        modelContextWindow: 131072,
+        contextWindow: 32768,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
+        browserMemoryGb4k: 5,
+        contextMemoryDeltaGb: {
+            8192: 1,
+            16384: 2.5,
+            32768: 5
+        },
         multimodal: true,
-        status: 'experimental'
+        status: 'primary'
     },
     'qwen-3-5-4b': {
         id: 'qwen-3-5-4b',
@@ -103,27 +121,20 @@ const MODEL_REGISTRY = {
         multimodalClassName: 'Qwen3_5ForConditionalGeneration',
         dtype: {
             embed_tokens: 'q4',
-            vision_encoder: 'q4',
+            vision_encoder: 'fp16',
             decoder_model_merged: 'q4'
         },
-        contextWindow: 4096,
-        modelContextWindow: 131072,
+        contextWindow: 32768,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
+        browserMemoryGb4k: 8,
+        contextMemoryDeltaGb: {
+            8192: 1.5,
+            16384: 4,
+            32768: 8
+        },
         multimodal: true,
-        status: 'experimental'
-    },
-    'qwen-3-5-9b': {
-        id: 'qwen-3-5-9b',
-        label: 'Qwen3.5 9B',
-        provider: 'Qwen',
-        repo: '',
-        className: '',
-        dtype: 'q4',
-        contextWindow: 131072,
-        defaultContextWindow: 4096,
-        multimodal: true,
-        status: 'unavailable',
-        disabledReason: 'No verified Transformers.js ONNX repository is enabled for v1.'
+        status: 'primary'
     }
 };
 
@@ -133,6 +144,46 @@ function getModelConfig(modelId) {
 
 function getContextLabel(value) {
     return value >= 1024 ? `${value / 1024}K` : String(value);
+}
+
+function formatMemoryGb(value) {
+    const rounded = Math.round(Number(value) * 10) / 10;
+    return Number.isInteger(rounded) ? `${rounded} GB` : `${rounded.toFixed(1)} GB`;
+}
+
+function getModelOptionLabel(modelId) {
+    const model = getModelConfig(modelId);
+    const memory = model.browserMemoryGb4k
+        ? `~${formatMemoryGb(model.browserMemoryGb4k)} @ 4K`
+        : 'memory varies';
+
+    return `${model.label} (${memory})`;
+}
+
+function getContextMemoryDeltaGb(modelId, value) {
+    const model = getModelConfig(modelId);
+    const contextValue = Number(value);
+
+    if (contextValue <= 4096) {
+        return 0;
+    }
+
+    if (model.contextMemoryDeltaGb && Object.prototype.hasOwnProperty.call(model.contextMemoryDeltaGb, contextValue)) {
+        return model.contextMemoryDeltaGb[contextValue];
+    }
+
+    return DEFAULT_CONTEXT_MEMORY_DELTA_GB[contextValue] || 0;
+}
+
+function getContextOptionLabel(value, modelId) {
+    const base = getContextLabel(value);
+    const delta = getContextMemoryDeltaGb(modelId, value);
+
+    if (delta > 0) {
+        return `${base} (+${formatMemoryGb(delta)})`;
+    }
+
+    return base;
 }
 
 function clampContextWindow(modelId, requestedValue) {
@@ -147,5 +198,7 @@ export {
     MODEL_REGISTRY,
     getModelConfig,
     getContextLabel,
+    getModelOptionLabel,
+    getContextOptionLabel,
     clampContextWindow
 };

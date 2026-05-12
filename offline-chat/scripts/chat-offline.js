@@ -121,10 +121,37 @@ class OfflineModelResolver {
                 return response;
             }
 
+            if (this.enabled && this.useBundledFiles && this.isRemoteRequest(requestUrl)) {
+                throw new Error(`Offline bundle blocked remote request: ${requestUrl}`);
+            }
+
             return this.originalFetch(input, init);
         };
 
         this.fetchPatched = true;
+    }
+
+    isRemoteRequest(value) {
+        if (!value) {
+            return false;
+        }
+
+        let url;
+        try {
+            url = new URL(value, window.location.href);
+        } catch (error) {
+            return false;
+        }
+
+        if (!['http:', 'https:'].includes(url.protocol)) {
+            return false;
+        }
+
+        if (url.origin === window.location.origin) {
+            return false;
+        }
+
+        return !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
     }
 
     parseHuggingFaceAsset(value) {

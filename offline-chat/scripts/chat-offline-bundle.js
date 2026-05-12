@@ -7,10 +7,14 @@ const CONTEXT_WINDOWS = [
     4096,
     8192,
     16384,
-    32768,
-    65536,
-    131072
+    32768
 ];
+
+const DEFAULT_CONTEXT_MEMORY_DELTA_GB = {
+    8192: 1,
+    16384: 2,
+    32768: 4
+};
 
 const MODEL_REGISTRY = {
     'gemma-4-e2b': {
@@ -18,22 +22,23 @@ const MODEL_REGISTRY = {
         label: 'Gemma 4 E2B',
         provider: 'Gemma',
         repo: 'onnx-community/gemma-4-E2B-it-ONNX',
-        className: 'Gemma4ForCausalLM',
+        className: 'Gemma4ForConditionalGeneration',
         multimodalClassName: 'Gemma4ForConditionalGeneration',
-        dtype: {
-            audio_encoder: 'fp16',
-            embed_tokens: 'q4f16',
-            vision_encoder: 'fp16',
-            decoder_model_merged: 'q4f16'
-        },
+        dtype: 'q4f16',
         contextWindow: 32768,
-        modelContextWindow: 131072,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
         maxNewTokens: 768,
         midContextMaxNewTokens: 384,
         longContextMaxNewTokens: 256,
-        prefillChunkTokens: 1024,
+        prefillChunkTokens: 4096,
         contextSafetyTokens: 512,
+        browserMemoryGb4k: 8,
+        contextMemoryDeltaGb: {
+            8192: 1,
+            16384: 3,
+            32768: 6
+        },
         multimodal: true,
         status: 'primary'
     },
@@ -42,22 +47,23 @@ const MODEL_REGISTRY = {
         label: 'Gemma 4 E4B',
         provider: 'Gemma',
         repo: 'onnx-community/gemma-4-E4B-it-ONNX',
-        className: 'Gemma4ForCausalLM',
+        className: 'Gemma4ForConditionalGeneration',
         multimodalClassName: 'Gemma4ForConditionalGeneration',
-        dtype: {
-            audio_encoder: 'fp16',
-            embed_tokens: 'q4f16',
-            vision_encoder: 'fp16',
-            decoder_model_merged: 'q4f16'
-        },
+        dtype: 'q4f16',
         contextWindow: 32768,
-        modelContextWindow: 131072,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
         maxNewTokens: 512,
         midContextMaxNewTokens: 256,
         longContextMaxNewTokens: 192,
-        prefillChunkTokens: 1024,
+        prefillChunkTokens: 4096,
         contextSafetyTokens: 512,
+        browserMemoryGb4k: 11,
+        contextMemoryDeltaGb: {
+            8192: 1.5,
+            16384: 4,
+            32768: 8
+        },
         multimodal: true,
         status: 'primary'
     },
@@ -70,14 +76,20 @@ const MODEL_REGISTRY = {
         multimodalClassName: 'Qwen3_5ForConditionalGeneration',
         dtype: {
             embed_tokens: 'q4',
-            vision_encoder: 'q4',
+            vision_encoder: 'fp16',
             decoder_model_merged: 'q4'
         },
-        contextWindow: 16384,
-        modelContextWindow: 131072,
+        contextWindow: 32768,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
+        browserMemoryGb4k: 3,
+        contextMemoryDeltaGb: {
+            8192: 0.5,
+            16384: 1.5,
+            32768: 3
+        },
         multimodal: true,
-        status: 'experimental'
+        status: 'primary'
     },
     'qwen-3-5-2b': {
         id: 'qwen-3-5-2b',
@@ -88,14 +100,20 @@ const MODEL_REGISTRY = {
         multimodalClassName: 'Qwen3_5ForConditionalGeneration',
         dtype: {
             embed_tokens: 'q4',
-            vision_encoder: 'q4',
+            vision_encoder: 'fp16',
             decoder_model_merged: 'q4'
         },
-        contextWindow: 8192,
-        modelContextWindow: 131072,
+        contextWindow: 32768,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
+        browserMemoryGb4k: 5,
+        contextMemoryDeltaGb: {
+            8192: 1,
+            16384: 2.5,
+            32768: 5
+        },
         multimodal: true,
-        status: 'experimental'
+        status: 'primary'
     },
     'qwen-3-5-4b': {
         id: 'qwen-3-5-4b',
@@ -106,27 +124,20 @@ const MODEL_REGISTRY = {
         multimodalClassName: 'Qwen3_5ForConditionalGeneration',
         dtype: {
             embed_tokens: 'q4',
-            vision_encoder: 'q4',
+            vision_encoder: 'fp16',
             decoder_model_merged: 'q4'
         },
-        contextWindow: 4096,
-        modelContextWindow: 131072,
+        contextWindow: 32768,
+        modelContextWindow: 32768,
         defaultContextWindow: 4096,
+        browserMemoryGb4k: 8,
+        contextMemoryDeltaGb: {
+            8192: 1.5,
+            16384: 4,
+            32768: 8
+        },
         multimodal: true,
-        status: 'experimental'
-    },
-    'qwen-3-5-9b': {
-        id: 'qwen-3-5-9b',
-        label: 'Qwen3.5 9B',
-        provider: 'Qwen',
-        repo: '',
-        className: '',
-        dtype: 'q4',
-        contextWindow: 131072,
-        defaultContextWindow: 4096,
-        multimodal: true,
-        status: 'unavailable',
-        disabledReason: 'No verified Transformers.js ONNX repository is enabled for v1.'
+        status: 'primary'
     }
 };
 
@@ -136,6 +147,46 @@ function getModelConfig(modelId) {
 
 function getContextLabel(value) {
     return value >= 1024 ? `${value / 1024}K` : String(value);
+}
+
+function formatMemoryGb(value) {
+    const rounded = Math.round(Number(value) * 10) / 10;
+    return Number.isInteger(rounded) ? `${rounded} GB` : `${rounded.toFixed(1)} GB`;
+}
+
+function getModelOptionLabel(modelId) {
+    const model = getModelConfig(modelId);
+    const memory = model.browserMemoryGb4k
+        ? `~${formatMemoryGb(model.browserMemoryGb4k)} @ 4K`
+        : 'memory varies';
+
+    return `${model.label} (${memory})`;
+}
+
+function getContextMemoryDeltaGb(modelId, value) {
+    const model = getModelConfig(modelId);
+    const contextValue = Number(value);
+
+    if (contextValue <= 4096) {
+        return 0;
+    }
+
+    if (model.contextMemoryDeltaGb && Object.prototype.hasOwnProperty.call(model.contextMemoryDeltaGb, contextValue)) {
+        return model.contextMemoryDeltaGb[contextValue];
+    }
+
+    return DEFAULT_CONTEXT_MEMORY_DELTA_GB[contextValue] || 0;
+}
+
+function getContextOptionLabel(value, modelId) {
+    const base = getContextLabel(value);
+    const delta = getContextMemoryDeltaGb(modelId, value);
+
+    if (delta > 0) {
+        return `${base} (+${formatMemoryGb(delta)})`;
+    }
+
+    return base;
 }
 
 function clampContextWindow(modelId, requestedValue) {
@@ -150,6 +201,8 @@ globalThis.CONTEXT_WINDOWS = CONTEXT_WINDOWS;
 globalThis.MODEL_REGISTRY = MODEL_REGISTRY;
 globalThis.getModelConfig = getModelConfig;
 globalThis.getContextLabel = getContextLabel;
+globalThis.getModelOptionLabel = getModelOptionLabel;
+globalThis.getContextOptionLabel = getContextOptionLabel;
 globalThis.clampContextWindow = clampContextWindow;
 })();
 
@@ -375,24 +428,9 @@ class ChatFileProcessor {
         await this.yieldToBrowser();
         const raw = new TextDecoder('latin1').decode(bytes);
         await this.yieldToBrowser();
-        const chunks = [];
-        const textObjectPattern = /\((?:\\.|[^\\)])*\)\s*Tj|\[(?:.|\n|\r)*?\]\s*TJ/g;
-        const literalPattern = /\((?:\\.|[^\\)])*\)/g;
-        let match;
-        let processed = 0;
-
-        while ((match = textObjectPattern.exec(raw)) !== null) {
-            const literals = match[0].match(literalPattern) || [];
-            const line = literals.map(value => this.decodePdfLiteral(value.slice(1, -1))).join('');
-            if (line.trim()) {
-                chunks.push(line.trim());
-            }
-
-            processed++;
-            if (processed % 120 === 0) {
-                await this.yieldToBrowser();
-            }
-        }
+        const streamTexts = await this.extractPdfStreamTexts(bytes, raw);
+        const streamChunks = streamTexts.flatMap(text => this.extractPdfTextChunks(text));
+        const chunks = streamChunks.length ? streamChunks : this.extractPdfTextChunks(raw);
 
         if (!chunks.length) {
             await this.yieldToBrowser();
@@ -413,17 +451,166 @@ class ChatFileProcessor {
         return chunks.join('\n');
     }
 
+    async extractPdfStreamTexts(bytes, raw) {
+        const texts = [];
+        const streamPattern = /<<(?:.|\n|\r)*?>>\s*stream(?:\r\n|\n|\r)?/g;
+        let match;
+        let processed = 0;
+
+        while ((match = streamPattern.exec(raw)) !== null) {
+            const dictionary = match[0];
+            const dataStart = streamPattern.lastIndex;
+            const endIndex = raw.indexOf('endstream', dataStart);
+
+            if (endIndex === -1) {
+                break;
+            }
+
+            let dataEnd = endIndex;
+            while (dataEnd > dataStart && (bytes[dataEnd - 1] === 10 || bytes[dataEnd - 1] === 13)) {
+                dataEnd--;
+            }
+
+            const streamBytes = bytes.slice(dataStart, dataEnd);
+            let text = '';
+
+            if (/\/FlateDecode\b/.test(dictionary)) {
+                text = await this.inflatePdfStream(streamBytes);
+            } else {
+                text = raw.slice(dataStart, dataEnd);
+            }
+
+            if (text && /(?:\bT[Jj]\b|\bBT\b|\bET\b)/.test(text)) {
+                texts.push(text);
+            }
+
+            streamPattern.lastIndex = endIndex + 'endstream'.length;
+            processed++;
+            if (processed % 24 === 0) {
+                await this.yieldToBrowser();
+            }
+        }
+
+        return texts;
+    }
+
+    async inflatePdfStream(bytes) {
+        if (!('DecompressionStream' in window)) {
+            return '';
+        }
+
+        for (const format of ['deflate', 'deflate-raw']) {
+            try {
+                const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(format));
+                const buffer = await new Response(stream).arrayBuffer();
+                return new TextDecoder('latin1').decode(new Uint8Array(buffer));
+            } catch (error) {
+                // Some PDFs use zlib-wrapped deflate, others raw deflate.
+            }
+        }
+
+        return '';
+    }
+
+    extractPdfTextChunks(content) {
+        const chunks = [];
+        const textObjectPattern = /(?:\((?:\\.|[^\\)])*\)|<[\dA-Fa-f\s]+>)\s*Tj|\[(?:.|\n|\r)*?\]\s*TJ/g;
+        let match;
+
+        while ((match = textObjectPattern.exec(content)) !== null) {
+            const line = this.extractPdfTextTokens(match[0]).join('').replace(/[ \t]{2,}/g, ' ').trim();
+            if (line) {
+                chunks.push(line);
+            }
+        }
+
+        return chunks;
+    }
+
+    extractPdfTextTokens(value) {
+        const tokens = [];
+        const tokenPattern = /\((?:\\.|[^\\)])*\)|<([\dA-Fa-f\s]+)>|-?\d+(?:\.\d+)?/g;
+        let match;
+
+        while ((match = tokenPattern.exec(value)) !== null) {
+            const token = match[0];
+
+            if (token.startsWith('(')) {
+                tokens.push(this.decodePdfLiteral(token.slice(1, -1)));
+                continue;
+            }
+
+            if (token.startsWith('<')) {
+                tokens.push(this.decodePdfHexString(token.slice(1, -1)));
+                continue;
+            }
+
+            const adjustment = Number(token);
+            if (Number.isFinite(adjustment) && adjustment < -120 && tokens.at(-1) !== ' ') {
+                tokens.push(' ');
+            }
+        }
+
+        return tokens;
+    }
+
     yieldToBrowser() {
         return new Promise(resolve => setTimeout(resolve, 0));
     }
 
     decodePdfLiteral(value) {
         return value
+            .replace(/\\\r?\n/g, '')
             .replace(/\\([nrtbf()\\])/g, (_, code) => {
                 const map = { n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', '(': '(', ')': ')', '\\': '\\' };
                 return map[code] || code;
             })
             .replace(/\\([0-7]{1,3})/g, (_, octal) => String.fromCharCode(parseInt(octal, 8)));
+    }
+
+    decodePdfHexString(value) {
+        let hex = String(value || '').replace(/\s+/g, '');
+        if (!hex) {
+            return '';
+        }
+        if (hex.length % 2) {
+            hex += '0';
+        }
+
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let index = 0; index < hex.length; index += 2) {
+            bytes[index / 2] = parseInt(hex.slice(index, index + 2), 16);
+        }
+
+        if (bytes[0] === 0xfe && bytes[1] === 0xff) {
+            return this.decodeUtf16Be(bytes.slice(2));
+        }
+
+        const zeroHighBytes = bytes.reduce((total, byte, index) => total + (index % 2 === 0 && byte === 0 ? 1 : 0), 0);
+        if (bytes.length > 3 && zeroHighBytes / Math.ceil(bytes.length / 2) > 0.35) {
+            return this.decodeUtf16Be(bytes);
+        }
+
+        try {
+            return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+        } catch (error) {
+            try {
+                return new TextDecoder('windows-1252').decode(bytes);
+            } catch (fallbackError) {
+                return new TextDecoder('latin1').decode(bytes);
+            }
+        }
+    }
+
+    decodeUtf16Be(bytes) {
+        let text = '';
+        for (let index = 0; index + 1 < bytes.length; index += 2) {
+            const code = (bytes[index] << 8) | bytes[index + 1];
+            if (code) {
+                text += String.fromCharCode(code);
+            }
+        }
+        return text;
     }
 
     async extractDocxText(file) {
@@ -644,10 +831,37 @@ class OfflineModelResolver {
                 return response;
             }
 
+            if (this.enabled && this.useBundledFiles && this.isRemoteRequest(requestUrl)) {
+                throw new Error(`Offline bundle blocked remote request: ${requestUrl}`);
+            }
+
             return this.originalFetch(input, init);
         };
 
         this.fetchPatched = true;
+    }
+
+    isRemoteRequest(value) {
+        if (!value) {
+            return false;
+        }
+
+        let url;
+        try {
+            url = new URL(value, window.location.href);
+        } catch (error) {
+            return false;
+        }
+
+        if (!['http:', 'https:'].includes(url.protocol)) {
+            return false;
+        }
+
+        if (url.origin === window.location.origin) {
+            return false;
+        }
+
+        return !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
     }
 
     parseHuggingFaceAsset(value) {
@@ -838,7 +1052,9 @@ const {
     CONTEXT_WINDOWS,
     MODEL_REGISTRY,
     clampContextWindow,
+    getContextOptionLabel,
     getContextLabel,
+    getModelOptionLabel,
     getModelConfig,
     ChatStorage,
     ChatFileProcessor,
@@ -855,28 +1071,13 @@ const CONTEXT_SAFETY_TOKENS = 128;
 const MESSAGE_OVERHEAD_TOKENS = 18;
 const ATTACHMENT_TEXT_CHAR_LIMIT = 20000;
 const CONTEXT_WARNING_RATIO = 0.85;
+const AUTO_COMPACT_RATIO = 0.88;
+const AUTO_COMPACT_RECENT_MESSAGES = 8;
+const AUTO_COMPACT_MAX_SUMMARY_TOKENS = 1800;
+const AUTO_COMPACT_MIN_OLD_MESSAGES = 4;
 const GEMMA_MID_CONTEXT_TOKENS = 8192;
 const GEMMA_LONG_CONTEXT_TOKENS = 16384;
-const GEMMA_TEXT_DTYPE_Q4F16 = {
-    embed_tokens: 'q4f16',
-    decoder_model_merged: 'q4f16'
-};
-const GEMMA_TEXT_DTYPE_Q4 = {
-    embed_tokens: 'q4',
-    decoder_model_merged: 'q4'
-};
-const GEMMA_MULTIMODAL_DTYPE_Q4F16 = {
-    audio_encoder: 'fp16',
-    embed_tokens: 'q4f16',
-    vision_encoder: 'fp16',
-    decoder_model_merged: 'q4f16'
-};
-const GEMMA_MULTIMODAL_DTYPE_Q4 = {
-    audio_encoder: 'q4',
-    embed_tokens: 'q4',
-    vision_encoder: 'q4',
-    decoder_model_merged: 'q4'
-};
+const GEMMA_DTYPE_Q4F16 = 'q4f16';
 const SYSTEM_PROMPT = [
     'You are ASD123.ai Chat, a helpful local assistant that runs in the user’s browser.',
     'Reply in the same language the user uses, unless the user explicitly asks for another language.',
@@ -948,9 +1149,53 @@ class ChatModelRunner {
         this.currentModelKey = null;
         this.activeDtypeLabel = null;
         this.loading = false;
+        this.abortController = null;
+        this.abortReason = '';
+        this.fetchAbortPatched = false;
+        this.abortableFetch = null;
+    }
+
+    beginAbortableOperation(reason = 'operation') {
+        if (!this.abortController || this.abortController.signal.aborted) {
+            this.abortController = new AbortController();
+        }
+        this.abortReason = reason;
+        return this.abortController;
+    }
+
+    finishAbortableOperation(controller) {
+        if (!controller || this.abortController === controller) {
+            this.abortController = null;
+            this.abortReason = '';
+        }
+    }
+
+    cancelCurrentOperation() {
+        if (!this.abortController || this.abortController.signal.aborted) {
+            return false;
+        }
+
+        this.abortController.abort();
+        return true;
+    }
+
+    throwIfAborted() {
+        if (!this.abortController?.signal?.aborted) {
+            return;
+        }
+
+        const error = new Error(`${this.abortReason || 'Operation'} stopped by user.`);
+        error.name = 'AbortError';
+        throw error;
+    }
+
+    isAbortError(error) {
+        return error?.name === 'AbortError' ||
+            /aborted|abort|stopped by user/i.test(error?.message || String(error || ''));
     }
 
     async ensure(modelId, wantsMultimodal = false, { force = false } = {}) {
+        this.throwIfAborted();
         const modelKey = `${modelId}:${wantsMultimodal ? 'multimodal' : 'text'}`;
         if (!force && this.currentModelKey === modelKey && this.model && this.processor) {
             return;
@@ -974,6 +1219,7 @@ class ChatModelRunner {
             }
 
             this.hf = this.hf || await this.loadTransformers();
+            this.throwIfAborted();
 
             const ModelClass = this.resolveModelClass(config, wantsMultimodal);
             if (!ModelClass) {
@@ -982,8 +1228,12 @@ class ChatModelRunner {
 
             this.updateStatus(`Loading ${config.label} processor...`);
             this.processor = await this.hf.AutoProcessor.from_pretrained(config.repo, {
-                progress_callback: info => this.handleProgress(info, config.label)
+                progress_callback: info => {
+                    this.throwIfAborted();
+                    this.handleProgress(info, config.label);
+                }
             });
+            this.throwIfAborted();
 
             this.model = await this.loadModelWithDtypeFallback(ModelClass, config, wantsMultimodal);
 
@@ -1011,11 +1261,19 @@ class ChatModelRunner {
                 const model = await ModelClass.from_pretrained(config.repo, {
                     dtype: candidate.dtype,
                     device: 'webgpu',
-                    progress_callback: info => this.handleProgress(info, config.label)
+                    progress_callback: info => {
+                        this.throwIfAborted();
+                        this.handleProgress(info, config.label);
+                    }
                 });
+                this.throwIfAborted();
                 this.activeDtypeLabel = candidate.label;
                 return model;
             } catch (error) {
+                if (this.isAbortError(error)) {
+                    throw error;
+                }
+
                 lastError = error;
                 const fallback = candidates[index + 1];
 
@@ -1035,11 +1293,7 @@ class ChatModelRunner {
             return [
                 {
                     label: 'q4f16',
-                    dtype: wantsMultimodal ? GEMMA_MULTIMODAL_DTYPE_Q4F16 : GEMMA_TEXT_DTYPE_Q4F16
-                },
-                {
-                    label: 'q4 fallback',
-                    dtype: wantsMultimodal ? GEMMA_MULTIMODAL_DTYPE_Q4 : GEMMA_TEXT_DTYPE_Q4
+                    dtype: GEMMA_DTYPE_Q4F16
                 }
             ];
         }
@@ -1127,9 +1381,12 @@ class ChatModelRunner {
 
         module.env.allowLocalModels = true;
         module.env.allowRemoteModels = true;
+        this.patchFetchForAbort();
+        module.env.fetch = window.fetch.bind(window);
 
         if (offline) {
             module.env.useBrowserCache = false;
+            module.env.useWasmCache = false;
             module.env.useCustomCache = false;
             module.env.customCache = null;
             module.env.experimental_useCrossOriginStorage = false;
@@ -1138,12 +1395,56 @@ class ChatModelRunner {
 
         const onnx = module.env.backends?.onnx || globalThis.ORT_WEBGPU?.env;
         if (onnx?.wasm) {
+            if (offline) {
+                onnx.wasm.wasmPaths = this.getOfflineWasmPaths();
+            }
             onnx.wasm.proxy = false;
             onnx.wasm.numThreads = 1;
         }
         if (onnx?.webgpu) {
             onnx.webgpu.powerPreference = 'high-performance';
         }
+    }
+
+    getOfflineWasmPaths() {
+        const embedded = window.asd123OrtWasmPaths;
+        if (embedded?.wasm) {
+            const paths = { wasm: embedded.wasm };
+            if (embedded.mjs) {
+                paths.mjs = new URL(embedded.mjs, window.location.href).href;
+            }
+            return paths;
+        }
+
+        const vendorBase = new URL('vendor/', window.location.href);
+        return {
+            wasm: new URL('ort-wasm-simd-threaded.asyncify.wasm', vendorBase).href,
+            mjs: new URL('ort-wasm-simd-threaded.asyncify.mjs', vendorBase).href
+        };
+    }
+
+    patchFetchForAbort() {
+        if (this.fetchAbortPatched || typeof window.fetch !== 'function') {
+            return;
+        }
+
+        const runner = this;
+        const baseFetch = window.fetch.bind(window);
+        this.abortableFetch = baseFetch;
+
+        window.fetch = function fetchWithChatAbort(input, init = undefined) {
+            const signal = runner.abortController?.signal;
+            if (!signal || signal.aborted || init?.signal) {
+                return baseFetch(input, init);
+            }
+
+            return baseFetch(input, {
+                ...(init || {}),
+                signal
+            });
+        };
+
+        this.fetchAbortPatched = true;
     }
 
     async clearTransformersBrowserCache(module) {
@@ -1188,7 +1489,7 @@ class ChatModelRunner {
 
         if (info.status === 'progress_total' && Number.isFinite(info.progress)) {
             const progress = Math.round(info.progress);
-            this.updateStatus(progress >= 100 ? `Preparing ${label} WebGPU session...` : `${label} ${progress}%`);
+            this.updateStatus(progress >= 100 ? `Preparing ${label} WebGPU session from local files...` : `${label} ${progress}%`);
             return;
         }
 
@@ -1241,6 +1542,7 @@ class ChatModelRunner {
     }
 
     async generate({ modelId, messages, contextWindow, temperature, onToken }) {
+        this.throwIfAborted();
         const context = this.measureContext(messages, contextWindow, modelId);
         if (context.blocked) {
             throw new Error(this.formatContextError(context));
@@ -1256,9 +1558,11 @@ class ChatModelRunner {
 
         try {
             const images = await this.loadImages(imageAttachments);
+            this.throwIfAborted();
             const config = getModelConfig(modelId);
             const prompt = this.formatPrompt(modelMessages, config);
             inputs = await this.prepareInputs(prompt, images, config);
+            this.throwIfAborted();
             const exactInputTokens = this.getInputTokenCount(inputs);
             const maxNewTokens = this.getMaxNewTokens(modelId, exactInputTokens);
             const exactContext = this.measureExactContext(exactInputTokens, contextWindow, modelId, maxNewTokens);
@@ -1289,6 +1593,7 @@ class ChatModelRunner {
     }
 
     async generateWithRetry({ inputs, inputTokenCount, maxNewTokens, modelId, temperature, onToken }) {
+        this.throwIfAborted();
         let allowSampling = this.shouldSample(modelId, temperature, inputTokenCount);
         const config = getModelConfig(modelId);
 
@@ -1325,12 +1630,14 @@ class ChatModelRunner {
     }
 
     async runGeneration({ inputs, inputTokenCount, maxNewTokens, temperature, doSample, onToken }) {
+        this.throwIfAborted();
         let streamed = '';
 
         const streamer = new this.hf.TextStreamer(this.processor.tokenizer, {
             skip_prompt: true,
             skip_special_tokens: true,
             callback_function: text => {
+                this.throwIfAborted();
                 streamed += text;
                 onToken?.(this.cleanAssistantText(streamed), text);
             }
@@ -1349,6 +1656,7 @@ class ChatModelRunner {
         }
 
         const outputs = await this.model.generate(generationOptions);
+        this.throwIfAborted();
         return { outputs, streamed };
     }
 
@@ -1507,6 +1815,13 @@ class ChatModelRunner {
     }
 
     toModelMessage(message) {
+        if (this.isCompactMessage(message)) {
+            return {
+                role: 'user',
+                content: `[Local compact summary of earlier conversation]\n${message.content || ''}`
+            };
+        }
+
         if (message.role === 'assistant') {
             return {
                 role: 'assistant',
@@ -1545,6 +1860,10 @@ class ChatModelRunner {
             role: 'user',
             content
         };
+    }
+
+    isCompactMessage(message) {
+        return message?.role === 'compact' || message?.compact === true;
     }
 
     formatGemmaPrompt(messages) {
@@ -1595,6 +1914,7 @@ class ChatModelRunner {
 
         const images = [];
         for (const attachment of attachments) {
+            this.throwIfAborted();
             images.push(await RawImage.read(attachment.dataUrl));
         }
         return images;
@@ -1632,12 +1952,14 @@ class ChatModelRunner {
 
         try {
             for (let start = 0; start < prefillEnd; start += chunkSize) {
+                this.throwIfAborted();
                 const end = Math.min(prefillEnd, start + chunkSize);
                 const feeds = this.createPrefillFeeds(inputs, start, end, cache);
                 let outputs = null;
 
                 try {
                     outputs = await this.model.forward(feeds);
+                    this.throwIfAborted();
                     cache = this.extractPastKeyValues(outputs, cache);
                     await this.disposeForwardOutputs(outputs, cache);
                 } finally {
@@ -1649,6 +1971,7 @@ class ChatModelRunner {
                     this.updateStatus(`Prefilling ${config.label} context ${progress}%`);
                 }
             }
+            this.throwIfAborted();
         } catch (error) {
             await cache?.dispose?.();
             throw error;
@@ -1841,6 +2164,9 @@ class LocalChatApp {
         this.currentChat = null;
         this.pendingAttachments = [];
         this.generating = false;
+        this.operationActive = false;
+        this.operationController = null;
+        this.operationType = '';
         this.contextBlocked = false;
         this.offlineBundle = isOfflineBundle();
         this.offlineControlsAvailable = false;
@@ -1904,6 +2230,7 @@ class LocalChatApp {
             'modelStatus',
             'offlineStatus',
             'loadModelBtn',
+            'stopBtn',
             'offlineFolderBtn',
             'folderInput',
             'attachBtn',
@@ -1924,6 +2251,7 @@ class LocalChatApp {
         this.elements.exportChatBtn.addEventListener('click', () => this.exportCurrentChat());
         this.elements.sendBtn.addEventListener('click', () => this.sendMessage());
         this.elements.loadModelBtn.addEventListener('click', () => this.loadSelectedModel());
+        this.elements.stopBtn?.addEventListener('click', () => this.stopCurrentOperation());
         if (this.elements.offlineFolderBtn) {
             this.elements.offlineFolderBtn.addEventListener('click', () => this.chooseOfflineFolder());
         }
@@ -1951,32 +2279,19 @@ class LocalChatApp {
     }
 
     populateModels() {
-        const primary = document.createElement('optgroup');
-        primary.label = 'Primary';
-        const experimental = document.createElement('optgroup');
-        experimental.label = 'Experimental';
-        const unavailable = document.createElement('optgroup');
-        unavailable.label = 'Not enabled';
+        this.elements.modelSelect.textContent = '';
 
         Object.values(MODEL_REGISTRY).forEach(config => {
+            if (config.status === 'unavailable') {
+                return;
+            }
+
             const option = document.createElement('option');
             option.value = config.id;
-            option.textContent = config.status === 'experimental'
-                ? `${config.label} (experimental)`
-                : config.label;
-            option.disabled = config.status === 'unavailable';
-            option.title = config.disabledReason || config.repo;
-
-            if (config.status === 'primary') {
-                primary.appendChild(option);
-            } else if (config.status === 'experimental') {
-                experimental.appendChild(option);
-            } else {
-                unavailable.appendChild(option);
-            }
+            option.textContent = getModelOptionLabel(config.id);
+            option.title = `Estimated browser memory at 4K context: ${option.textContent}. Actual usage depends on browser, GPU, and loaded context.`;
+            this.elements.modelSelect.appendChild(option);
         });
-
-        this.elements.modelSelect.append(primary, experimental, unavailable);
     }
 
     populateContextWindows() {
@@ -2093,10 +2408,13 @@ class LocalChatApp {
 
         [...this.elements.contextSelect.options].forEach(option => {
             const value = Number(option.value);
+            option.textContent = getContextOptionLabel(value, model.id);
             option.disabled = value > model.contextWindow;
             option.title = option.disabled
                 ? `${model.label} is capped at ${getContextLabel(model.contextWindow)} in this browser/WebGPU build.`
-                : '';
+                : value > 4096
+                    ? `Estimated extra browser memory compared with 4K context for ${model.label}.`
+                    : '';
         });
     }
 
@@ -2128,6 +2446,152 @@ class LocalChatApp {
             Number(this.elements.contextSelect.value || getModelConfig(modelId).defaultContextWindow),
             modelId
         );
+    }
+
+    compactMessagesForContext(messages, { force = false } = {}) {
+        const measure = this.getCurrentContextMeasure(messages);
+        const shouldCompact = force ||
+            measure.blocked ||
+            measure.truncated ||
+            (measure.limit > 0 && measure.used / measure.limit >= AUTO_COMPACT_RATIO);
+
+        if (!shouldCompact || messages.length <= AUTO_COMPACT_RECENT_MESSAGES + AUTO_COMPACT_MIN_OLD_MESSAGES) {
+            return { messages, measure, changed: false, compactedCount: 0 };
+        }
+
+        const splitIndex = Math.max(AUTO_COMPACT_MIN_OLD_MESSAGES, messages.length - AUTO_COMPACT_RECENT_MESSAGES);
+        const olderMessages = messages.slice(0, splitIndex);
+        const recentMessages = messages.slice(splitIndex);
+        const compactedCount = olderMessages.reduce((total, message) => {
+            if (this.runner.isCompactMessage(message)) {
+                return total + (message.sourceMessageCount || 1);
+            }
+            return total + 1;
+        }, 0);
+
+        if (compactedCount < AUTO_COMPACT_MIN_OLD_MESSAGES) {
+            return { messages, measure, changed: false, compactedCount: 0 };
+        }
+
+        const summaryTarget = this.getCompactSummaryTarget(measure);
+        const compactMessage = this.createCompactMessage(olderMessages, summaryTarget, compactedCount);
+        let nextMessages = [compactMessage, ...recentMessages];
+        let nextMeasure = this.getCurrentContextMeasure(nextMessages);
+
+        if (nextMeasure.blocked) {
+            const smallerSummary = this.createCompactMessage(olderMessages, Math.max(280, Math.floor(summaryTarget / 2)), compactedCount);
+            nextMessages = [smallerSummary, ...recentMessages];
+            nextMeasure = this.getCurrentContextMeasure(nextMessages);
+        }
+
+        return {
+            messages: nextMessages,
+            measure: nextMeasure,
+            changed: true,
+            compactedCount
+        };
+    }
+
+    getCompactSummaryTarget(measure) {
+        return Math.max(280, Math.min(
+            AUTO_COMPACT_MAX_SUMMARY_TOKENS,
+            Math.floor((measure?.limit || 4096) * 0.22)
+        ));
+    }
+
+    createCompactMessage(messages, targetTokens, sourceMessageCount) {
+        return {
+            id: createId('compact'),
+            role: 'compact',
+            compact: true,
+            sourceMessageCount,
+            createdAt: new Date().toISOString(),
+            content: this.createCompactSummary(messages, targetTokens)
+        };
+    }
+
+    createCompactSummary(messages, targetTokens) {
+        const perMessageSizes = [700, 420, 240, 140];
+        const header = [
+            'Earlier conversation compacted locally to fit the context window.',
+            'Use this as background. The most recent messages remain verbatim below.'
+        ];
+
+        for (const maxChars of perMessageSizes) {
+            const lines = [...header, ''];
+            messages.forEach(message => {
+                if (this.runner.isCompactMessage(message)) {
+                    lines.push(this.compactExistingSummary(message.content, maxChars * 2));
+                    lines.push('');
+                    return;
+                }
+
+                const role = this.getMessageRoleLabel(message);
+                const content = this.compactTextForSummary(message.content || '', maxChars);
+                const attachments = this.compactAttachmentsForSummary(message.attachments || [], Math.floor(maxChars / 2));
+                lines.push(`${role}: ${content || '[empty]'}`);
+                if (attachments) {
+                    lines.push(attachments);
+                }
+                lines.push('');
+            });
+
+            const summary = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+            if (this.runner.estimateTokens(summary) <= targetTokens) {
+                return summary;
+            }
+        }
+
+        const fallback = [
+            ...header,
+            '',
+            this.compactTextForSummary(
+                messages.map(message => `${this.getMessageRoleLabel(message)}: ${message.content || ''}`).join('\n'),
+                Math.max(900, targetTokens * 3)
+            )
+        ].join('\n');
+
+        return this.truncateToEstimatedTokens(fallback, targetTokens);
+    }
+
+    compactExistingSummary(content, maxChars) {
+        return this.compactTextForSummary(String(content || '').replace(/^Earlier conversation compacted locally[^\n]*\n?/i, ''), maxChars);
+    }
+
+    compactTextForSummary(text, maxChars) {
+        const compacted = String(text || '')
+            .replace(/<think>[\s\S]*?<\/think>/gi, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        if (compacted.length <= maxChars) {
+            return compacted;
+        }
+
+        return `${compacted.slice(0, Math.max(0, maxChars - 24)).trim()} ... [truncated]`;
+    }
+
+    compactAttachmentsForSummary(attachments, maxChars) {
+        const lines = (attachments || []).map(attachment => {
+            if (attachment.kind === 'image') {
+                return `[Image attachment: ${attachment.name}]`;
+            }
+
+            const excerpt = attachment.text
+                ? ` excerpt: ${this.compactTextForSummary(attachment.text, maxChars)}`
+                : '';
+            return `[File attachment: ${attachment.name}${excerpt}]`;
+        });
+
+        return lines.join('\n');
+    }
+
+    truncateToEstimatedTokens(text, targetTokens) {
+        let value = String(text || '');
+        while (this.runner.estimateTokens(value) > targetTokens && value.length > 200) {
+            value = `${value.slice(0, Math.floor(value.length * 0.72)).trim()} ... [truncated]`;
+        }
+        return value;
     }
 
     updateContextBudget() {
@@ -2165,7 +2629,7 @@ class LocalChatApp {
         }
 
         this.contextBlocked = measure.blocked;
-        this.elements.sendBtn.disabled = this.generating || this.contextBlocked;
+        this.elements.sendBtn.disabled = this.generating || this.operationActive || this.contextBlocked;
         return measure;
     }
 
@@ -2224,12 +2688,12 @@ class LocalChatApp {
 
     renderMessage(message, index) {
         const article = document.createElement('article');
-        article.className = `chat-message chat-message--${message.role}`;
+        article.className = `chat-message chat-message--${this.getMessageClassRole(message)}`;
         article.dataset.messageId = message.id;
 
         const avatar = document.createElement('div');
         avatar.className = 'chat-message-avatar';
-        avatar.textContent = message.role === 'user' ? 'Y' : 'A';
+        avatar.textContent = this.getMessageAvatar(message);
 
         const content = document.createElement('div');
         content.className = 'chat-message-content';
@@ -2239,7 +2703,7 @@ class LocalChatApp {
 
         const role = document.createElement('span');
         role.className = 'chat-message-role';
-        role.textContent = message.role === 'user' ? 'You' : 'Assistant';
+        role.textContent = this.getMessageRoleLabel(message);
         header.appendChild(role);
 
         if (message.role === 'user') {
@@ -2263,6 +2727,24 @@ class LocalChatApp {
 
         article.append(avatar, content);
         return article;
+    }
+
+    getMessageClassRole(message) {
+        return this.runner.isCompactMessage(message) ? 'compact' : message.role;
+    }
+
+    getMessageRoleLabel(message) {
+        if (this.runner.isCompactMessage(message)) {
+            return 'Context summary';
+        }
+        return message.role === 'user' ? 'You' : 'Assistant';
+    }
+
+    getMessageAvatar(message) {
+        if (this.runner.isCompactMessage(message)) {
+            return 'C';
+        }
+        return message.role === 'user' ? 'Y' : 'A';
     }
 
     renderMessageBody(text) {
@@ -2633,14 +3115,18 @@ class LocalChatApp {
             }
             return { ...item, content: text };
         });
-        const measure = this.getCurrentContextMeasure(proposedMessages);
+        const compacted = this.compactMessagesForContext(proposedMessages);
+        const measure = compacted.measure;
         if (measure.blocked) {
             this.setModelStatus(this.runner.formatContextError(measure));
             this.updateContextBudget();
             return;
         }
 
-        this.currentChat.messages = proposedMessages;
+        this.currentChat.messages = compacted.messages;
+        if (compacted.changed) {
+            this.setModelStatus(`Compacted ${compacted.compactedCount} older messages locally.`);
+        }
         await this.persistCurrentChat();
         this.renderMessages();
         await this.generateAssistantReply();
@@ -2660,7 +3146,8 @@ class LocalChatApp {
             ...this.createDraftUserMessage(text),
             id: createId('msg')
         };
-        const measure = this.getCurrentContextMeasure([...(this.currentChat.messages || []), userMessage]);
+        const compacted = this.compactMessagesForContext([...(this.currentChat.messages || []), userMessage]);
+        const measure = compacted.measure;
         if (measure.blocked) {
             this.setModelStatus(this.runner.formatContextError(measure));
             this.updateContextBudget();
@@ -2668,12 +3155,16 @@ class LocalChatApp {
             return;
         }
 
-        this.currentChat.messages.push(userMessage);
+        this.currentChat.messages = compacted.messages;
         this.elements.messageInput.value = '';
         this.pendingAttachments = [];
         this.renderPendingAttachments();
         this.resizeComposer();
         this.updateContextBudget();
+
+        if (compacted.changed) {
+            this.setModelStatus(`Compacted ${compacted.compactedCount} older messages locally.`);
+        }
 
         if (this.currentChat.title === 'New Chat') {
             this.currentChat.title = this.generateTitle(userMessage.content);
@@ -2685,6 +3176,13 @@ class LocalChatApp {
     }
 
     async generateAssistantReply() {
+        const compacted = this.compactMessagesForContext(this.currentChat.messages);
+        if (compacted.changed && !compacted.measure.blocked) {
+            this.currentChat.messages = compacted.messages;
+            this.setModelStatus(`Compacted ${compacted.compactedCount} older messages locally.`);
+            await this.persistCurrentChat();
+        }
+
         const assistantMessage = {
             id: createId('msg'),
             role: 'assistant',
@@ -2695,6 +3193,7 @@ class LocalChatApp {
 
         this.currentChat.messages.push(assistantMessage);
         this.generating = true;
+        const operation = this.beginOperation('generation');
         this.setControlsDisabled(true);
         this.renderMessages();
 
@@ -2715,6 +3214,15 @@ class LocalChatApp {
             this.updateAssistantMessage(assistantMessage.id, assistantMessage.content);
             await this.persistCurrentChat();
         } catch (error) {
+            if (this.runner.isAbortError(error)) {
+                assistantMessage.content = assistantMessage.content || 'Generation stopped.';
+                this.updateAssistantMessage(assistantMessage.id, assistantMessage.content);
+                await this.persistCurrentChat();
+                await this.runner.resetLoadedModel();
+                this.setModelStatus('Generation stopped. Reload the model to continue.');
+                return;
+            }
+
             const message = this.describeGenerationFailure(error);
             assistantMessage.content = `Local generation failed: ${message}`;
             this.updateAssistantMessage(assistantMessage.id, assistantMessage.content);
@@ -2723,11 +3231,46 @@ class LocalChatApp {
             this.setModelStatus('Generation failed. Reload the model to continue.');
         } finally {
             this.generating = false;
+            this.endOperation(operation);
             this.setControlsDisabled(false);
             this.chats = await this.storage.listChats();
             this.renderHistory();
             this.updateContextBudget();
         }
+    }
+
+    beginOperation(type) {
+        const controller = this.runner.beginAbortableOperation(type);
+        this.operationActive = true;
+        this.operationController = controller;
+        this.operationType = type;
+        this.updateStopButton();
+        return controller;
+    }
+
+    endOperation(controller) {
+        if (controller && this.operationController !== controller) {
+            return;
+        }
+
+        this.runner.finishAbortableOperation(controller);
+        this.operationActive = false;
+        this.operationController = null;
+        this.operationType = '';
+        this.updateStopButton();
+    }
+
+    stopCurrentOperation() {
+        if (!this.operationActive) {
+            return;
+        }
+
+        const label = this.operationType === 'loading' ? 'model loading' : 'generation';
+        const stopped = this.runner.cancelCurrentOperation();
+        if (stopped) {
+            this.setModelStatus(`Stopping ${label}...`);
+        }
+        this.updateStopButton({ stopping: true });
     }
 
     describeGenerationFailure(error) {
@@ -2744,7 +3287,7 @@ class LocalChatApp {
             }
 
             const model = getModelConfig(this.currentChat?.modelId || DEFAULT_MODEL_ID);
-            return `${model.label} overflowed the WebGPU session even though the UI budget allowed the prompt. Reload the model and check that it becomes ready with q4f16; if the offline bundle shows q4 fallback, add the Gemma q4f16 model files before using larger context windows.`;
+            return `${model.label} overflowed the WebGPU session even though the UI budget allowed the prompt. Reload the model and check that it becomes ready with q4f16; make sure the offline bundle includes the q4f16 model files before using larger context windows.`;
         }
 
         return message;
@@ -2806,6 +3349,9 @@ class LocalChatApp {
     }
 
     async loadSelectedModel() {
+        const operation = this.beginOperation('loading');
+        this.setControlsDisabled(true);
+
         try {
             const modelId = this.elements.modelSelect.value;
             const label = getContextLabel(Number(this.elements.contextSelect.value));
@@ -2814,7 +3360,15 @@ class LocalChatApp {
             await this.runner.ensure(modelId, false, { force: true });
             this.updateContextBudget();
         } catch (error) {
-            this.setModelStatus(error.message);
+            if (this.runner.isAbortError(error)) {
+                await this.runner.resetLoadedModel();
+                this.setModelStatus('Model loading stopped.');
+            } else {
+                this.setModelStatus(error.message);
+            }
+        } finally {
+            this.endOperation(operation);
+            this.setControlsDisabled(false);
         }
     }
 
@@ -2942,7 +3496,7 @@ class LocalChatApp {
         ];
 
         chat.messages.forEach(message => {
-            lines.push(`## ${message.role === 'user' ? 'User' : 'Assistant'}`, '');
+            lines.push(`## ${this.getMessageRoleLabel(message)}`, '');
 
             if (message.attachments?.length) {
                 lines.push('Attachments:', '');
@@ -3014,15 +3568,31 @@ class LocalChatApp {
     }
 
     setControlsDisabled(disabled) {
-        this.elements.sendBtn.disabled = disabled || this.contextBlocked;
-        this.elements.loadModelBtn.disabled = disabled;
-        this.elements.modelSelect.disabled = disabled;
-        this.elements.contextSelect.disabled = disabled;
-        this.elements.temperatureInput.disabled = disabled;
+        const blocked = disabled || this.operationActive;
+        this.elements.sendBtn.disabled = blocked || this.contextBlocked;
+        this.elements.loadModelBtn.disabled = blocked;
+        this.elements.modelSelect.disabled = blocked;
+        this.elements.contextSelect.disabled = blocked;
+        this.elements.temperatureInput.disabled = blocked;
+        this.updateStopButton();
 
-        if (!disabled) {
+        if (!blocked) {
             this.updateContextBudget();
         }
+    }
+
+    updateStopButton({ stopping = false } = {}) {
+        const button = this.elements.stopBtn;
+        if (!button) {
+            return;
+        }
+
+        button.hidden = !this.operationActive;
+        button.disabled = !this.operationActive || stopping;
+        button.setAttribute('aria-busy', stopping ? 'true' : 'false');
+        button.title = this.operationType === 'loading'
+            ? 'Stop model loading'
+            : 'Stop generation';
     }
 
     setModelStatus(message) {

@@ -2,8 +2,10 @@ import {
     CONTEXT_WINDOWS,
     MODEL_REGISTRY,
     clampContextWindow,
+    getContextOptionLabel,
     getContextLabel,
-    getModelConfig
+    getModelConfig,
+    getModelOptionLabel
 } from './chat-models.js?v=20260511-offline-split';
 import { ChatStorage } from './chat-storage.js?v=20260511-offline-split';
 import { ChatFileProcessor } from './chat-files.js?v=20260511-offline-split';
@@ -20,28 +22,13 @@ const CONTEXT_SAFETY_TOKENS = 128;
 const MESSAGE_OVERHEAD_TOKENS = 18;
 const ATTACHMENT_TEXT_CHAR_LIMIT = 20000;
 const CONTEXT_WARNING_RATIO = 0.85;
+const AUTO_COMPACT_RATIO = 0.88;
+const AUTO_COMPACT_RECENT_MESSAGES = 8;
+const AUTO_COMPACT_MAX_SUMMARY_TOKENS = 1800;
+const AUTO_COMPACT_MIN_OLD_MESSAGES = 4;
 const GEMMA_MID_CONTEXT_TOKENS = 8192;
 const GEMMA_LONG_CONTEXT_TOKENS = 16384;
-const GEMMA_TEXT_DTYPE_Q4F16 = {
-    embed_tokens: 'q4f16',
-    decoder_model_merged: 'q4f16'
-};
-const GEMMA_TEXT_DTYPE_Q4 = {
-    embed_tokens: 'q4',
-    decoder_model_merged: 'q4'
-};
-const GEMMA_MULTIMODAL_DTYPE_Q4F16 = {
-    audio_encoder: 'fp16',
-    embed_tokens: 'q4f16',
-    vision_encoder: 'fp16',
-    decoder_model_merged: 'q4f16'
-};
-const GEMMA_MULTIMODAL_DTYPE_Q4 = {
-    audio_encoder: 'q4',
-    embed_tokens: 'q4',
-    vision_encoder: 'q4',
-    decoder_model_merged: 'q4'
-};
+const GEMMA_DTYPE_Q4F16 = 'q4f16';
 const SYSTEM_PROMPT = [
     'You are ASD123.ai Chat, a helpful local assistant that runs in the user’s browser.',
     'Reply in the same language the user uses, unless the user explicitly asks for another language.',
@@ -113,9 +100,53 @@ class ChatModelRunner {
         this.currentModelKey = null;
         this.activeDtypeLabel = null;
         this.loading = false;
+        this.abortController = null;
+        this.abortReason = '';
+        this.fetchAbortPatched = false;
+        this.abortableFetch = null;
+    }
+
+    beginAbortableOperation(reason = 'operation') {
+        if (!this.abortController || this.abortController.signal.aborted) {
+            this.abortController = new AbortController();
+        }
+        this.abortReason = reason;
+        return this.abortController;
+    }
+
+    finishAbortableOperation(controller) {
+        if (!controller || this.abortController === controller) {
+            this.abortController = null;
+            this.abortReason = '';
+        }
+    }
+
+    cancelCurrentOperation() {
+        if (!this.abortController || this.abortController.signal.aborted) {
+            return false;
+        }
+
+        this.abortController.abort();
+        return true;
+    }
+
+    throwIfAborted() {
+        if (!this.abortController?.signal?.aborted) {
+            return;
+        }
+
+        const error = new Error(`${this.abortReason || 'Operation'} stopped by user.`);
+        error.name = 'AbortError';
+        throw error;
+    }
+
+    isAbortError(error) {
+        return error?.name === 'AbortError' ||
+            /aborted|abort|stopped by user/i.test(error?.message || String(error || ''));
     }
 
     async ensure(modelId, wantsMultimodal = false, { force = false } = {}) {
+        this.throwIfAborted();
         const modelKey = `${modelId}:${wantsMultimodal ? 'multimodal' : 'text'}`;
         if (!force && this.currentModelKey === modelKey && this.model && this.processor) {
             return;
@@ -139,6 +170,7 @@ class ChatModelRunner {
             }
 
             this.hf = this.hf || await this.loadTransformers();
+            this.throwIfAborted();
 
             const ModelClass = this.resolveModelClass(config, wantsMultimodal);
             if (!ModelClass) {
@@ -147,8 +179,12 @@ class ChatModelRunner {
 
             this.updateStatus(`Loading ${config.label} processor...`);
             this.processor = await this.hf.AutoProcessor.from_pretrained(config.repo, {
-                progress_callback: info => this.handleProgress(info, config.label)
+                progress_callback: info => {
+                    this.throwIfAborted();
+                    this.handleProgress(info, config.label);
+                }
             });
+            this.throwIfAborted();
 
             this.model = await this.loadModelWithDtypeFallback(ModelClass, config, wantsMultimodal);
 
@@ -176,11 +212,19 @@ class ChatModelRunner {
                 const model = await ModelClass.from_pretrained(config.repo, {
                     dtype: candidate.dtype,
                     device: 'webgpu',
-                    progress_callback: info => this.handleProgress(info, config.label)
+                    progress_callback: info => {
+                        this.throwIfAborted();
+                        this.handleProgress(info, config.label);
+                    }
                 });
+                this.throwIfAborted();
                 this.activeDtypeLabel = candidate.label;
                 return model;
             } catch (error) {
+                if (this.isAbortError(error)) {
+                    throw error;
+                }
+
                 lastError = error;
                 const fallback = candidates[index + 1];
 
@@ -200,11 +244,7 @@ class ChatModelRunner {
             return [
                 {
                     label: 'q4f16',
-                    dtype: wantsMultimodal ? GEMMA_MULTIMODAL_DTYPE_Q4F16 : GEMMA_TEXT_DTYPE_Q4F16
-                },
-                {
-                    label: 'q4 fallback',
-                    dtype: wantsMultimodal ? GEMMA_MULTIMODAL_DTYPE_Q4 : GEMMA_TEXT_DTYPE_Q4
+                    dtype: GEMMA_DTYPE_Q4F16
                 }
             ];
         }
@@ -292,9 +332,12 @@ class ChatModelRunner {
 
         module.env.allowLocalModels = true;
         module.env.allowRemoteModels = true;
+        this.patchFetchForAbort();
+        module.env.fetch = window.fetch.bind(window);
 
         if (offline) {
             module.env.useBrowserCache = false;
+            module.env.useWasmCache = false;
             module.env.useCustomCache = false;
             module.env.customCache = null;
             module.env.experimental_useCrossOriginStorage = false;
@@ -303,12 +346,56 @@ class ChatModelRunner {
 
         const onnx = module.env.backends?.onnx || globalThis.ORT_WEBGPU?.env;
         if (onnx?.wasm) {
+            if (offline) {
+                onnx.wasm.wasmPaths = this.getOfflineWasmPaths();
+            }
             onnx.wasm.proxy = false;
             onnx.wasm.numThreads = 1;
         }
         if (onnx?.webgpu) {
             onnx.webgpu.powerPreference = 'high-performance';
         }
+    }
+
+    getOfflineWasmPaths() {
+        const embedded = window.asd123OrtWasmPaths;
+        if (embedded?.wasm) {
+            const paths = { wasm: embedded.wasm };
+            if (embedded.mjs) {
+                paths.mjs = new URL(embedded.mjs, window.location.href).href;
+            }
+            return paths;
+        }
+
+        const vendorBase = new URL('vendor/', window.location.href);
+        return {
+            wasm: new URL('ort-wasm-simd-threaded.asyncify.wasm', vendorBase).href,
+            mjs: new URL('ort-wasm-simd-threaded.asyncify.mjs', vendorBase).href
+        };
+    }
+
+    patchFetchForAbort() {
+        if (this.fetchAbortPatched || typeof window.fetch !== 'function') {
+            return;
+        }
+
+        const runner = this;
+        const baseFetch = window.fetch.bind(window);
+        this.abortableFetch = baseFetch;
+
+        window.fetch = function fetchWithChatAbort(input, init = undefined) {
+            const signal = runner.abortController?.signal;
+            if (!signal || signal.aborted || init?.signal) {
+                return baseFetch(input, init);
+            }
+
+            return baseFetch(input, {
+                ...(init || {}),
+                signal
+            });
+        };
+
+        this.fetchAbortPatched = true;
     }
 
     async clearTransformersBrowserCache(module) {
@@ -353,7 +440,7 @@ class ChatModelRunner {
 
         if (info.status === 'progress_total' && Number.isFinite(info.progress)) {
             const progress = Math.round(info.progress);
-            this.updateStatus(progress >= 100 ? `Preparing ${label} WebGPU session...` : `${label} ${progress}%`);
+            this.updateStatus(progress >= 100 ? `Preparing ${label} WebGPU session from local files...` : `${label} ${progress}%`);
             return;
         }
 
@@ -406,6 +493,7 @@ class ChatModelRunner {
     }
 
     async generate({ modelId, messages, contextWindow, temperature, onToken }) {
+        this.throwIfAborted();
         const context = this.measureContext(messages, contextWindow, modelId);
         if (context.blocked) {
             throw new Error(this.formatContextError(context));
@@ -421,9 +509,11 @@ class ChatModelRunner {
 
         try {
             const images = await this.loadImages(imageAttachments);
+            this.throwIfAborted();
             const config = getModelConfig(modelId);
             const prompt = this.formatPrompt(modelMessages, config);
             inputs = await this.prepareInputs(prompt, images, config);
+            this.throwIfAborted();
             const exactInputTokens = this.getInputTokenCount(inputs);
             const maxNewTokens = this.getMaxNewTokens(modelId, exactInputTokens);
             const exactContext = this.measureExactContext(exactInputTokens, contextWindow, modelId, maxNewTokens);
@@ -454,6 +544,7 @@ class ChatModelRunner {
     }
 
     async generateWithRetry({ inputs, inputTokenCount, maxNewTokens, modelId, temperature, onToken }) {
+        this.throwIfAborted();
         let allowSampling = this.shouldSample(modelId, temperature, inputTokenCount);
         const config = getModelConfig(modelId);
 
@@ -490,12 +581,14 @@ class ChatModelRunner {
     }
 
     async runGeneration({ inputs, inputTokenCount, maxNewTokens, temperature, doSample, onToken }) {
+        this.throwIfAborted();
         let streamed = '';
 
         const streamer = new this.hf.TextStreamer(this.processor.tokenizer, {
             skip_prompt: true,
             skip_special_tokens: true,
             callback_function: text => {
+                this.throwIfAborted();
                 streamed += text;
                 onToken?.(this.cleanAssistantText(streamed), text);
             }
@@ -514,6 +607,7 @@ class ChatModelRunner {
         }
 
         const outputs = await this.model.generate(generationOptions);
+        this.throwIfAborted();
         return { outputs, streamed };
     }
 
@@ -672,6 +766,13 @@ class ChatModelRunner {
     }
 
     toModelMessage(message) {
+        if (this.isCompactMessage(message)) {
+            return {
+                role: 'user',
+                content: `[Local compact summary of earlier conversation]\n${message.content || ''}`
+            };
+        }
+
         if (message.role === 'assistant') {
             return {
                 role: 'assistant',
@@ -710,6 +811,10 @@ class ChatModelRunner {
             role: 'user',
             content
         };
+    }
+
+    isCompactMessage(message) {
+        return message?.role === 'compact' || message?.compact === true;
     }
 
     formatGemmaPrompt(messages) {
@@ -760,6 +865,7 @@ class ChatModelRunner {
 
         const images = [];
         for (const attachment of attachments) {
+            this.throwIfAborted();
             images.push(await RawImage.read(attachment.dataUrl));
         }
         return images;
@@ -797,12 +903,14 @@ class ChatModelRunner {
 
         try {
             for (let start = 0; start < prefillEnd; start += chunkSize) {
+                this.throwIfAborted();
                 const end = Math.min(prefillEnd, start + chunkSize);
                 const feeds = this.createPrefillFeeds(inputs, start, end, cache);
                 let outputs = null;
 
                 try {
                     outputs = await this.model.forward(feeds);
+                    this.throwIfAborted();
                     cache = this.extractPastKeyValues(outputs, cache);
                     await this.disposeForwardOutputs(outputs, cache);
                 } finally {
@@ -814,6 +922,7 @@ class ChatModelRunner {
                     this.updateStatus(`Prefilling ${config.label} context ${progress}%`);
                 }
             }
+            this.throwIfAborted();
         } catch (error) {
             await cache?.dispose?.();
             throw error;
@@ -1006,6 +1115,9 @@ class LocalChatApp {
         this.currentChat = null;
         this.pendingAttachments = [];
         this.generating = false;
+        this.operationActive = false;
+        this.operationController = null;
+        this.operationType = '';
         this.contextBlocked = false;
         this.offlineBundle = isOfflineBundle();
         this.offlineControlsAvailable = false;
@@ -1069,6 +1181,7 @@ class LocalChatApp {
             'modelStatus',
             'offlineStatus',
             'loadModelBtn',
+            'stopBtn',
             'offlineFolderBtn',
             'folderInput',
             'attachBtn',
@@ -1089,6 +1202,7 @@ class LocalChatApp {
         this.elements.exportChatBtn.addEventListener('click', () => this.exportCurrentChat());
         this.elements.sendBtn.addEventListener('click', () => this.sendMessage());
         this.elements.loadModelBtn.addEventListener('click', () => this.loadSelectedModel());
+        this.elements.stopBtn?.addEventListener('click', () => this.stopCurrentOperation());
         if (this.elements.offlineFolderBtn) {
             this.elements.offlineFolderBtn.addEventListener('click', () => this.chooseOfflineFolder());
         }
@@ -1116,32 +1230,19 @@ class LocalChatApp {
     }
 
     populateModels() {
-        const primary = document.createElement('optgroup');
-        primary.label = 'Primary';
-        const experimental = document.createElement('optgroup');
-        experimental.label = 'Experimental';
-        const unavailable = document.createElement('optgroup');
-        unavailable.label = 'Not enabled';
+        this.elements.modelSelect.textContent = '';
 
         Object.values(MODEL_REGISTRY).forEach(config => {
+            if (config.status === 'unavailable') {
+                return;
+            }
+
             const option = document.createElement('option');
             option.value = config.id;
-            option.textContent = config.status === 'experimental'
-                ? `${config.label} (experimental)`
-                : config.label;
-            option.disabled = config.status === 'unavailable';
-            option.title = config.disabledReason || config.repo;
-
-            if (config.status === 'primary') {
-                primary.appendChild(option);
-            } else if (config.status === 'experimental') {
-                experimental.appendChild(option);
-            } else {
-                unavailable.appendChild(option);
-            }
+            option.textContent = getModelOptionLabel(config.id);
+            option.title = `Estimated browser memory at 4K context: ${option.textContent}. Actual usage depends on browser, GPU, and loaded context.`;
+            this.elements.modelSelect.appendChild(option);
         });
-
-        this.elements.modelSelect.append(primary, experimental, unavailable);
     }
 
     populateContextWindows() {
@@ -1258,10 +1359,13 @@ class LocalChatApp {
 
         [...this.elements.contextSelect.options].forEach(option => {
             const value = Number(option.value);
+            option.textContent = getContextOptionLabel(value, model.id);
             option.disabled = value > model.contextWindow;
             option.title = option.disabled
                 ? `${model.label} is capped at ${getContextLabel(model.contextWindow)} in this browser/WebGPU build.`
-                : '';
+                : value > 4096
+                    ? `Estimated extra browser memory compared with 4K context for ${model.label}.`
+                    : '';
         });
     }
 
@@ -1293,6 +1397,152 @@ class LocalChatApp {
             Number(this.elements.contextSelect.value || getModelConfig(modelId).defaultContextWindow),
             modelId
         );
+    }
+
+    compactMessagesForContext(messages, { force = false } = {}) {
+        const measure = this.getCurrentContextMeasure(messages);
+        const shouldCompact = force ||
+            measure.blocked ||
+            measure.truncated ||
+            (measure.limit > 0 && measure.used / measure.limit >= AUTO_COMPACT_RATIO);
+
+        if (!shouldCompact || messages.length <= AUTO_COMPACT_RECENT_MESSAGES + AUTO_COMPACT_MIN_OLD_MESSAGES) {
+            return { messages, measure, changed: false, compactedCount: 0 };
+        }
+
+        const splitIndex = Math.max(AUTO_COMPACT_MIN_OLD_MESSAGES, messages.length - AUTO_COMPACT_RECENT_MESSAGES);
+        const olderMessages = messages.slice(0, splitIndex);
+        const recentMessages = messages.slice(splitIndex);
+        const compactedCount = olderMessages.reduce((total, message) => {
+            if (this.runner.isCompactMessage(message)) {
+                return total + (message.sourceMessageCount || 1);
+            }
+            return total + 1;
+        }, 0);
+
+        if (compactedCount < AUTO_COMPACT_MIN_OLD_MESSAGES) {
+            return { messages, measure, changed: false, compactedCount: 0 };
+        }
+
+        const summaryTarget = this.getCompactSummaryTarget(measure);
+        const compactMessage = this.createCompactMessage(olderMessages, summaryTarget, compactedCount);
+        let nextMessages = [compactMessage, ...recentMessages];
+        let nextMeasure = this.getCurrentContextMeasure(nextMessages);
+
+        if (nextMeasure.blocked) {
+            const smallerSummary = this.createCompactMessage(olderMessages, Math.max(280, Math.floor(summaryTarget / 2)), compactedCount);
+            nextMessages = [smallerSummary, ...recentMessages];
+            nextMeasure = this.getCurrentContextMeasure(nextMessages);
+        }
+
+        return {
+            messages: nextMessages,
+            measure: nextMeasure,
+            changed: true,
+            compactedCount
+        };
+    }
+
+    getCompactSummaryTarget(measure) {
+        return Math.max(280, Math.min(
+            AUTO_COMPACT_MAX_SUMMARY_TOKENS,
+            Math.floor((measure?.limit || 4096) * 0.22)
+        ));
+    }
+
+    createCompactMessage(messages, targetTokens, sourceMessageCount) {
+        return {
+            id: createId('compact'),
+            role: 'compact',
+            compact: true,
+            sourceMessageCount,
+            createdAt: new Date().toISOString(),
+            content: this.createCompactSummary(messages, targetTokens)
+        };
+    }
+
+    createCompactSummary(messages, targetTokens) {
+        const perMessageSizes = [700, 420, 240, 140];
+        const header = [
+            'Earlier conversation compacted locally to fit the context window.',
+            'Use this as background. The most recent messages remain verbatim below.'
+        ];
+
+        for (const maxChars of perMessageSizes) {
+            const lines = [...header, ''];
+            messages.forEach(message => {
+                if (this.runner.isCompactMessage(message)) {
+                    lines.push(this.compactExistingSummary(message.content, maxChars * 2));
+                    lines.push('');
+                    return;
+                }
+
+                const role = this.getMessageRoleLabel(message);
+                const content = this.compactTextForSummary(message.content || '', maxChars);
+                const attachments = this.compactAttachmentsForSummary(message.attachments || [], Math.floor(maxChars / 2));
+                lines.push(`${role}: ${content || '[empty]'}`);
+                if (attachments) {
+                    lines.push(attachments);
+                }
+                lines.push('');
+            });
+
+            const summary = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+            if (this.runner.estimateTokens(summary) <= targetTokens) {
+                return summary;
+            }
+        }
+
+        const fallback = [
+            ...header,
+            '',
+            this.compactTextForSummary(
+                messages.map(message => `${this.getMessageRoleLabel(message)}: ${message.content || ''}`).join('\n'),
+                Math.max(900, targetTokens * 3)
+            )
+        ].join('\n');
+
+        return this.truncateToEstimatedTokens(fallback, targetTokens);
+    }
+
+    compactExistingSummary(content, maxChars) {
+        return this.compactTextForSummary(String(content || '').replace(/^Earlier conversation compacted locally[^\n]*\n?/i, ''), maxChars);
+    }
+
+    compactTextForSummary(text, maxChars) {
+        const compacted = String(text || '')
+            .replace(/<think>[\s\S]*?<\/think>/gi, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        if (compacted.length <= maxChars) {
+            return compacted;
+        }
+
+        return `${compacted.slice(0, Math.max(0, maxChars - 24)).trim()} ... [truncated]`;
+    }
+
+    compactAttachmentsForSummary(attachments, maxChars) {
+        const lines = (attachments || []).map(attachment => {
+            if (attachment.kind === 'image') {
+                return `[Image attachment: ${attachment.name}]`;
+            }
+
+            const excerpt = attachment.text
+                ? ` excerpt: ${this.compactTextForSummary(attachment.text, maxChars)}`
+                : '';
+            return `[File attachment: ${attachment.name}${excerpt}]`;
+        });
+
+        return lines.join('\n');
+    }
+
+    truncateToEstimatedTokens(text, targetTokens) {
+        let value = String(text || '');
+        while (this.runner.estimateTokens(value) > targetTokens && value.length > 200) {
+            value = `${value.slice(0, Math.floor(value.length * 0.72)).trim()} ... [truncated]`;
+        }
+        return value;
     }
 
     updateContextBudget() {
@@ -1330,7 +1580,7 @@ class LocalChatApp {
         }
 
         this.contextBlocked = measure.blocked;
-        this.elements.sendBtn.disabled = this.generating || this.contextBlocked;
+        this.elements.sendBtn.disabled = this.generating || this.operationActive || this.contextBlocked;
         return measure;
     }
 
@@ -1389,12 +1639,12 @@ class LocalChatApp {
 
     renderMessage(message, index) {
         const article = document.createElement('article');
-        article.className = `chat-message chat-message--${message.role}`;
+        article.className = `chat-message chat-message--${this.getMessageClassRole(message)}`;
         article.dataset.messageId = message.id;
 
         const avatar = document.createElement('div');
         avatar.className = 'chat-message-avatar';
-        avatar.textContent = message.role === 'user' ? 'Y' : 'A';
+        avatar.textContent = this.getMessageAvatar(message);
 
         const content = document.createElement('div');
         content.className = 'chat-message-content';
@@ -1404,7 +1654,7 @@ class LocalChatApp {
 
         const role = document.createElement('span');
         role.className = 'chat-message-role';
-        role.textContent = message.role === 'user' ? 'You' : 'Assistant';
+        role.textContent = this.getMessageRoleLabel(message);
         header.appendChild(role);
 
         if (message.role === 'user') {
@@ -1428,6 +1678,24 @@ class LocalChatApp {
 
         article.append(avatar, content);
         return article;
+    }
+
+    getMessageClassRole(message) {
+        return this.runner.isCompactMessage(message) ? 'compact' : message.role;
+    }
+
+    getMessageRoleLabel(message) {
+        if (this.runner.isCompactMessage(message)) {
+            return 'Context summary';
+        }
+        return message.role === 'user' ? 'You' : 'Assistant';
+    }
+
+    getMessageAvatar(message) {
+        if (this.runner.isCompactMessage(message)) {
+            return 'C';
+        }
+        return message.role === 'user' ? 'Y' : 'A';
     }
 
     renderMessageBody(text) {
@@ -1798,14 +2066,18 @@ class LocalChatApp {
             }
             return { ...item, content: text };
         });
-        const measure = this.getCurrentContextMeasure(proposedMessages);
+        const compacted = this.compactMessagesForContext(proposedMessages);
+        const measure = compacted.measure;
         if (measure.blocked) {
             this.setModelStatus(this.runner.formatContextError(measure));
             this.updateContextBudget();
             return;
         }
 
-        this.currentChat.messages = proposedMessages;
+        this.currentChat.messages = compacted.messages;
+        if (compacted.changed) {
+            this.setModelStatus(`Compacted ${compacted.compactedCount} older messages locally.`);
+        }
         await this.persistCurrentChat();
         this.renderMessages();
         await this.generateAssistantReply();
@@ -1825,7 +2097,8 @@ class LocalChatApp {
             ...this.createDraftUserMessage(text),
             id: createId('msg')
         };
-        const measure = this.getCurrentContextMeasure([...(this.currentChat.messages || []), userMessage]);
+        const compacted = this.compactMessagesForContext([...(this.currentChat.messages || []), userMessage]);
+        const measure = compacted.measure;
         if (measure.blocked) {
             this.setModelStatus(this.runner.formatContextError(measure));
             this.updateContextBudget();
@@ -1833,12 +2106,16 @@ class LocalChatApp {
             return;
         }
 
-        this.currentChat.messages.push(userMessage);
+        this.currentChat.messages = compacted.messages;
         this.elements.messageInput.value = '';
         this.pendingAttachments = [];
         this.renderPendingAttachments();
         this.resizeComposer();
         this.updateContextBudget();
+
+        if (compacted.changed) {
+            this.setModelStatus(`Compacted ${compacted.compactedCount} older messages locally.`);
+        }
 
         if (this.currentChat.title === 'New Chat') {
             this.currentChat.title = this.generateTitle(userMessage.content);
@@ -1850,6 +2127,13 @@ class LocalChatApp {
     }
 
     async generateAssistantReply() {
+        const compacted = this.compactMessagesForContext(this.currentChat.messages);
+        if (compacted.changed && !compacted.measure.blocked) {
+            this.currentChat.messages = compacted.messages;
+            this.setModelStatus(`Compacted ${compacted.compactedCount} older messages locally.`);
+            await this.persistCurrentChat();
+        }
+
         const assistantMessage = {
             id: createId('msg'),
             role: 'assistant',
@@ -1860,6 +2144,7 @@ class LocalChatApp {
 
         this.currentChat.messages.push(assistantMessage);
         this.generating = true;
+        const operation = this.beginOperation('generation');
         this.setControlsDisabled(true);
         this.renderMessages();
 
@@ -1880,6 +2165,15 @@ class LocalChatApp {
             this.updateAssistantMessage(assistantMessage.id, assistantMessage.content);
             await this.persistCurrentChat();
         } catch (error) {
+            if (this.runner.isAbortError(error)) {
+                assistantMessage.content = assistantMessage.content || 'Generation stopped.';
+                this.updateAssistantMessage(assistantMessage.id, assistantMessage.content);
+                await this.persistCurrentChat();
+                await this.runner.resetLoadedModel();
+                this.setModelStatus('Generation stopped. Reload the model to continue.');
+                return;
+            }
+
             const message = this.describeGenerationFailure(error);
             assistantMessage.content = `Local generation failed: ${message}`;
             this.updateAssistantMessage(assistantMessage.id, assistantMessage.content);
@@ -1888,11 +2182,46 @@ class LocalChatApp {
             this.setModelStatus('Generation failed. Reload the model to continue.');
         } finally {
             this.generating = false;
+            this.endOperation(operation);
             this.setControlsDisabled(false);
             this.chats = await this.storage.listChats();
             this.renderHistory();
             this.updateContextBudget();
         }
+    }
+
+    beginOperation(type) {
+        const controller = this.runner.beginAbortableOperation(type);
+        this.operationActive = true;
+        this.operationController = controller;
+        this.operationType = type;
+        this.updateStopButton();
+        return controller;
+    }
+
+    endOperation(controller) {
+        if (controller && this.operationController !== controller) {
+            return;
+        }
+
+        this.runner.finishAbortableOperation(controller);
+        this.operationActive = false;
+        this.operationController = null;
+        this.operationType = '';
+        this.updateStopButton();
+    }
+
+    stopCurrentOperation() {
+        if (!this.operationActive) {
+            return;
+        }
+
+        const label = this.operationType === 'loading' ? 'model loading' : 'generation';
+        const stopped = this.runner.cancelCurrentOperation();
+        if (stopped) {
+            this.setModelStatus(`Stopping ${label}...`);
+        }
+        this.updateStopButton({ stopping: true });
     }
 
     describeGenerationFailure(error) {
@@ -1909,7 +2238,7 @@ class LocalChatApp {
             }
 
             const model = getModelConfig(this.currentChat?.modelId || DEFAULT_MODEL_ID);
-            return `${model.label} overflowed the WebGPU session even though the UI budget allowed the prompt. Reload the model and check that it becomes ready with q4f16; if the offline bundle shows q4 fallback, add the Gemma q4f16 model files before using larger context windows.`;
+            return `${model.label} overflowed the WebGPU session even though the UI budget allowed the prompt. Reload the model and check that it becomes ready with q4f16; make sure the offline bundle includes the q4f16 model files before using larger context windows.`;
         }
 
         return message;
@@ -1971,6 +2300,9 @@ class LocalChatApp {
     }
 
     async loadSelectedModel() {
+        const operation = this.beginOperation('loading');
+        this.setControlsDisabled(true);
+
         try {
             const modelId = this.elements.modelSelect.value;
             const label = getContextLabel(Number(this.elements.contextSelect.value));
@@ -1979,7 +2311,15 @@ class LocalChatApp {
             await this.runner.ensure(modelId, false, { force: true });
             this.updateContextBudget();
         } catch (error) {
-            this.setModelStatus(error.message);
+            if (this.runner.isAbortError(error)) {
+                await this.runner.resetLoadedModel();
+                this.setModelStatus('Model loading stopped.');
+            } else {
+                this.setModelStatus(error.message);
+            }
+        } finally {
+            this.endOperation(operation);
+            this.setControlsDisabled(false);
         }
     }
 
@@ -2107,7 +2447,7 @@ class LocalChatApp {
         ];
 
         chat.messages.forEach(message => {
-            lines.push(`## ${message.role === 'user' ? 'User' : 'Assistant'}`, '');
+            lines.push(`## ${this.getMessageRoleLabel(message)}`, '');
 
             if (message.attachments?.length) {
                 lines.push('Attachments:', '');
@@ -2179,15 +2519,31 @@ class LocalChatApp {
     }
 
     setControlsDisabled(disabled) {
-        this.elements.sendBtn.disabled = disabled || this.contextBlocked;
-        this.elements.loadModelBtn.disabled = disabled;
-        this.elements.modelSelect.disabled = disabled;
-        this.elements.contextSelect.disabled = disabled;
-        this.elements.temperatureInput.disabled = disabled;
+        const blocked = disabled || this.operationActive;
+        this.elements.sendBtn.disabled = blocked || this.contextBlocked;
+        this.elements.loadModelBtn.disabled = blocked;
+        this.elements.modelSelect.disabled = blocked;
+        this.elements.contextSelect.disabled = blocked;
+        this.elements.temperatureInput.disabled = blocked;
+        this.updateStopButton();
 
-        if (!disabled) {
+        if (!blocked) {
             this.updateContextBudget();
         }
+    }
+
+    updateStopButton({ stopping = false } = {}) {
+        const button = this.elements.stopBtn;
+        if (!button) {
+            return;
+        }
+
+        button.hidden = !this.operationActive;
+        button.disabled = !this.operationActive || stopping;
+        button.setAttribute('aria-busy', stopping ? 'true' : 'false');
+        button.title = this.operationType === 'loading'
+            ? 'Stop model loading'
+            : 'Stop generation';
     }
 
     setModelStatus(message) {
