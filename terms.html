@@ -36,6 +36,28 @@
                 </a>
 
                 <div class="nav-links">
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                        </div>
+                    </div>
                     <a href="documentation.html" class="nav-link">Documentation</a>
                     <a href="about.html" class="nav-link">About</a>
                 </div>
@@ -54,7 +76,7 @@
                 <div class="liquid-glass" style="padding: var(--space-12);">
                     <div class="prose prose-invert max-w-none">
                         <div style="margin-bottom: var(--space-8); padding: var(--space-4); background: rgba(240, 240, 232, 0.5); border: 2px solid var(--border-color); border-radius: 8px;">
-                            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;"><strong>Last updated:</strong> April 25, 2026</p>
+                            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;"><strong>Last updated:</strong> May 12, 2026</p>
                             <p style="font-size: 14px; color: var(--text-secondary);"><strong>Effective date:</strong> April 25, 2026</p>
                         </div>
 
@@ -65,12 +87,12 @@
 
                         <h3 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">2. Service Description</h3>
                         <p style="color: var(--text-secondary); margin-bottom: var(--space-6); line-height: 1.6;">
-                            ASD123.ai provides browser-based text utilities, including an Optimizer for text cleanup and an Anonymizer for exploring local PII detection and anonymization workflows. The tools are provided for informational, productivity, and demonstration purposes.
+                            ASD123.ai provides browser-based text utilities, including an Optimizer for text cleanup, an Anonymizer for exploring local PII detection and anonymization workflows, and Local AI Chat for browser-based model inference. The tools are provided for informational, productivity, and demonstration purposes.
                         </p>
 
                         <h3 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">3. Local Processing and Third-Party Model Downloads</h3>
                         <p style="color: var(--text-secondary); margin-bottom: var(--space-6); line-height: 1.6;">
-                            Text processing is designed to run locally in your browser. Optional AI detection modes may download model files from third-party providers such as Hugging Face. These model downloads do not require your text to be sent to those providers, but those providers may receive normal technical request data when serving files.
+                            Text processing and chat generation are designed to run locally in your browser. Optional AI modes may download model files from third-party providers such as Hugging Face. These model downloads do not require your text, files, prompts, chat history, or generated output to be sent to those providers, but those providers may receive normal technical request data when serving files.
                         </p>
 
                         <h3 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">4. Experimental Anonymizer</h3>

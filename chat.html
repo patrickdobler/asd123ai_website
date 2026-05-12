@@ -7,7 +7,7 @@
     <meta name="description" content="Run a private local AI chat in your browser with WebGPU models. Prompts, files, images, and chat history stay on your device.">
     <meta name="keywords" content="local AI chat, WebGPU chat, private chatbot, browser AI, Gemma WebGPU, local LLM">
     <meta name="author" content="ASD123.ai">
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="robots" content="index, follow">
     <meta property="og:title" content="ASD123.ai Local AI Chat">
     <meta property="og:description" content="A private in-browser AI chat that runs local WebGPU models and stores history only on your device.">
     <meta property="og:type" content="website">
@@ -36,6 +36,28 @@
                 </a>
 
                 <div class="nav-links">
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                        </div>
+                    </div>
                     <a href="documentation.html" class="nav-link">Documentation</a>
                     <a href="about.html" class="nav-link">About</a>
                 </div>
@@ -205,6 +227,6 @@
         </footer>
     </div>
 
-    <script type="module" src="scripts/chat-app.js?v=20260511-offline-split"></script>
+    <script type="module" src="scripts/chat-app.js?v=20260512-chat-public"></script>
 </body>
 </html>

@@ -12,6 +12,7 @@ const redirects = {
   '/terms.html': '/terms',
   '/test-optimizer.html': '/test',
   '/anonymizer-guide.html': '/anonymizer-guide',
+  '/chat-guide.html': '/chat-guide',
   '/optimizer-guide.html': '/optimizer-guide'
 };
 
@@ -26,6 +27,7 @@ const cleanUrls = {
   '/terms': '/terms.html',
   '/test': '/test-optimizer.html',
   '/anonymizer-guide': '/anonymizer-guide.html',
+  '/chat-guide': '/chat-guide.html',
   '/optimizer-guide': '/optimizer-guide.html'
 };
 
@@ -62,6 +64,22 @@ Use this skill when an agent needs to help a user anonymize or redact personally
 ## Privacy
 
 Text, uploaded files, detected entities, and mappings remain in the local browser session. Optional AI modes download model files, but do not upload the user's text for processing.
+`,
+  'chat': `# ASD123.ai Local AI Chat
+
+Use this skill when an agent needs to help a user work with the ASD123.ai Local AI Chat browser tool.
+
+## Capabilities
+
+- Browser-based WebGPU chat with supported ONNX models
+- Local chat history in IndexedDB
+- File and image attachments processed in the browser
+- Editable user messages and Markdown export
+- Context window and temperature controls
+
+## Privacy
+
+Prompts, uploaded files, chat history, and generated output remain in the user's browser. Online model loading may download model and runtime files, but the user's chat content is not sent to ASD123.ai servers for inference.
 `
 };
 
@@ -95,7 +113,9 @@ async function agentSkillsIndex() {
     type: 'skill-md',
     description: name === 'optimizer'
       ? 'Clean and normalize text locally with the ASD123.ai Optimizer.'
-      : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
+      : name === 'chat'
+        ? 'Chat with local WebGPU models in the ASD123.ai browser chat tool.'
+        : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
     url: `${SITE_ORIGIN}/.well-known/agent-skills/${name}/SKILL.md`,
     digest: await sha256Digest(content)
   })));

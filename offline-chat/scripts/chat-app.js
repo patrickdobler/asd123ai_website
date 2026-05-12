@@ -6,10 +6,10 @@ import {
     getContextLabel,
     getModelConfig,
     getModelOptionLabel
-} from './chat-models.js?v=20260511-offline-split';
-import { ChatStorage } from './chat-storage.js?v=20260511-offline-split';
-import { ChatFileProcessor } from './chat-files.js?v=20260511-offline-split';
-import { OfflineModelResolver } from './chat-offline.js?v=20260511-offline-split';
+} from './chat-models.js?v=20260512-chat-public';
+import { ChatStorage } from './chat-storage.js?v=20260512-chat-public';
+import { ChatFileProcessor } from './chat-files.js?v=20260512-chat-public';
+import { OfflineModelResolver } from './chat-offline.js?v=20260512-chat-public';
 
 const TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';
 const TRANSFORMERS_LOCAL = 'vendor/transformers.local.mjs';

@@ -54,6 +54,7 @@ class NavigationManager {
     constructor() {
         this.currentPage = this.detectCurrentPage();
         this.setActiveNavItem();
+        this.initToolsMenu();
     }
     
     detectCurrentPage() {
@@ -63,14 +64,66 @@ class NavigationManager {
     }
     
     setActiveNavItem() {
-        document.querySelectorAll('.nav-link').forEach(link => {
+        document.querySelectorAll('.nav-link, .nav-tool-item').forEach(link => {
             link.classList.remove('nav-link--active');
         });
         
-        const activeLink = document.querySelector(`[href*="${this.currentPage}"]`);
+        const linkedPage = {
+            'optimizer-guide': 'optimizer',
+            'anonymizer-guide': 'anonymizer',
+            'chat-guide': 'chat'
+        }[this.currentPage] || this.currentPage;
+        const activeLink = document.querySelector(`.nav-links a[href*="${linkedPage}"]`);
         if (activeLink) {
             activeLink.classList.add('nav-link--active');
+            const toolsMenu = activeLink.closest('.nav-tools');
+            const toolsTrigger = toolsMenu?.querySelector('.nav-tools-trigger');
+            if (toolsTrigger) {
+                toolsTrigger.classList.add('nav-link--active');
+            }
         }
+    }
+
+    initToolsMenu() {
+        document.querySelectorAll('.nav-tools').forEach(menu => {
+            const trigger = menu.querySelector('.nav-tools-trigger');
+            const panel = menu.querySelector('.nav-tools-menu');
+
+            if (!trigger || !panel) {
+                return;
+            }
+
+            const setOpen = isOpen => {
+                menu.classList.toggle('nav-tools--open', isOpen);
+                trigger.setAttribute('aria-expanded', String(isOpen));
+            };
+
+            trigger.addEventListener('click', event => {
+                event.preventDefault();
+                setOpen(!menu.classList.contains('nav-tools--open'));
+            });
+
+            trigger.addEventListener('keydown', event => {
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    setOpen(true);
+                    panel.querySelector('a')?.focus();
+                }
+            });
+
+            document.addEventListener('click', event => {
+                if (!menu.contains(event.target)) {
+                    setOpen(false);
+                }
+            });
+
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    setOpen(false);
+                    trigger.focus();
+                }
+            });
+        });
     }
 }
 
@@ -176,7 +229,8 @@ class WebMCPManager {
                 pathname: window.location.pathname,
                 tools: [
                     'optimizer: local text cleanup and normalization',
-                    'anonymizer: local PII anonymization and redaction'
+                    'anonymizer: local PII anonymization and redaction',
+                    'chat: local WebGPU AI chat with browser-stored history'
                 ],
                 privacy: 'ASD123.ai text tools run in the browser. User text is not sent to ASD123.ai servers for processing.'
             })
@@ -190,7 +244,7 @@ class WebMCPManager {
                 properties: {
                     page: {
                         type: 'string',
-                        enum: ['home', 'optimizer', 'anonymizer', 'documentation', 'optimizer-guide', 'anonymizer-guide', 'privacy', 'terms']
+                        enum: ['home', 'optimizer', 'anonymizer', 'chat', 'documentation', 'optimizer-guide', 'anonymizer-guide', 'chat-guide', 'privacy', 'terms']
                     }
                 },
                 required: ['page'],
@@ -201,9 +255,11 @@ class WebMCPManager {
                     home: '/',
                     optimizer: '/optimizer',
                     anonymizer: '/anonymizer',
+                    chat: '/chat',
                     documentation: '/documentation',
                     'optimizer-guide': '/optimizer-guide',
                     'anonymizer-guide': '/anonymizer-guide',
+                    'chat-guide': '/chat-guide',
                     privacy: '/privacy',
                     terms: '/terms'
                 };

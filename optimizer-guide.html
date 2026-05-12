@@ -33,9 +33,31 @@
                     </a>
 
                     <div class="nav-links">
-                        <a href="documentation.html" class="nav-link">Documentation</a>
-                        <a href="about.html" class="nav-link">About</a>
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                        </div>
                     </div>
+                    <a href="documentation.html" class="nav-link">Documentation</a>
+                    <a href="about.html" class="nav-link">About</a>
+                </div>
                 </nav>
             </header>
 

@@ -85,6 +85,7 @@ function initialBuild() {
         'chat.html',
         'anonymizer.html',
         'anonymizer-guide.html',
+        'chat-guide.html',
         'optimizer-guide.html'
     ];
     
@@ -196,7 +197,7 @@ function setupWatchers() {
         'index.html', 'optimizer.html', 'documentation.html',
         'about.html', 'contact.html', 'privacy.html', 'terms.html',
         'test-optimizer.html', 'chat.html', 'anonymizer.html',
-        'anonymizer-guide.html', 'optimizer-guide.html'
+        'anonymizer-guide.html', 'chat-guide.html', 'optimizer-guide.html'
     ];
     
     htmlFiles.forEach(file => {

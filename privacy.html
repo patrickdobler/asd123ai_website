@@ -39,6 +39,28 @@
                 </a>
 
                 <div class="nav-links">
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                        </div>
+                    </div>
                     <a href="documentation.html" class="nav-link">Documentation</a>
                     <a href="about.html" class="nav-link">About</a>
                 </div>
@@ -59,7 +81,7 @@
                     <div class="prose prose-invert max-w-none">
 
                         <div style="margin-bottom: var(--space-8); padding: var(--space-4); background: rgba(240, 240, 232, 0.5); border: 2px solid var(--border-color); border-radius: 8px;">
-                            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;"><strong>Last updated:</strong> April 25, 2026</p>
+                            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;"><strong>Last updated:</strong> May 12, 2026</p>
                             <p style="font-size: 14px; color: var(--text-secondary);"><strong>Effective date:</strong> January 23, 2025</p>
                         </div>
 
@@ -106,7 +128,7 @@
                             We use browser local storage to save your preferences (such as language mapping settings) locally on your device. This data remains on your device and is not transmitted to our servers.
                         </p>
                         <p style="color: var(--text-secondary); margin-bottom: var(--space-6); line-height: 1.6;">
-                            Browser-local AI tools may use IndexedDB to store history, uploaded attachment content, model choice, context setting, temperature setting, and optional offline model folder permission on your device. You can delete local history from inside the relevant tool. ASD123.ai cannot read this browser-local database.
+                            Browser-local AI tools may use IndexedDB to store history, uploaded attachment content, model choice, context setting, and temperature setting on your device. You can delete local history from inside the relevant tool. ASD123.ai cannot read this browser-local database.
                         </p>
 
                         <h4 style="font-size: var(--text-xl); font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">3.3 Contact Information</h4>

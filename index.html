@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASD123.ai - Privacy-First AI Text Processing Tools</title>
-    <meta name="description" content="Professional AI text processing tools built for privacy. Clean, standardize, and optimize AI-generated text with our browser-based Optimizer. Swiss-made, 100% client-side processing.">
-    <meta name="keywords" content="AI text processing, text optimizer, privacy-first, Swiss AI tools, text cleaning, diacritic removal, citation removal, markdown converter">
+    <meta name="description" content="Professional AI text processing tools built for privacy. Clean, anonymize, and chat with local browser AI tools. Swiss-made, client-side processing.">
+    <meta name="keywords" content="AI text processing, local AI chat, text optimizer, privacy-first, Swiss AI tools, text cleaning, PII anonymizer, WebGPU chat">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="ASD123.ai - Privacy-First AI Text Processing Tools">
-    <meta property="og:description" content="Professional AI text processing tools built for privacy. Clean, standardize, and optimize AI-generated text with our browser-based Optimizer.">
+    <meta property="og:description" content="Professional AI text processing tools built for privacy. Clean, anonymize, and chat with local browser AI tools.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="ASD123.ai - Privacy-First AI Text Processing Tools">
-    <meta name="twitter:description" content="Professional AI text processing tools built for privacy. Clean, standardize, and optimize AI-generated text with our browser-based Optimizer.">
+    <meta name="twitter:description" content="Professional AI text processing tools built for privacy. Clean, anonymize, and chat with local browser AI tools.">
     <link rel="canonical" href="https://asd123.ai/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,6 +38,28 @@
                 </a>
 
                 <div class="nav-links">
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                        </div>
+                    </div>
                     <a href="documentation.html" class="nav-link">Documentation</a>
                     <a href="about.html" class="nav-link">About</a>
                 </div>
@@ -49,7 +71,7 @@
                 <h1 class="hero-title">AI Text Processing</h1>
                 <div class="title-underline" aria-hidden="true"></div>
                 <p class="hero-subtitle">
-                    Tools to clean and adapt AI-generated text for your region. Built for privacy, speed, and reliability.
+                    Tools to clean, anonymize, and chat with AI locally in your browser. Built for privacy, speed, and reliability.
                 </p>
             </section>
 
@@ -90,6 +112,22 @@
                     </div>
                     <p class="feature-description">
                         Explore local PII detection, anonymization, and deanonymization workflows directly in your browser. This tool is an experimental proof of concept and should be reviewed carefully before use with sensitive material.
+                    </p>
+                </a>
+
+                <a href="chat.html" class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-title-group">
+                            <!-- Lucide: Messages Square Icon -->
+                            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/>
+                                <path d="M18 9h2a2 2 0 0 1 2 2v10l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+                            </svg>
+                            <h2 class="feature-title">Chat</h2>
+                        </div>
+                    </div>
+                    <p class="feature-description">
+                        Run a private WebGPU AI chat directly in your browser. Choose local models, attach documents or images, edit prompts, export Markdown, and keep chat history on your device.
                     </p>
                 </a>
             </div>

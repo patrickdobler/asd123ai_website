@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASD123.ai Documentation - AI Text Processing Guide</title>
-    <meta name="description" content="Documentation for ASD123.ai privacy-first text processing tools, including the Optimizer and experimental local PII Anonymizer.">
-    <meta name="keywords" content="ASD123 documentation, AI text processing guide, optimizer tutorial, anonymizer guide, local PII detection">
+    <meta name="description" content="Documentation for ASD123.ai privacy-first browser tools, including Optimizer, Anonymizer, and Local AI Chat.">
+    <meta name="keywords" content="ASD123 documentation, AI text processing guide, optimizer tutorial, anonymizer guide, local AI chat guide, WebGPU chat">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="ASD123.ai Documentation - AI Text Processing Guide">
-    <meta property="og:description" content="Learn how to use ASD123.ai's privacy-first Optimizer and experimental local Anonymizer.">
+    <meta property="og:description" content="Learn how to use ASD123.ai's privacy-first Optimizer, Anonymizer, and Local AI Chat.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/documentation">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="ASD123.ai Documentation - AI Text Processing Guide">
-    <meta name="twitter:description" content="Learn how to use ASD123.ai's privacy-first Optimizer and experimental local Anonymizer.">
+    <meta name="twitter:description" content="Learn how to use ASD123.ai's privacy-first Optimizer, Anonymizer, and Local AI Chat.">
     <link rel="canonical" href="https://asd123.ai/documentation">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +39,29 @@
                 </a>
 
                 <div class="nav-links">
-                    <a href="documentation.html" class="nav-link nav-link--active">Documentation</a>
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                        </div>
+                    </div>
+                    <a href="documentation.html" class="nav-link">Documentation</a>
                     <a href="about.html" class="nav-link">About</a>
                 </div>
             </nav>
@@ -49,7 +71,7 @@
             <div class="page-header">
                 <h1 class="page-title">Documentation</h1>
                 <p class="page-subtitle">
-                    Guides, privacy notes, and practical workflows for ASD123.ai's browser-based text tools.
+                    Guides, privacy notes, and practical workflows for ASD123.ai's browser-based text and chat tools.
                 </p>
             </div>
 
@@ -154,13 +176,60 @@
                         <a href="anonymizer-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
                     </div>
                 </div>
+
+                <div class="liquid-glass" style="padding: var(--space-12); display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--space-6);">
+                        <div style="width: 48px; height: 48px; border-radius: 8px; background: var(--text-primary); display: flex; align-items: center; justify-content: center;">
+                            <svg style="width: 24px; height: 24px; color: var(--paper-texture);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/>
+                                <path d="M18 9h2a2 2 0 0 1 2 2v10l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+                            </svg>
+                        </div>
+                        <h2 style="font-size: var(--text-3xl); font-weight: 900; color: var(--text-primary);">Local AI Chat</h2>
+                    </div>
+
+                    <div style="flex: 1; margin-bottom: var(--space-6);">
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+                            Chat with WebGPU models directly in your browser. Prompts, uploads, generated text, and chat history stay on your device.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Local WebGPU Models</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Load Gemma and Qwen ONNX models in the browser. Model files are downloaded, but prompts are not sent for remote inference.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Files and Images</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Attach images, text, Markdown, PDF, or DOCX files. Extraction happens locally before content is added to the prompt context.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">History and Export</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Chats are stored in browser IndexedDB, can be deleted locally, and can be exported as Markdown.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: stretch;">
+                        <a href="chat.html" class="btn btn--primary" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Try Chat</a>
+                        <a href="chat-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
+                    </div>
+                </div>
             </div>
 
             <div style="max-width: 1100px; margin: var(--space-16) auto 0;">
                 <div class="liquid-glass" style="padding: var(--space-12); text-align: center;">
                     <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Privacy and Limits</h2>
                     <p style="font-size: var(--text-lg); color: var(--text-secondary); margin-bottom: var(--space-6);">
-                        The tools are designed for local browser processing. Optional AI modes download model files into your browser, but your text and anonymization mappings remain local. PII detection can miss sensitive information, so manual review is still required.
+                        The tools are designed for local browser processing. Optional AI modes download model files into your browser, but your text, prompts, attachments, chat history, and anonymization mappings remain local. PII detection can miss sensitive information, so manual review is still required.
                     </p>
                     <div style="display: flex; justify-content: center; gap: var(--space-3); flex-wrap: wrap;">
                         <a href="privacy.html" class="btn" style="text-decoration: none;">Privacy Policy</a>
