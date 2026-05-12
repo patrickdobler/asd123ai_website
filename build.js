@@ -79,9 +79,11 @@ async function copyAndMinifyFiles() {
         'terms.html',
         'test-optimizer.html',
         'chat.html',
+        'context.html',
         'anonymizer.html',
         'anonymizer-guide.html',
         'chat-guide.html',
+        'context-guide.html',
         'optimizer-guide.html'
     ];
     for (const file of htmlFiles) {
@@ -149,6 +151,27 @@ async function copyAndMinifyFiles() {
         };
         copyRecursively('components', path.join(distDir, 'components'));
         console.log('Copied: components directory');
+    }
+
+    // Copy self-hosted vendor assets used by browser-only tools
+    if (fs.existsSync('vendor')) {
+        const copyRecursively = (src, dest) => {
+            if (!fs.existsSync(dest)) {
+                fs.mkdirSync(dest, { recursive: true });
+            }
+            const files = fs.readdirSync(src);
+            for (const file of files) {
+                const srcFile = path.join(src, file);
+                const destFile = path.join(dest, file);
+                if (fs.statSync(srcFile).isDirectory()) {
+                    copyRecursively(srcFile, destFile);
+                } else {
+                    fs.copyFileSync(srcFile, destFile);
+                }
+            }
+        };
+        copyRecursively('vendor', path.join(distDir, 'vendor'));
+        console.log('Copied: vendor directory');
     }
 }
 

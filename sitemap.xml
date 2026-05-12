@@ -25,6 +25,12 @@
         <priority>0.9</priority>
     </url>
     <url>
+        <loc>https://asd123.ai/context</loc>
+        <lastmod>2026-05-12</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
         <loc>https://asd123.ai/documentation</loc>
         <lastmod>2026-05-12</lastmod>
         <changefreq>monthly</changefreq>
@@ -32,6 +38,12 @@
     </url>
     <url>
         <loc>https://asd123.ai/chat-guide</loc>
+        <lastmod>2026-05-12</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://asd123.ai/context-guide</loc>
         <lastmod>2026-05-12</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>

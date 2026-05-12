@@ -71,7 +71,8 @@ class NavigationManager {
         const linkedPage = {
             'optimizer-guide': 'optimizer',
             'anonymizer-guide': 'anonymizer',
-            'chat-guide': 'chat'
+            'chat-guide': 'chat',
+            'context-guide': 'context'
         }[this.currentPage] || this.currentPage;
         const activeLink = document.querySelector(`.nav-links a[href*="${linkedPage}"]`);
         if (activeLink) {
@@ -230,7 +231,8 @@ class WebMCPManager {
                 tools: [
                     'optimizer: local text cleanup and normalization',
                     'anonymizer: local PII anonymization and redaction',
-                    'chat: local WebGPU AI chat with browser-stored history'
+                    'chat: local WebGPU AI chat with browser-stored history',
+                    'context: local context window estimation for text and documents'
                 ],
                 privacy: 'ASD123.ai text tools run in the browser. User text is not sent to ASD123.ai servers for processing.'
             })
@@ -244,7 +246,7 @@ class WebMCPManager {
                 properties: {
                     page: {
                         type: 'string',
-                        enum: ['home', 'optimizer', 'anonymizer', 'chat', 'documentation', 'optimizer-guide', 'anonymizer-guide', 'chat-guide', 'privacy', 'terms']
+                        enum: ['home', 'optimizer', 'anonymizer', 'chat', 'context', 'documentation', 'optimizer-guide', 'anonymizer-guide', 'chat-guide', 'context-guide', 'privacy', 'terms']
                     }
                 },
                 required: ['page'],
@@ -256,10 +258,12 @@ class WebMCPManager {
                     optimizer: '/optimizer',
                     anonymizer: '/anonymizer',
                     chat: '/chat',
+                    context: '/context',
                     documentation: '/documentation',
                     'optimizer-guide': '/optimizer-guide',
                     'anonymizer-guide': '/anonymizer-guide',
                     'chat-guide': '/chat-guide',
+                    'context-guide': '/context-guide',
                     privacy: '/privacy',
                     terms: '/terms'
                 };

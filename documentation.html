@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASD123.ai Documentation - AI Text Processing Guide</title>
-    <meta name="description" content="Documentation for ASD123.ai privacy-first browser tools, including Optimizer, Anonymizer, and Local AI Chat.">
-    <meta name="keywords" content="ASD123 documentation, AI text processing guide, optimizer tutorial, anonymizer guide, local AI chat guide, WebGPU chat">
+    <meta name="description" content="Documentation for ASD123.ai privacy-first browser tools, including Optimizer, Anonymizer, Local AI Chat, and Context Estimator.">
+    <meta name="keywords" content="ASD123 documentation, AI text processing guide, optimizer tutorial, anonymizer guide, local AI chat guide, context estimator guide, WebGPU chat">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="ASD123.ai Documentation - AI Text Processing Guide">
-    <meta property="og:description" content="Learn how to use ASD123.ai's privacy-first Optimizer, Anonymizer, and Local AI Chat.">
+    <meta property="og:description" content="Learn how to use ASD123.ai's privacy-first Optimizer, Anonymizer, Local AI Chat, and Context Estimator.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/documentation">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="ASD123.ai Documentation - AI Text Processing Guide">
-    <meta name="twitter:description" content="Learn how to use ASD123.ai's privacy-first Optimizer, Anonymizer, and Local AI Chat.">
+    <meta name="twitter:description" content="Learn how to use ASD123.ai's privacy-first Optimizer, Anonymizer, Local AI Chat, and Context Estimator.">
     <link rel="canonical" href="https://asd123.ai/documentation">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,6 +59,10 @@
                                 <span class="nav-tool-title">Local AI Chat</span>
                                 <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
                             </a>
+                            <a href="context.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Context Estimator</span>
+                                <span class="nav-tool-description">Estimate useful LLM context size.</span>
+                            </a>
                         </div>
                     </div>
                     <a href="documentation.html" class="nav-link">Documentation</a>
@@ -71,7 +75,7 @@
             <div class="page-header">
                 <h1 class="page-title">Documentation</h1>
                 <p class="page-subtitle">
-                    Guides, privacy notes, and practical workflows for ASD123.ai's browser-based text and chat tools.
+                    Guides, privacy notes, and practical workflows for ASD123.ai's browser-based text, context, and chat tools.
                 </p>
             </div>
 
@@ -223,13 +227,61 @@
                         <a href="chat-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
                     </div>
                 </div>
+
+                <div class="liquid-glass" style="padding: var(--space-12); display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--space-6);">
+                        <div style="width: 48px; height: 48px; border-radius: 8px; background: var(--text-primary); display: flex; align-items: center; justify-content: center;">
+                            <svg style="width: 24px; height: 24px; color: var(--paper-texture);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m12 14 4-4"/>
+                                <path d="M3.34 19a10 10 0 1 1 17.32 0"/>
+                                <path d="M12 20h.01"/>
+                            </svg>
+                        </div>
+                        <h2 style="font-size: var(--text-3xl); font-weight: 900; color: var(--text-primary);">Context Estimator</h2>
+                    </div>
+
+                    <div style="flex: 1; margin-bottom: var(--space-6);">
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+                            Estimate how much AI chat context you need for pasted text or local documents before choosing 4K, 8K, 16K, or larger model settings.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Context Recommendation</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Compare 4K through 128K windows and see which one leaves enough room for an answer.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Local File Extraction</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">TXT, DOCX, and PDF files are read in the browser. File contents are not uploaded for processing.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Model Profiles</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Generic, Llama / Mistral, Qwen, Gemma, and GPT-style profiles keep the estimate fast without tokenizer downloads.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: stretch;">
+                        <a href="context.html" class="btn btn--primary" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Try Context</a>
+                        <a href="context-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
+                    </div>
+                </div>
             </div>
 
             <div style="max-width: 1100px; margin: var(--space-16) auto 0;">
                 <div class="liquid-glass" style="padding: var(--space-12); text-align: center;">
                     <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Privacy and Limits</h2>
                     <p style="font-size: var(--text-lg); color: var(--text-secondary); margin-bottom: var(--space-6);">
-                        The tools are designed for local browser processing. Optional AI modes download model files into your browser, but your text, prompts, attachments, chat history, and anonymization mappings remain local. PII detection can miss sensitive information, so manual review is still required.
+                        The tools are designed for local browser processing. Optional AI modes download model files into your browser, but your text, prompts, attachments, chat history, context estimates, and anonymization mappings remain local. PII detection and context estimation can miss edge cases, so manual review is still required.
                     </p>
                     <div style="display: flex; justify-content: center; gap: var(--space-3); flex-wrap: wrap;">
                         <a href="privacy.html" class="btn" style="text-decoration: none;">Privacy Policy</a>

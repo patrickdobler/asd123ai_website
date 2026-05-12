@@ -56,6 +56,10 @@
                                 <span class="nav-tool-title">Local AI Chat</span>
                                 <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
                             </a>
+                            <a href="context.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Context Estimator</span>
+                                <span class="nav-tool-description">Estimate useful LLM context size.</span>
+                            </a>
                         </div>
                     </div>
                     <a href="documentation.html" class="nav-link">Documentation</a>
@@ -87,12 +91,12 @@
 
                         <h3 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">2. Service Description</h3>
                         <p style="color: var(--text-secondary); margin-bottom: var(--space-6); line-height: 1.6;">
-                            ASD123.ai provides browser-based text utilities, including an Optimizer for text cleanup, an Anonymizer for exploring local PII detection and anonymization workflows, and Local AI Chat for browser-based model inference. The tools are provided for informational, productivity, and demonstration purposes.
+                            ASD123.ai provides browser-based text utilities, including an Optimizer for text cleanup, an Anonymizer for exploring local PII detection and anonymization workflows, a Context Estimator for planning AI chat context windows, and Local AI Chat for browser-based model inference. The tools are provided for informational, productivity, and demonstration purposes.
                         </p>
 
                         <h3 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">3. Local Processing and Third-Party Model Downloads</h3>
                         <p style="color: var(--text-secondary); margin-bottom: var(--space-6); line-height: 1.6;">
-                            Text processing and chat generation are designed to run locally in your browser. Optional AI modes may download model files from third-party providers such as Hugging Face. These model downloads do not require your text, files, prompts, chat history, or generated output to be sent to those providers, but those providers may receive normal technical request data when serving files.
+                            Text processing, document context estimation, and chat generation are designed to run locally in your browser. Optional AI modes may download model files from third-party providers such as Hugging Face. These model downloads do not require your text, files, context estimates, prompts, chat history, or generated output to be sent to those providers, but those providers may receive normal technical request data when serving files.
                         </p>
 
                         <h3 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">4. Experimental Anonymizer</h3>

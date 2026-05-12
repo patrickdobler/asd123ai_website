@@ -83,9 +83,11 @@ function initialBuild() {
         'terms.html',
         'test-optimizer.html',
         'chat.html',
+        'context.html',
         'anonymizer.html',
         'anonymizer-guide.html',
         'chat-guide.html',
+        'context-guide.html',
         'optimizer-guide.html'
     ];
     
@@ -132,6 +134,12 @@ function initialBuild() {
         copyDirectory('components', path.join(distDir, 'components'));
         const timestamp = new Date().toLocaleTimeString();
         console.log(`[${timestamp}] ✓ Copied: components directory`);
+    }
+
+    if (fs.existsSync('vendor')) {
+        copyDirectory('vendor', path.join(distDir, 'vendor'));
+        const timestamp = new Date().toLocaleTimeString();
+        console.log(`[${timestamp}] ✓ Copied: vendor directory`);
     }
     
     console.log('=== Build Complete ===\n');
@@ -196,8 +204,8 @@ function setupWatchers() {
     const htmlFiles = [
         'index.html', 'optimizer.html', 'documentation.html',
         'about.html', 'contact.html', 'privacy.html', 'terms.html',
-        'test-optimizer.html', 'chat.html', 'anonymizer.html',
-        'anonymizer-guide.html', 'chat-guide.html', 'optimizer-guide.html'
+        'test-optimizer.html', 'chat.html', 'context.html', 'anonymizer.html',
+        'anonymizer-guide.html', 'chat-guide.html', 'context-guide.html', 'optimizer-guide.html'
     ];
     
     htmlFiles.forEach(file => {
@@ -208,6 +216,7 @@ function setupWatchers() {
     watchDirectory('styles', 'styles');
     watchDirectory('scripts', 'scripts');
     watchDirectory('components', 'components');
+    watchDirectory('vendor', 'vendor');
     
     console.log('✓ Watching for file changes...');
     console.log('✓ Edit your files and they will auto-copy to dist/');

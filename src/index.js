@@ -5,6 +5,7 @@ const redirects = {
   '/optimizer.html': '/optimizer',
   '/anonymizer.html': '/anonymizer',
   '/chat.html': '/chat',
+  '/context.html': '/context',
   '/documentation.html': '/documentation',
   '/about.html': '/about',
   '/contact.html': '/contact',
@@ -13,6 +14,7 @@ const redirects = {
   '/test-optimizer.html': '/test',
   '/anonymizer-guide.html': '/anonymizer-guide',
   '/chat-guide.html': '/chat-guide',
+  '/context-guide.html': '/context-guide',
   '/optimizer-guide.html': '/optimizer-guide'
 };
 
@@ -20,6 +22,7 @@ const cleanUrls = {
   '/optimizer': '/optimizer.html',
   '/anonymizer': '/anonymizer.html',
   '/chat': '/chat.html',
+  '/context': '/context.html',
   '/documentation': '/documentation.html',
   '/about': '/about.html',
   '/contact': '/contact.html',
@@ -28,6 +31,7 @@ const cleanUrls = {
   '/test': '/test-optimizer.html',
   '/anonymizer-guide': '/anonymizer-guide.html',
   '/chat-guide': '/chat-guide.html',
+  '/context-guide': '/context-guide.html',
   '/optimizer-guide': '/optimizer-guide.html'
 };
 
@@ -80,6 +84,22 @@ Use this skill when an agent needs to help a user work with the ASD123.ai Local 
 ## Privacy
 
 Prompts, uploaded files, chat history, and generated output remain in the user's browser. Online model loading may download model and runtime files, but the user's chat content is not sent to ASD123.ai servers for inference.
+`,
+  'context': `# ASD123.ai Context Estimator
+
+Use this skill when an agent needs to help a user estimate an AI chat context window for text or local documents.
+
+## Capabilities
+
+- Estimate useful context windows for pasted text
+- Extract TXT, DOCX, and PDF text locally in the browser
+- Compare 4K, 8K, 16K, 32K, 64K, and 128K context sizes
+- Apply lightweight model-family profiles without tokenizer downloads
+- Reserve answer and reasoning budget before recommending a window
+
+## Privacy
+
+Pasted text and uploaded file contents remain in the user's browser. The tool does not upload documents or store extracted text in server-side storage.
 `
 };
 
@@ -115,7 +135,9 @@ async function agentSkillsIndex() {
       ? 'Clean and normalize text locally with the ASD123.ai Optimizer.'
       : name === 'chat'
         ? 'Chat with local WebGPU models in the ASD123.ai browser chat tool.'
-        : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
+        : name === 'context'
+          ? 'Estimate AI chat context windows locally with the ASD123.ai Context Estimator.'
+          : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
     url: `${SITE_ORIGIN}/.well-known/agent-skills/${name}/SKILL.md`,
     digest: await sha256Digest(content)
   })));
