@@ -2109,8 +2109,7 @@ footer {
 
 .context-results-panel {
     align-content: start;
-    display: grid;
-    gap: var(--space-5);
+    display: block;
 }
 
 .context-panel-header {
@@ -2144,8 +2143,8 @@ footer {
 
 .context-textarea {
     width: 100%;
-    height: clamp(280px, 36vh, 390px);
-    min-height: 260px;
+    height: clamp(360px, 46vh, 500px);
+    min-height: 340px;
     resize: vertical;
     background: rgba(255, 255, 255, 0.42);
     border: 2px solid var(--border-color);
@@ -2248,13 +2247,13 @@ footer {
 
 .context-settings {
     display: grid;
-    gap: var(--space-8);
-    margin-bottom: var(--space-8);
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
 }
 
 .context-setting {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--space-3);
 }
 
 .context-setting > span {
@@ -2274,14 +2273,14 @@ footer {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-4);
-    margin-bottom: var(--space-7);
+    margin-bottom: var(--space-8);
 }
 
 .context-metric {
     background: rgba(255, 255, 255, 0.46);
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    padding: var(--space-4);
+    padding: var(--space-3);
 }
 
 .context-metric span,
@@ -2294,17 +2293,18 @@ footer {
 
 .context-metric span {
     font-weight: 800;
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
 }
 
 .context-metric strong {
     color: var(--text-primary);
     display: block;
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 800;
     line-height: 1.15;
     margin-bottom: var(--space-1);
+    white-space: nowrap;
 }
 
 .context-table-wrap {

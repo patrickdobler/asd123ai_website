@@ -42,7 +42,7 @@ const MODEL_PROFILES = {
 
 const STATUS_COPY = {
     empty: {
-        label: 'Waiting for text',
+        label: '-',
         tone: 'neutral',
         detail: 'Paste text or upload a supported file to estimate the context window.'
     },
@@ -413,16 +413,17 @@ class ContextEstimatorApp {
                 <tr>
                     <td>${formatContext(size)}</td>
                     <td data-context-usable="${size}">-</td>
-                    <td><span class="context-status-pill" data-tone="neutral">Waiting</span></td>
+                    <td><span class="context-status-pill" data-tone="neutral">-</span></td>
                 </tr>
             `)
             .join('');
     }
 
     renderTable(windows, recommendation, exceedsMax) {
+        const hasInput = windows.some(row => row.status !== 'empty');
         this.elements.tableBody.innerHTML = windows.map(row => {
             const status = STATUS_COPY[row.status] || STATUS_COPY.empty;
-            const isRecommended = !exceedsMax && recommendation.contextWindow === row.contextWindow;
+            const isRecommended = hasInput && !exceedsMax && recommendation.contextWindow === row.contextWindow;
             return `
                 <tr class="${isRecommended ? 'context-table-row--recommended' : ''}">
                     <td>${formatContext(row.contextWindow)}${isRecommended ? ' · recommended' : ''}</td>
