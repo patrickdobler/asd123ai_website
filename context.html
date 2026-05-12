@@ -112,7 +112,8 @@
                     </div>
 
                     <label class="sr-only" for="contextInput">Text to estimate</label>
-                    <textarea id="contextInput" class="context-textarea" spellcheck="false" autocomplete="off" placeholder="Paste the prompt, source text, meeting transcript, RAG chunk, or document text you want to fit into an AI chat context window. The estimate updates locally while you type."></textarea>
+                    <textarea id="contextInput" class="context-textarea" spellcheck="false" autocomplete="off" placeholder="Paste text, a transcript, or document content here. The estimate updates locally."></textarea>
+                    <p id="contextMeta" class="context-meta">No text loaded yet.</p>
 
                     <div id="contextDropzone" class="context-dropzone" aria-label="Upload a local TXT, DOCX, or PDF file">
                         <div class="context-dropzone-icon" aria-hidden="true">
@@ -153,12 +154,6 @@
                         </label>
                     </div>
 
-                    <div class="context-recommendation-card">
-                        <span>Recommended context</span>
-                        <strong id="contextRecommended">-</strong>
-                        <p id="contextSummary">Paste text or upload a supported file to estimate the context window.</p>
-                    </div>
-
                     <div class="context-metrics-grid">
                         <div class="context-metric">
                             <span>Estimated input</span>
@@ -170,19 +165,7 @@
                             <strong id="contextReserveTokens">35%</strong>
                             <small>answer/system budget</small>
                         </div>
-                        <div class="context-metric">
-                            <span>Usable budget</span>
-                            <strong id="contextUsableBudget">0</strong>
-                            <small>for source text</small>
-                        </div>
-                        <div class="context-metric">
-                            <span>Status</span>
-                            <strong id="contextSafety" data-tone="neutral">Waiting</strong>
-                            <small>fit quality</small>
-                        </div>
                     </div>
-
-                    <p id="contextMeta" class="context-meta">No text loaded yet.</p>
 
                     <div class="context-table-wrap">
                         <table class="context-table">
@@ -198,13 +181,6 @@
                         </table>
                     </div>
 
-                    <button id="contextCopyBtn" type="button" class="btn btn-secondary context-copy-btn">
-                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-                        </svg>
-                        Copy Summary
-                    </button>
                 </aside>
             </section>
         </main>

@@ -140,6 +140,10 @@ function classifyWindow(estimatedInputTokens, contextWindow, reservePercent) {
         status = 'good';
     }
 
+    if (contextWindow === CONTEXT_WINDOWS[0] && status === 'overkill') {
+        status = 'good';
+    }
+
     return {
         contextWindow,
         usableBudget,
@@ -147,11 +151,6 @@ function classifyWindow(estimatedInputTokens, contextWindow, reservePercent) {
         ratio,
         status
     };
-}
-
-function createDownloadUrl(name, content, type = 'text/plain;charset=utf-8') {
-    const blob = new Blob([content], { type });
-    return URL.createObjectURL(blob);
 }
 
 class ContextFileProcessor {
@@ -294,13 +293,8 @@ class ContextEstimatorApp {
             reserveValue: document.getElementById('contextReserveValue'),
             estimateBtn: document.getElementById('contextEstimateBtn'),
             clearBtn: document.getElementById('contextClearBtn'),
-            copyBtn: document.getElementById('contextCopyBtn'),
-            recommended: document.getElementById('contextRecommended'),
             inputTokens: document.getElementById('contextInputTokens'),
             reserveTokens: document.getElementById('contextReserveTokens'),
-            usableBudget: document.getElementById('contextUsableBudget'),
-            safety: document.getElementById('contextSafety'),
-            summary: document.getElementById('contextSummary'),
             tableBody: document.getElementById('contextTableBody'),
             meta: document.getElementById('contextMeta')
         };
@@ -330,7 +324,6 @@ class ContextEstimatorApp {
         });
         this.elements.estimateBtn.addEventListener('click', () => this.updateEstimate({ announce: true }));
         this.elements.clearBtn.addEventListener('click', () => this.clear());
-        this.elements.copyBtn.addEventListener('click', () => this.copySummary());
         this.elements.chooseFileBtn.addEventListener('click', () => this.elements.fileInput.click());
         this.elements.fileInput.addEventListener('change', event => this.handleFiles(event.target.files));
 
@@ -386,52 +379,26 @@ class ContextEstimatorApp {
         const windows = CONTEXT_WINDOWS.map(size => classifyWindow(estimate.estimatedInputTokens, size, reservePercent));
         const recommendation = windows.find(row => row.status !== 'tooSmall') || windows[windows.length - 1];
         const exceedsMax = estimate.estimatedInputTokens > windows[windows.length - 1].usableBudget;
-        const recommendedStatus = exceedsMax ? 'tooSmall' : recommendation.status;
-        const statusCopy = STATUS_COPY[recommendedStatus] || STATUS_COPY.empty;
 
         this.lastResult = {
             estimate,
-            profile,
             reservePercent,
             windows,
             recommendation,
-            exceedsMax,
-            source: this.fileName || 'Pasted text'
+            exceedsMax
         };
 
-        this.renderResult(statusCopy, announce);
+        this.renderResult(announce);
     }
 
-    renderResult(statusCopy, announce) {
-        const { estimate, profile, reservePercent, windows, recommendation, exceedsMax, source } = this.lastResult;
-        const recommendedLabel = estimate.estimatedInputTokens
-            ? (exceedsMax ? '>128K' : formatContext(recommendation.contextWindow))
-            : '-';
-
-        this.elements.recommended.textContent = recommendedLabel;
+    renderResult(announce) {
+        const { estimate, reservePercent, windows, recommendation, exceedsMax } = this.lastResult;
         this.elements.inputTokens.textContent = estimate.estimatedInputTokens ? formatTokens(estimate.estimatedInputTokens) : '0';
         this.elements.reserveTokens.textContent = recommendation ? `${reservePercent}% (${formatTokens(recommendation.reservedTokens)})` : `${reservePercent}%`;
-        this.elements.usableBudget.textContent = recommendation ? formatTokens(recommendation.usableBudget) : '0';
-        this.elements.safety.textContent = statusCopy.label;
-        this.elements.safety.dataset.tone = statusCopy.tone;
-
-        const languageNote = estimate.cjkShare > 0.25
-            ? 'CJK-heavy text detected; estimates use a denser token profile.'
-            : 'Latin-script heuristic active.';
 
         this.elements.meta.textContent = estimate.estimatedInputTokens
-            ? `${formatTokens(estimate.characters)} characters · ${formatTokens(estimate.words)} words · ${profile.label} · ${languageNote}`
+            ? `${formatTokens(estimate.characters)} characters · ${formatTokens(estimate.words)} words`
             : 'No text loaded yet.';
-
-        if (!estimate.estimatedInputTokens) {
-            this.elements.summary.textContent = STATUS_COPY.empty.detail;
-        } else if (exceedsMax) {
-            const maxWindow = windows[windows.length - 1];
-            const overPercent = Math.ceil(((estimate.estimatedInputTokens - maxWindow.usableBudget) / maxWindow.usableBudget) * 100);
-            this.elements.summary.textContent = `This input is about ${overPercent}% over the safe 128K budget with a ${reservePercent}% reserve. Split the document or reduce the reserve only if you expect a very short answer.`;
-        } else {
-            this.elements.summary.textContent = `${formatContext(recommendation.contextWindow)} is the smallest recommended context window for ${source}. ${statusCopy.detail}`;
-        }
 
         this.renderTable(windows, recommendation, exceedsMax);
 
@@ -464,37 +431,6 @@ class ContextEstimatorApp {
                 </tr>
             `;
         }).join('');
-    }
-
-    async copySummary() {
-        if (!this.lastResult?.estimate.estimatedInputTokens) {
-            this.setFileStatus('Add text or a file before copying a summary.', 'warning');
-            return;
-        }
-
-        const { estimate, profile, reservePercent, recommendation, exceedsMax, source } = this.lastResult;
-        const summary = [
-            'ASD123.ai Context Estimator',
-            `Source: ${source}`,
-            `Model profile: ${profile.label}`,
-            `Estimated input: ${formatTokens(estimate.estimatedInputTokens)} tokens including ${formatTokens(FIXED_PROMPT_OVERHEAD)} prompt overhead`,
-            `Reserve: ${reservePercent}% for answer, system prompt, formatting, and reasoning`,
-            `Recommended context: ${exceedsMax ? '>128K or split the input' : formatContext(recommendation.contextWindow)}`,
-            'Note: This is a browser-local heuristic estimate, not exact tokenizer output.'
-        ].join('\n');
-
-        try {
-            await navigator.clipboard.writeText(summary);
-            this.setFileStatus('Summary copied.', 'good');
-        } catch (error) {
-            const url = createDownloadUrl('context-estimate.txt', summary);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'context-estimate.txt';
-            link.click();
-            URL.revokeObjectURL(url);
-            this.setFileStatus('Clipboard unavailable. Summary downloaded as a text file.', 'good');
-        }
     }
 
     clear() {

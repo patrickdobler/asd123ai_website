@@ -2090,6 +2090,7 @@ footer {
 }
 
 .context-shell {
+    align-items: start;
     display: grid;
     grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr);
     gap: var(--space-8);
@@ -2104,6 +2105,12 @@ footer {
     border-radius: 8px;
     box-shadow: var(--shadow-sm), inset 0 1px 2px rgba(255, 255, 255, 0.45);
     padding: var(--space-8);
+}
+
+.context-results-panel {
+    align-content: start;
+    display: grid;
+    gap: var(--space-5);
 }
 
 .context-panel-header {
@@ -2137,14 +2144,15 @@ footer {
 
 .context-textarea {
     width: 100%;
-    min-height: 430px;
+    height: clamp(280px, 36vh, 390px);
+    min-height: 260px;
     resize: vertical;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.42);
     border: 2px solid var(--border-color);
     border-radius: 8px;
     color: var(--text-primary);
-    font: 500 15px/1.65 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    padding: var(--space-5);
+    font: 400 15px/1.7 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    padding: var(--space-6);
     transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
@@ -2156,7 +2164,8 @@ footer {
 }
 
 .context-textarea::placeholder {
-    color: var(--text-muted);
+    color: rgba(60, 60, 60, 0.42);
+    font-weight: 400;
 }
 
 .context-dropzone {
@@ -2166,7 +2175,7 @@ footer {
     gap: var(--space-4);
     border: 2px dashed var(--border-color);
     border-radius: 8px;
-    margin-top: var(--space-5);
+    margin-top: 0;
     padding: var(--space-5);
     transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
 }
@@ -2221,30 +2230,31 @@ footer {
     margin-top: var(--space-3);
 }
 
-.context-file-status[data-tone="good"],
-#contextSafety[data-tone="good"] {
+.context-meta {
+    margin-bottom: var(--space-6);
+}
+
+.context-file-status[data-tone="good"] {
     color: #28734d;
 }
 
-.context-file-status[data-tone="warning"],
-#contextSafety[data-tone="warning"] {
+.context-file-status[data-tone="warning"] {
     color: #8a5a00;
 }
 
-.context-file-status[data-tone="danger"],
-#contextSafety[data-tone="danger"] {
+.context-file-status[data-tone="danger"] {
     color: #9b2f2f;
 }
 
 .context-settings {
     display: grid;
-    gap: var(--space-4);
-    margin-bottom: var(--space-5);
+    gap: var(--space-8);
+    margin-bottom: var(--space-8);
 }
 
 .context-setting {
     display: grid;
-    gap: var(--space-2);
+    gap: var(--space-4);
 }
 
 .context-setting > span {
@@ -2260,45 +2270,11 @@ footer {
     width: 100%;
 }
 
-.context-recommendation-card {
-    background: var(--text-primary);
-    border-radius: 8px;
-    color: var(--paper-texture);
-    margin-bottom: var(--space-5);
-    padding: var(--space-6);
-}
-
-.context-recommendation-card span {
-    display: block;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    margin-bottom: var(--space-2);
-    opacity: 0.72;
-    text-transform: uppercase;
-}
-
-.context-recommendation-card strong {
-    display: block;
-    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: clamp(44px, 7vw, 72px);
-    font-weight: 800;
-    letter-spacing: 0;
-    line-height: 0.95;
-    margin-bottom: var(--space-4);
-}
-
-.context-recommendation-card p {
-    font-size: 14px;
-    line-height: 1.55;
-    margin: 0;
-    opacity: 0.82;
-}
-
 .context-metrics-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-3);
+    gap: var(--space-4);
+    margin-bottom: var(--space-7);
 }
 
 .context-metric {
@@ -2334,7 +2310,7 @@ footer {
 .context-table-wrap {
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    margin-top: var(--space-5);
+    margin-top: 0;
     overflow: hidden;
 }
 
@@ -2394,12 +2370,6 @@ footer {
 .context-status-pill[data-tone="danger"] {
     background: rgba(155, 47, 47, 0.12);
     color: #9b2f2f;
-}
-
-.context-copy-btn {
-    justify-content: center;
-    margin-top: var(--space-5);
-    width: 100%;
 }
 
 .guide-page {
@@ -2521,27 +2491,23 @@ footer {
     background: rgba(255, 255, 255, 0.06);
 }
 
-[data-theme="dark"] .context-recommendation-card {
-    background: rgba(255, 255, 255, 0.92);
-    color: #111111;
-}
-
 [data-theme="dark"] .context-file-status[data-tone="good"],
-[data-theme="dark"] #contextSafety[data-tone="good"],
 [data-theme="dark"] .context-status-pill[data-tone="good"] {
     color: #7ac9a0;
 }
 
 [data-theme="dark"] .context-file-status[data-tone="warning"],
-[data-theme="dark"] #contextSafety[data-tone="warning"],
 [data-theme="dark"] .context-status-pill[data-tone="warning"] {
     color: #e0b15e;
 }
 
 [data-theme="dark"] .context-file-status[data-tone="danger"],
-[data-theme="dark"] #contextSafety[data-tone="danger"],
 [data-theme="dark"] .context-status-pill[data-tone="danger"] {
     color: #ef8d8d;
+}
+
+[data-theme="dark"] .context-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.38);
 }
 
 /* ========================================
