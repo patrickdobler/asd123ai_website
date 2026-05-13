@@ -18,6 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/components.css">
     <script src="scripts/shared.js"></script>
@@ -68,92 +69,133 @@
         </header>
 
         <main id="main" role="main">
-            <article class="guide-page">
-                <div class="page-header">
-                    <h1 class="page-title">Context Estimator Guide</h1>
-                    <p class="page-subtitle">
-                        Choose practical context windows for AI chats before you load a local model or paste a long document.
-                    </p>
-                    <a href="context.html" class="btn btn-primary guide-cta">Open Context Estimator</a>
+            <div class="page-header">
+                <h1 class="page-title">Context Estimator Guide</h1>
+                <p class="page-subtitle">
+                    Choose practical context windows for AI chats before you load a local model or paste a long document.
+                </p>
+            </div>
+
+            <div class="max-w-6xl mx-auto">
+                <div class="liquid-glass p-8 md:p-12">
+                    <div class="mb-12 p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                        <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h3>
+                        <div class="grid md:grid-cols-2 gap-3 text-sm">
+                            <a href="#overview" class="text-[var(--primary-color)] hover:underline">→ Overview</a>
+                            <a href="#workflow" class="text-[var(--primary-color)] hover:underline">→ Basic Workflow</a>
+                            <a href="#profiles" class="text-[var(--primary-color)] hover:underline">→ Model Profiles</a>
+                            <a href="#reserve" class="text-[var(--primary-color)] hover:underline">→ Reserve</a>
+                            <a href="#statuses" class="text-[var(--primary-color)] hover:underline">→ Statuses</a>
+                            <a href="#privacy" class="text-[var(--primary-color)] hover:underline">→ Privacy</a>
+                        </div>
+                    </div>
+
+                    <div id="overview" class="mb-12">
+                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <span class="text-[var(--primary-color)]">1.</span> Overview
+                        </h3>
+                        <div class="space-y-4 text-[var(--text-secondary)]">
+                            <p class="leading-relaxed">
+                                Context Estimator gives you a fast estimate of how much AI chat context a piece of text or a document may need. It is useful before choosing settings such as 4K, 8K, 16K, 32K, 64K, or 128K in tools like Ollama, LM Studio, or local browser chat.
+                            </p>
+                            <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
+                                <p class="text-sm text-[var(--text-secondary)]">
+                                    <strong class="text-[var(--text-primary)]">Estimate, not exact count:</strong> Different models tokenize text differently. The tool gives a practical planning estimate without downloading tokenizers.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="workflow" class="mb-12">
+                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <span class="text-[var(--primary-color)]">2.</span> Basic Workflow
+                        </h3>
+                        <div class="space-y-6 text-[var(--text-secondary)]">
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">1</div>
+                                <div>
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-1">Paste or upload</h4>
+                                    <p class="text-sm">Paste text into the input area or choose a local TXT, DOCX, or PDF file.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">2</div>
+                                <div>
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-1">Choose profile and reserve</h4>
+                                    <p class="text-sm">Select the closest model profile and keep a reserve for system prompt, answer, formatting, and reasoning.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">3</div>
+                                <div>
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-1">Read the comparison table</h4>
+                                    <p class="text-sm">Use the row marked recommended as the minimum practical context window. If the fit is tight, choose the next larger window.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="profiles" class="mb-12">
+                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <span class="text-[var(--primary-color)]">3.</span> Model Profiles
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
+                            <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Generic LLM</h4>
+                                <p class="text-sm">A safe default when you do not know which tokenizer your model uses.</p>
+                            </div>
+                            <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Model families</h4>
+                                <p class="text-sm">Llama / Mistral, Qwen, Gemma, and GPT-style profiles adjust the estimate for common tokenization patterns.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="reserve" class="mb-12">
+                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <span class="text-[var(--primary-color)]">4.</span> Reserve
+                        </h3>
+                        <div class="space-y-4 text-[var(--text-secondary)]">
+                            <p class="leading-relaxed">
+                                A context window must hold the source text, your instruction, system prompt, and generated answer. The reserve slider keeps part of the window free before making a recommendation.
+                            </p>
+                            <p class="leading-relaxed">
+                                The default 35% is a practical starting point. Increase it for detailed answers or reasoning. Lower it only when you expect a short answer.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="statuses" class="mb-12">
+                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <span class="text-[var(--primary-color)]">5.</span> Statuses
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
+                            <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Too small / Tight</h4>
+                                <p class="text-sm">The input may overflow, or there may be little room left for a useful answer.</p>
+                            </div>
+                            <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Good / Overkill</h4>
+                                <p class="text-sm">Good is the practical target. Overkill means the window is likely larger than needed.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="privacy">
+                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <span class="text-[var(--primary-color)]">6.</span> Privacy and Limits
+                        </h3>
+                        <div class="space-y-4 text-[var(--text-secondary)]">
+                            <p class="leading-relaxed">
+                                Text extraction and estimation run locally in your browser. Pasted text and uploaded files are not sent to ASD123.ai for processing, and document contents are not saved in localStorage or IndexedDB.
+                            </p>
+                            <p class="leading-relaxed">
+                                PDF extraction depends on readable embedded text. Scanned, image-only, password-protected, or unusual PDFs may need OCR or manual cleanup before estimation.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-
-                <nav class="guide-toc" aria-label="Guide sections">
-                    <a href="#overview">Overview</a>
-                    <a href="#context-windows">Context windows</a>
-                    <a href="#workflow">Workflow</a>
-                    <a href="#profiles">Model profiles</a>
-                    <a href="#reserve">Reserve</a>
-                    <a href="#statuses">Statuses</a>
-                    <a href="#privacy">Privacy</a>
-                    <a href="#limits">Limits</a>
-                </nav>
-
-                <section id="overview" class="guide-section">
-                    <h2>Overview</h2>
-                    <p>
-                        Context Estimator gives you a fast estimate of how much AI chat context a piece of text or a document may need. It is useful before choosing settings such as 4K, 8K, 16K, 32K, 64K, or 128K in tools like Ollama, LM Studio, or local browser chat.
-                    </p>
-                    <p>
-                        The result is intentionally practical rather than token-perfect. Different models tokenize text differently, and language, punctuation, tables, code, and PDF extraction can all change the final count.
-                    </p>
-                </section>
-
-                <section id="context-windows" class="guide-section">
-                    <h2>What context windows mean</h2>
-                    <p>
-                        A context window is the maximum amount of information a model can consider at once. It must fit the source text, your instruction, any system prompt, and the generated answer. Larger windows can handle more material, but they often need more memory and can slow down generation.
-                    </p>
-                </section>
-
-                <section id="workflow" class="guide-section">
-                    <h2>Basic workflow</h2>
-                    <ol>
-                        <li>Paste text into the input area or choose a local TXT, DOCX, or PDF file.</li>
-                        <li>Select the closest model profile if you know the model family.</li>
-                        <li>Keep the reserve near 35% for normal summarization and question answering.</li>
-                        <li>Use the recommended context window as the minimum practical setting.</li>
-                        <li>If the status is tight, choose the next larger window for longer answers or follow-up questions.</li>
-                    </ol>
-                </section>
-
-                <section id="profiles" class="guide-section">
-                    <h2>Model profiles</h2>
-                    <p>
-                        Profiles adjust the estimate for common tokenizer behavior. Generic LLM is the safest default. Llama / Mistral, Qwen, Gemma, and GPT-style profiles provide slightly different estimates for the same text. These are heuristics, not exact tokenizer replicas.
-                    </p>
-                </section>
-
-                <section id="reserve" class="guide-section">
-                    <h2>Reserve for answers and reasoning</h2>
-                    <p>
-                        If a document needs about 4K tokens, a 4K context window is usually not enough. The model still needs room for your question, system instructions, formatting, reasoning, and the final answer. The reserve slider keeps that space free before recommending a context window.
-                    </p>
-                    <p>
-                        Use a larger reserve for detailed answers, multi-step reasoning, or long output. Use a smaller reserve only when you expect a short answer and understand the risk of truncation.
-                    </p>
-                </section>
-
-                <section id="statuses" class="guide-section">
-                    <h2>Reading the statuses</h2>
-                    <p>
-                        <strong>Too small</strong> means the input probably will not fit with the selected reserve. <strong>Tight</strong> means it can work but leaves little room. <strong>Good</strong> is the intended target for most chats. <strong>Overkill</strong> means the window is likely larger than needed for the current input.
-                    </p>
-                </section>
-
-                <section id="privacy" class="guide-section">
-                    <h2>Privacy model</h2>
-                    <p>
-                        Text extraction and estimation run locally in your browser. Pasted text and uploaded files are not sent to ASD123.ai for processing. The tool does not save document contents in localStorage or IndexedDB.
-                    </p>
-                </section>
-
-                <section id="limits" class="guide-section">
-                    <h2>Limits and review</h2>
-                    <p>
-                        PDF extraction depends on readable embedded text. Scanned PDFs, image-only files, password-protected documents, and unusual encodings may need OCR or manual cleanup first. Always treat the recommendation as a planning aid and leave extra room when the result is business-critical.
-                    </p>
-                </section>
-            </article>
+            </div>
         </main>
 
         <footer role="contentinfo">

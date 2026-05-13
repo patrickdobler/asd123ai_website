@@ -2519,7 +2519,7 @@ main#main.chat-main {
     display: block !important;
     justify-content: flex-start !important;
     max-width: 1420px !important;
-    padding: var(--space-5) var(--space-6) var(--space-7) !important;
+    padding: var(--space-8) var(--space-6) var(--space-4) !important;
 }
 
 .chat-page-header {
@@ -3038,7 +3038,7 @@ main#main.chat-main {
     }
 
     main#main.chat-main {
-        padding: var(--space-5) var(--space-4) var(--space-7) !important;
+        padding: var(--space-6) var(--space-4) var(--space-4) !important;
     }
 
     .chat-shell {
@@ -4452,5 +4452,116 @@ main#main.chat-main {
         font-size: 0;
         min-width: 42px;
         padding: 0 11px;
+    }
+}
+
+/* ========================================
+   GLOBAL HOVER STABILITY OVERRIDES
+   ======================================== */
+
+.btn:hover,
+.btn:active,
+.btn-primary:hover,
+.btn-primary:active,
+.btn-secondary:hover,
+.btn-secondary:active,
+.btn-ghost:hover,
+.btn-ghost:active,
+.btn--primary:hover,
+.btn--primary:active,
+.sample-text-btn:hover,
+.feature-card:hover,
+.feature-card:active,
+.liquid-glass:hover,
+.card:hover,
+.entity-card:hover,
+.entity-card:active,
+.entity-item:hover,
+.entity-remove:hover,
+.nav-tool-item:hover,
+.social-link:hover,
+.social-links a:hover,
+.chat-icon-btn:hover,
+.chat-history-item:hover,
+.context-dropzone--active,
+.context-dropzone:focus-visible,
+.context-table-row:hover,
+.context-metric:hover {
+    transform: none !important;
+}
+
+[data-theme="dark"] .liquid-glass:hover,
+[data-theme="dark"] .feature-card:hover,
+[data-theme="dark"] .card:hover,
+[data-theme="dark"] .context-input-panel:hover,
+[data-theme="dark"] .context-results-panel:hover,
+[data-theme="dark"] .context-metric:hover,
+[data-theme="dark"] .guide-toc:hover,
+[data-theme="dark"] .guide-section:hover {
+    background: var(--glass-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .entity-card:hover,
+[data-theme="dark"] .entity-item:hover {
+    background: var(--paper-texture) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .contrast-surface {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] div.contrast-surface {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .contrast-surface,
+[data-theme="dark"] .contrast-surface p,
+[data-theme="dark"] .contrast-surface li,
+[data-theme="dark"] .contrast-surface span {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .contrast-surface strong,
+[data-theme="dark"] .contrast-surface h3,
+[data-theme="dark"] .contrast-surface h4,
+[data-theme="dark"] .contrast-surface a {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] a[style*="color: var(--primary-color)"],
+[data-theme="dark"] .text-\[var\(--primary-color\)\] {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .bg-\[rgba\(60\,60\,60\,0\.15\)\],
+[data-theme="dark"] .bg-\[rgba\(60\,60\,60\,0\.25\)\],
+[data-theme="dark"] .bg-\[rgba\(60\,60\,60\,0\.3\)\] {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .border-\[var\(--border-color\)\] {
+    border-color: var(--border-color) !important;
+}
+
+main#main.chat-main {
+    padding-top: var(--space-8) !important;
+    padding-bottom: var(--space-4) !important;
+}
+
+.chat-page-header {
+    margin-bottom: var(--space-2) !important;
+}
+
+.chat-shell {
+    margin-bottom: var(--space-4) !important;
+}
+
+@media (max-width: 768px) {
+    main#main.chat-main {
+        padding-top: var(--space-6) !important;
+        padding-bottom: var(--space-4) !important;
     }
 }
