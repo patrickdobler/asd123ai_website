@@ -89,9 +89,10 @@ function initialBuild() {
         'anonymizer-guide.html',
         'chat-guide.html',
         'context-guide.html',
+        'converter-guide.html',
         'optimizer-guide.html'
     ];
-    
+
     htmlFiles.forEach(file => {
         if (fs.existsSync(file)) {
             copyFile(file, path.join(distDir, file));
@@ -206,7 +207,7 @@ function setupWatchers() {
         'index.html', 'optimizer.html', 'documentation.html',
         'about.html', 'contact.html', 'privacy.html', 'terms.html',
         'test-optimizer.html', 'chat.html', 'context.html', 'converter.html', 'anonymizer.html',
-        'anonymizer-guide.html', 'chat-guide.html', 'context-guide.html', 'optimizer-guide.html'
+        'anonymizer-guide.html', 'chat-guide.html', 'context-guide.html', 'converter-guide.html', 'optimizer-guide.html'
     ];
     
     htmlFiles.forEach(file => {

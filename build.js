@@ -85,6 +85,7 @@ async function copyAndMinifyFiles() {
         'anonymizer-guide.html',
         'chat-guide.html',
         'context-guide.html',
+        'converter-guide.html',
         'optimizer-guide.html'
     ];
     for (const file of htmlFiles) {

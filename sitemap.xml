@@ -55,6 +55,12 @@
         <priority>0.7</priority>
     </url>
     <url>
+        <loc>https://asd123.ai/converter-guide</loc>
+        <lastmod>2026-05-21</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
         <loc>https://asd123.ai/about</loc>
         <lastmod>2025-01-23</lastmod>
         <changefreq>monthly</changefreq>

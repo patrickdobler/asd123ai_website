@@ -16,6 +16,7 @@ const redirects = {
   '/anonymizer-guide.html': '/anonymizer-guide',
   '/chat-guide.html': '/chat-guide',
   '/context-guide.html': '/context-guide',
+  '/converter-guide.html': '/converter-guide',
   '/optimizer-guide.html': '/optimizer-guide'
 };
 
@@ -34,6 +35,7 @@ const cleanUrls = {
   '/anonymizer-guide': '/anonymizer-guide.html',
   '/chat-guide': '/chat-guide.html',
   '/context-guide': '/context-guide.html',
+  '/converter-guide': '/converter-guide.html',
   '/optimizer-guide': '/optimizer-guide.html'
 };
 
