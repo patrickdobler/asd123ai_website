@@ -80,6 +80,7 @@ async function copyAndMinifyFiles() {
         'test-optimizer.html',
         'chat.html',
         'context.html',
+        'converter.html',
         'anonymizer.html',
         'anonymizer-guide.html',
         'chat-guide.html',

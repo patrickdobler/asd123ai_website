@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Context Estimator - AI Context Window Tool | ASD123.ai</title>
-    <meta name="description" content="Estimate the AI chat context window you need for pasted text or local TXT, DOCX, and PDF files. All processing runs in your browser.">
-    <meta name="keywords" content="context estimator, AI context window, token estimate, LLM context size, local file processing, Ollama context, LM Studio context">
+    <title>PDF & DOCX to Markdown Converter | ASD123.ai</title>
+    <meta name="description" content="Convert PDF and DOCX documents to clean Markdown locally in your browser. Files never leave your device.">
+    <meta name="keywords" content="pdf to markdown, docx to markdown, document converter, local converter, browser markdown converter, privacy-first">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="ASD123.ai Context Estimator">
-    <meta property="og:description" content="Estimate the minimum useful AI chat context window for text and documents. Files stay in your browser.">
+    <meta property="og:title" content="ASD123.ai PDF & DOCX to Markdown Converter">
+    <meta property="og:description" content="Convert PDF and DOCX documents to clean Markdown locally in your browser. Files never leave your device.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://asd123.ai/context">
+    <meta property="og:url" content="https://asd123.ai/converter">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
-    <link rel="canonical" href="https://asd123.ai/context">
+    <link rel="canonical" href="https://asd123.ai/converter">
     <link rel="icon" href="data:,">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="styles/components.css">
     <script src="scripts/shared.js"></script>
 </head>
-<body class="context-page">
+<body class="converter-page">
     <a href="#main" class="skip-to-main">Skip to main content</a>
 
     <div class="aurora-bg"></div>
@@ -72,48 +72,27 @@
             </nav>
         </header>
 
-        <main id="main" role="main" class="context-main">
-            <section class="page-header context-page-header" aria-labelledby="context-title">
+        <main id="main" role="main" class="converter-main">
+            <section class="page-header converter-page-header" aria-labelledby="converter-title">
                 <div class="header-top">
-                    <h1 id="context-title" class="page-title">Context Estimator</h1>
+                    <h1 id="converter-title" class="page-title">Markdown Converter</h1>
                 </div>
                 <p class="page-subtitle">
-                    Estimate which AI chat context window you should use for text or documents before loading a model in Ollama, LM Studio, or another local chat tool.
+                    Convert PDF and DOCX documents to clean Markdown directly in your browser. Files are parsed locally and never uploaded.
                 </p>
             </section>
 
-            <section class="context-shell" aria-label="Context estimator">
-                <div class="context-input-panel">
-                    <div class="context-panel-header">
+            <section class="converter-shell" aria-label="Document to Markdown converter">
+                <div class="converter-input-panel">
+                    <div class="converter-panel-header">
                         <div>
-                            <h2>Input</h2>
-                            <p>Paste text or load a local TXT, DOCX, or PDF file.</p>
-                        </div>
-                        <div class="context-actions">
-                            <button id="contextEstimateBtn" type="button" class="btn btn-primary btn-small">
-                                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18h18"/>
-                                    <path d="m19 9-5 5-4-4-3 3"/>
-                                </svg>
-                                Estimate
-                            </button>
-                            <button id="contextClearBtn" type="button" class="btn btn-secondary btn-small">
-                                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 6h18"/>
-                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                                </svg>
-                                Clear
-                            </button>
+                            <h2>Source document</h2>
+                            <p>Drop a PDF or DOCX file. The extraction and Markdown conversion run on this device.</p>
                         </div>
                     </div>
 
-                    <label class="sr-only" for="contextInput">Text to estimate</label>
-                    <textarea id="contextInput" class="context-textarea" spellcheck="false" autocomplete="off" placeholder="Paste text, a transcript, or document content here. The estimate updates locally."></textarea>
-                    <p id="contextMeta" class="context-meta">No text loaded yet.</p>
-
-                    <div id="contextDropzone" class="context-dropzone" aria-label="Upload a local TXT, DOCX, or PDF file">
-                        <div class="context-dropzone-icon" aria-hidden="true">
+                    <div id="converterDropzone" class="converter-dropzone" aria-label="Upload a local PDF or DOCX file">
+                        <div class="converter-dropzone-icon" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
                                 <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
@@ -123,61 +102,93 @@
                         </div>
                         <div>
                             <strong>Drop a document here</strong>
-                            <span>or choose a TXT, DOCX, or PDF file. Extraction happens locally in this browser.</span>
+                            <span>or choose a PDF or DOCX file. Conversion happens locally.</span>
                         </div>
-                        <button id="chooseContextFileBtn" type="button" class="btn btn-secondary btn-small">Choose file</button>
-                        <input id="contextFileInput" type="file" accept=".txt,.md,.markdown,.docx,.pdf" hidden>
+                        <button id="chooseConverterFileBtn" type="button" class="btn btn-secondary btn-small">Choose file</button>
+                        <input id="converterFileInput" type="file" accept=".pdf,.docx" hidden>
                     </div>
 
-                    <p id="contextFileStatus" class="context-file-status" data-tone="neutral">No file selected. Text and files are never uploaded.</p>
+                    <p id="converterFileStatus" class="converter-file-status" data-tone="neutral">No file selected. Documents stay on this device.</p>
+
+                    <div class="converter-settings">
+                        <div class="converter-setting">
+                            <span>PDF heading detection</span>
+                            <select id="converterHeadingMode" class="select-field">
+                                <option value="auto" selected>Auto (font size)</option>
+                                <option value="off">Off (plain paragraphs)</option>
+                            </select>
+                        </div>
+
+                        <div class="converter-toggle-grid">
+                            <label class="converter-toggle">
+                                <input type="checkbox" id="converterPreserveFormatting" checked>
+                                <span class="converter-toggle-label">
+                                    <strong>Preserve bold &amp; italic</strong>
+                                    <small>DOCX only. Mirrors inline styles as Markdown.</small>
+                                </span>
+                            </label>
+                            <label class="converter-toggle">
+                                <input type="checkbox" id="converterKeepTables" checked>
+                                <span class="converter-toggle-label">
+                                    <strong>Convert tables</strong>
+                                    <small>Render DOCX tables as Markdown tables.</small>
+                                </span>
+                            </label>
+                            <label class="converter-toggle">
+                                <input type="checkbox" id="converterKeepLinks" checked>
+                                <span class="converter-toggle-label">
+                                    <strong>Keep hyperlinks</strong>
+                                    <small>Use the Markdown link syntax for URLs.</small>
+                                </span>
+                            </label>
+                            <label class="converter-toggle">
+                                <input type="checkbox" id="converterCollapseWhitespace" checked>
+                                <span class="converter-toggle-label">
+                                    <strong>Collapse extra whitespace</strong>
+                                    <small>Remove repeated blank lines and stray spaces.</small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
-                <aside class="context-results-panel" aria-label="Context recommendation">
-                    <div class="context-settings">
-                        <label class="context-setting">
-                            <span>Model profile</span>
-                            <select id="contextProfileSelect" class="select-field">
-                                <option value="generic">Generic LLM</option>
-                                <option value="llama">Llama / Mistral</option>
-                                <option value="qwen">Qwen</option>
-                                <option value="gemma">Gemma</option>
-                                <option value="gpt">GPT-style</option>
-                            </select>
-                        </label>
-
-                        <label class="context-setting context-reserve-setting">
-                            <span>Reserve for answer and reasoning <strong id="contextReserveValue">35%</strong></span>
-                            <input id="contextReserveInput" type="range" min="15" max="60" step="5" value="35">
-                        </label>
-                    </div>
-
-                    <div class="context-metrics-grid">
-                        <div class="context-metric">
-                            <span>Estimated input</span>
-                            <strong id="contextInputTokens">0</strong>
-                            <small>tokens incl. overhead</small>
+                <aside class="converter-output-panel" aria-label="Markdown output">
+                    <div class="converter-panel-header">
+                        <div>
+                            <h2>Markdown output</h2>
+                            <p>Preview the rendered Markdown or copy the raw text for your tools.</p>
                         </div>
-                        <div class="context-metric">
-                            <span>Reserve</span>
-                            <strong id="contextReserveTokens">35%</strong>
-                            <small>answer/system budget</small>
+                        <div class="converter-actions">
+                            <button id="converterCopyBtn" type="button" class="btn btn-secondary btn-small" disabled>
+                                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                                </svg>
+                                Copy
+                            </button>
+                            <button id="converterDownloadBtn" type="button" class="btn btn-primary btn-small" disabled>
+                                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Download .md
+                            </button>
                         </div>
                     </div>
 
-                    <div class="context-table-wrap">
-                        <table class="context-table">
-                            <caption>Context window comparison</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Window</th>
-                                    <th scope="col">Usable tokens</th>
-                                    <th scope="col">Fit</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contextTableBody"></tbody>
-                        </table>
+                    <div class="converter-view-toggle" role="tablist" aria-label="Output view">
+                        <button id="converterViewMarkdown" type="button" class="converter-view-btn converter-view-btn--active" role="tab" aria-selected="true">Raw Markdown</button>
+                        <button id="converterViewPreview" type="button" class="converter-view-btn" role="tab" aria-selected="false">Preview</button>
                     </div>
 
+                    <div class="converter-output-stage">
+                        <label class="sr-only" for="converterOutput">Markdown output</label>
+                        <textarea id="converterOutput" class="converter-textarea" spellcheck="false" autocomplete="off" readonly placeholder="Markdown will appear here after a document is converted."></textarea>
+                        <div id="converterPreview" class="converter-preview" hidden aria-live="polite"></div>
+                    </div>
+
+                    <p id="converterMeta" class="converter-meta">No document converted yet.</p>
                 </aside>
             </section>
         </main>
@@ -219,6 +230,6 @@
         </footer>
     </div>
 
-    <script type="module" src="scripts/context.js"></script>
+    <script type="module" src="scripts/converter.js"></script>
 </body>
 </html>

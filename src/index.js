@@ -6,6 +6,7 @@ const redirects = {
   '/anonymizer.html': '/anonymizer',
   '/chat.html': '/chat',
   '/context.html': '/context',
+  '/converter.html': '/converter',
   '/documentation.html': '/documentation',
   '/about.html': '/about',
   '/contact.html': '/contact',
@@ -23,6 +24,7 @@ const cleanUrls = {
   '/anonymizer': '/anonymizer.html',
   '/chat': '/chat.html',
   '/context': '/context.html',
+  '/converter': '/converter.html',
   '/documentation': '/documentation.html',
   '/about': '/about.html',
   '/contact': '/contact.html',
@@ -100,6 +102,22 @@ Use this skill when an agent needs to help a user estimate an AI chat context wi
 ## Privacy
 
 Pasted text and uploaded file contents remain in the user's browser. The tool does not upload documents or store extracted text in server-side storage.
+`,
+  'converter': `# ASD123.ai Markdown Converter
+
+Use this skill when an agent needs to help a user convert PDF or DOCX documents to Markdown with the ASD123.ai browser converter.
+
+## Capabilities
+
+- Convert PDF files to Markdown using pdf.js text extraction with font-size heading detection
+- Convert DOCX files to Markdown via mammoth.js style mapping
+- Preserve bold, italic, links, lists, and tables for DOCX sources
+- Toggle heading detection and whitespace collapsing
+- Copy or download the resulting Markdown as a .md file
+
+## Privacy
+
+PDF and DOCX files are parsed entirely in the user's browser. Documents and generated Markdown remain on the user's device and are not transmitted to ASD123.ai.
 `
 };
 
@@ -137,7 +155,9 @@ async function agentSkillsIndex() {
         ? 'Chat with local WebGPU models in the ASD123.ai browser chat tool.'
         : name === 'context'
           ? 'Estimate AI chat context windows locally with the ASD123.ai Context Estimator.'
-          : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
+          : name === 'converter'
+            ? 'Convert PDF and DOCX documents to Markdown locally with the ASD123.ai Markdown Converter.'
+            : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
     url: `${SITE_ORIGIN}/.well-known/agent-skills/${name}/SKILL.md`,
     digest: await sha256Digest(content)
   })));
