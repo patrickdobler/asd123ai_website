@@ -8,12 +8,12 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>Markdown Converter Guide - ASD123.ai Documentation</title>
-    <meta name="description" content="Learn how to convert PDF and DOCX documents to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.">
+    <meta name="description" content="Learn how to convert PDF, DOCX, PPTX, Excel, CSV, and HTML files to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.">
     <meta name="keywords" content="markdown converter guide, pdf to markdown, docx to markdown, local document converter, browser markdown tool">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="ASD123.ai Markdown Converter Guide">
-    <meta property="og:description" content="A practical guide to converting PDF and DOCX files to Markdown directly in your browser.">
+    <meta property="og:description" content="A practical guide to converting PDF, DOCX, PPTX, Excel, CSV, and HTML files to Markdown directly in your browser.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://asd123.ai/converter-guide">
     <meta property="og:site_name" content="ASD123.ai">
@@ -29,7 +29,7 @@
     <meta property="og:image" content="https://asd123.ai/logo.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Markdown Converter Guide - ASD123.ai Documentation">
-    <meta name="twitter:description" content="Learn how to convert PDF and DOCX documents to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.">
+    <meta name="twitter:description" content="Learn how to convert PDF, DOCX, PPTX, Excel, CSV, and HTML files to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.">
     <meta name="twitter:image" content="https://asd123.ai/logo.png">
     <script type="application/ld+json">
     {
@@ -63,7 +63,7 @@
           "@type": "TechArticle",
           "@id": "https://asd123.ai/converter-guide#article",
           "headline": "Markdown Converter Guide - ASD123.ai Documentation",
-          "description": "Learn how to convert PDF and DOCX documents to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.",
+          "description": "Learn how to convert PDF, DOCX, PPTX, Excel, CSV, and HTML files to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.",
           "url": "https://asd123.ai/converter-guide",
           "image": "https://asd123.ai/logo.png",
           "inLanguage": "en",
@@ -142,7 +142,7 @@
                             </a>
                             <a href="converter.html" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Markdown Converter</span>
-                                <span class="nav-tool-description">Turn PDF and DOCX files into Markdown.</span>
+                                <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
                             </a>
                             <a href="tts.html" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Text to Speech</span>
@@ -160,7 +160,7 @@
             <div class="page-header">
                 <h1 class="page-title">Markdown Converter Guide</h1>
                 <p class="page-subtitle">
-                    Turn PDF and DOCX documents into clean Markdown without ever uploading them. Everything runs in your browser.
+                    Turn PDF, DOCX, PPTX, Excel, CSV, and HTML documents into clean Markdown without ever uploading them. Everything runs in your browser.
                 </p>
             </div>
 
@@ -187,7 +187,7 @@
                         </h3>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
-                                Markdown Converter reads PDF and DOCX files directly in your browser and turns them into clean Markdown. PDF text is extracted with pdf.js, DOCX is parsed with mammoth.js, and both are translated into plain Markdown headings, lists, links, and tables.
+                                Markdown Converter reads PDF, DOCX, PPTX, Excel (XLSX/XLS), CSV, and HTML files directly in your browser and turns them into clean Markdown. PDF uses pdf.js (or the high-accuracy engines), DOCX uses mammoth.js, spreadsheets use SheetJS, PPTX is read with JSZip, and HTML is converted with a built-in renderer — all translated into Markdown headings, lists, links, and tables.
                             </p>
                             <p class="leading-relaxed">
                                 The tool is built for the same workflows the rest of ASD123.ai targets: feeding documents into local AI chats, preparing snippets for the Optimizer or Anonymizer, or simply archiving content in a portable text format.
@@ -209,7 +209,7 @@
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">1</div>
                                 <div>
                                     <h4 class="font-bold text-[var(--text-primary)] mb-1">Pick a document</h4>
-                                    <p class="text-sm">Drag a PDF or DOCX into the drop area, or use the Choose file button. With the OCR engine you can also drop image files (PNG, JPG, WebP, BMP). The maximum size is 25&nbsp;MB.</p>
+                                    <p class="text-sm">Drag a PDF, DOCX, PPTX, Excel/CSV, or HTML file into the drop area, or use the Choose file button. With the OCR engine you can also drop image files (PNG, JPG, WebP, BMP). The maximum size is 25&nbsp;MB.</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
@@ -241,6 +241,18 @@
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">DOCX</h4>
                                 <p class="text-sm">Parsed with mammoth.js. Word styles such as Title, Heading 1–6, and Quote are mapped to the matching Markdown elements. Bold, italic, links, lists, and tables are preserved.</p>
+                            </div>
+                            <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                <h4 class="font-bold text-[var(--text-primary)] mb-2">PowerPoint (PPTX)</h4>
+                                <p class="text-sm">Read with JSZip. Each slide becomes its own section (<code>## Slide N</code>) with its text as bullet points, in slide order. Text only — images and animations are not included.</p>
+                            </div>
+                            <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Excel &amp; CSV (XLSX, XLS, CSV)</h4>
+                                <p class="text-sm">Parsed with SheetJS. Each worksheet becomes a Markdown table; multi-sheet workbooks get a <code>## Sheet name</code> heading per sheet. CSV is read as UTF-8.</p>
+                            </div>
+                            <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                <h4 class="font-bold text-[var(--text-primary)] mb-2">HTML</h4>
+                                <p class="text-sm">Converted with a built-in renderer. Scripts, styles, and page chrome are stripped; headings, lists, links, and tables become clean Markdown. Prefers <code>&lt;main&gt;</code>/<code>&lt;article&gt;</code> content when present.</p>
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">Images &amp; scanned PDFs <span class="text-xs font-normal text-[var(--text-secondary)]">(OCR engine)</span></h4>
@@ -323,10 +335,22 @@
                                                 <td class="p-3 border-b border-[var(--border-color)]"><a href="https://github.com/PaddlePaddle/PaddleOCR" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
                                             </tr>
                                             <tr>
-                                                <td class="p-3">mammoth.js</td>
-                                                <td class="p-3">DOCX</td>
-                                                <td class="p-3">1.12.0</td>
-                                                <td class="p-3"><a href="https://github.com/mwilliamson/mammoth.js" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">mammoth.js</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">DOCX</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">1.12.0</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]"><a href="https://github.com/mwilliamson/mammoth.js" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="p-3 border-b border-[var(--border-color)]">SheetJS (xlsx)</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">XLSX, XLS, CSV</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">0.20.3</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]"><a href="https://github.com/SheetJS/sheetjs" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="p-3">JSZip</td>
+                                                <td class="p-3">PPTX (reads slide XML)</td>
+                                                <td class="p-3">3.10.1</td>
+                                                <td class="p-3"><a href="https://github.com/Stuk/jszip" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
                                             </tr>
                                         </tbody>
                                     </table>

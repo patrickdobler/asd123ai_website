@@ -7,13 +7,13 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <title>PDF & DOCX to Markdown Converter | ASD123.ai</title>
-    <meta name="description" content="Convert PDF, DOCX, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
-    <meta name="keywords" content="pdf to markdown, docx to markdown, document converter, local converter, browser markdown converter, privacy-first">
+    <title>Document to Markdown Converter (PDF, DOCX, PPTX, Excel, HTML) | ASD123.ai</title>
+    <meta name="description" content="Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
+    <meta name="keywords" content="pdf to markdown, docx to markdown, pptx to markdown, excel to markdown, xlsx to markdown, csv to markdown, html to markdown, document converter, local converter, privacy-first">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="ASD123.ai PDF & DOCX to Markdown Converter">
-    <meta property="og:description" content="Convert PDF, DOCX, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
+    <meta property="og:title" content="ASD123.ai Document to Markdown Converter">
+    <meta property="og:description" content="Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/converter">
     <meta property="og:site_name" content="ASD123.ai">
@@ -27,8 +27,8 @@
     <script src="scripts/shared.js"></script>
     <meta property="og:image" content="https://asd123.ai/logo.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="PDF &amp; DOCX to Markdown Converter | ASD123.ai">
-    <meta name="twitter:description" content="Convert PDF, DOCX, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
+    <meta name="twitter:title" content="Document to Markdown Converter | ASD123.ai">
+    <meta name="twitter:description" content="Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
     <meta name="twitter:image" content="https://asd123.ai/logo.png">
     <script type="application/ld+json">
     {
@@ -61,9 +61,9 @@
         {
           "@type": "WebApplication",
           "@id": "https://asd123.ai/converter#app",
-          "name": "Markdown Converter — ASD123.ai",
+          "name": "Document to Markdown Converter — ASD123.ai",
           "url": "https://asd123.ai/converter",
-          "description": "Convert PDF, DOCX, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.",
+          "description": "Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.",
           "applicationCategory": "UtilitiesApplication",
           "operatingSystem": "Web browser",
           "browserRequirements": "Requires JavaScript; on-device AI features require WebGPU",
@@ -124,7 +124,7 @@
                             </a>
                             <a href="converter.html" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Markdown Converter</span>
-                                <span class="nav-tool-description">Turn PDF and DOCX files into Markdown.</span>
+                                <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
                             </a>
                             <a href="tts.html" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Text to Speech</span>
@@ -144,7 +144,7 @@
                     <h1 id="converter-title" class="page-title">Markdown Converter</h1>
                 </div>
                 <p class="page-subtitle">
-                    Convert PDF, DOCX, and image files to clean Markdown directly in your browser, with optional OCR for scanned documents. Files are parsed locally and never uploaded.
+                    Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown directly in your browser, with optional OCR for scanned documents. Files are parsed locally and never uploaded.
                 </p>
             </section>
 
@@ -153,7 +153,7 @@
                     <div class="converter-panel-header">
                         <div>
                             <h2>Source document</h2>
-                            <p>Drop a PDF, DOCX, or image file. The extraction and Markdown conversion run on this device.</p>
+                            <p>Drop a PDF, DOCX, PPTX, Excel/CSV, HTML, or image file. The extraction and Markdown conversion run on this device.</p>
                         </div>
                     </div>
 
@@ -169,10 +169,10 @@
                             </div>
                             <div>
                                 <strong>Drop a document here</strong>
-                                <span>or choose a PDF or DOCX file (plus images with the OCR engine). Conversion happens locally.</span>
+                                <span>or choose a PDF, DOCX, PPTX, XLSX/XLS, CSV, or HTML file (plus images with the OCR engine). Conversion happens locally.</span>
                             </div>
                             <button id="chooseConverterFileBtn" type="button" class="btn btn-secondary btn-small">Choose file</button>
-                            <input id="converterFileInput" type="file" accept=".pdf,.docx" hidden>
+                            <input id="converterFileInput" type="file" accept=".pdf,.docx,.pptx,.xlsx,.xls,.csv,.html,.htm,.png,.jpg,.jpeg,.webp,.bmp" hidden>
                         </div>
 
                         <div class="converter-engine-card">

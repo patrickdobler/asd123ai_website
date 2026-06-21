@@ -41,6 +41,22 @@ async function loadMammoth() {
     return window.mammoth;
 }
 
+// SheetJS — reads XLSX/XLS/CSV. Lazy-loaded on first spreadsheet conversion.
+async function loadSheetJs() {
+    if (!window.XLSX) {
+        await loadExternalScript('vendor/xlsx.full.min.js');
+    }
+    return window.XLSX;
+}
+
+// JSZip — PPTX is a ZIP of XML; used to read the slide parts. Lazy-loaded.
+async function loadJSZip() {
+    if (!window.JSZip) {
+        await loadExternalScript('vendor/jszip.min.js');
+    }
+    return window.JSZip;
+}
+
 let pdfjsModulePromise = null;
 async function loadPdfJs() {
     if (!pdfjsModulePromise) {
@@ -793,6 +809,125 @@ class DocxToMarkdown {
     }
 }
 
+// Build a GitHub-flavoured Markdown table from an array-of-arrays (sheet rows).
+function aoaToMarkdownTable(rows) {
+    const clean = (rows || []).filter(row => Array.isArray(row));
+    if (!clean.length) return '';
+    const width = Math.max(1, ...clean.map(row => row.length));
+    const cell = value => String(value ?? '').replace(/\r?\n/g, ' ').replace(/\|/g, '\\|').trim();
+    const pad = row => Array.from({ length: width }, (_, i) => cell(row[i]));
+    const header = pad(clean[0]).map((text, i) => text || `Column ${i + 1}`);
+    const line = cells => `| ${cells.join(' | ')} |`;
+    const out = [line(header), line(header.map(() => '---'))];
+    for (const row of clean.slice(1)) out.push(line(pad(row)));
+    return out.join('\n');
+}
+
+// HTML files: clean the document, then reuse the shared HTML→Markdown renderer.
+class HtmlFileToMarkdown {
+    constructor(options = {}) {
+        this.options = options;
+    }
+
+    async convert(file, statusCallback) {
+        const setStatus = statusCallback || (() => {});
+        setStatus('Reading HTML locally...');
+        const text = await file.text();
+        const doc = new DOMParser().parseFromString(text, 'text/html');
+        doc.querySelectorAll('script, style, noscript, template, svg, iframe, head').forEach(el => el.remove());
+        const root = doc.querySelector('main') || doc.querySelector('article') || doc.body || doc.documentElement;
+        const html = root ? root.innerHTML : text;
+        const markdown = new HtmlToMarkdown({
+            preserveFormatting: this.options.preserveFormatting,
+            keepTables: this.options.keepTables,
+            keepLinks: this.options.keepLinks
+        }).convert(html);
+        if (!markdown.trim()) {
+            throw new Error('No readable content was found in this HTML file.');
+        }
+        return this.options.collapseWhitespace ? collapseWhitespace(markdown) : markdown.trim();
+    }
+}
+
+// Spreadsheets (XLSX/XLS/CSV): one Markdown table per sheet.
+class XlsxToMarkdown {
+    constructor(options = {}) {
+        this.options = options;
+    }
+
+    async convert(file, statusCallback) {
+        const setStatus = statusCallback || (() => {});
+        setStatus('Loading spreadsheet reader...');
+        const XLSX = await loadSheetJs();
+        setStatus('Reading spreadsheet locally...');
+        // CSV: decode as UTF-8 text first (reading raw bytes mis-detects the
+        // codepage and mangles accents). XLSX/XLS: read the binary directly.
+        const workbook = /\.csv$/i.test(file.name)
+            ? XLSX.read(await file.text(), { type: 'string' })
+            : XLSX.read(new Uint8Array(await file.arrayBuffer()), { type: 'array' });
+        const multiSheet = workbook.SheetNames.length > 1;
+        const parts = [];
+        for (const name of workbook.SheetNames) {
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[name], { header: 1, blankrows: false, defval: '' });
+            const table = aoaToMarkdownTable(rows);
+            if (!table) continue;
+            parts.push(multiSheet ? `## ${name}\n\n${table}` : table);
+        }
+        if (!parts.length) {
+            throw new Error('No readable cells were found in this spreadsheet.');
+        }
+        const markdown = parts.join('\n\n');
+        return this.options.collapseWhitespace ? collapseWhitespace(markdown) : markdown.trim();
+    }
+}
+
+// PowerPoint (PPTX): a ZIP of XML; extract slide text in order, one section per slide.
+class PptxToMarkdown {
+    constructor(options = {}) {
+        this.options = options;
+    }
+
+    async convert(file, statusCallback) {
+        const setStatus = statusCallback || (() => {});
+        setStatus('Loading PPTX reader...');
+        const JSZip = await loadJSZip();
+        setStatus('Reading PPTX locally...');
+        const zip = await JSZip.loadAsync(await file.arrayBuffer());
+        const slideNum = path => {
+            const match = path.match(/slide(\d+)\.xml$/);
+            return match ? parseInt(match[1], 10) : 0;
+        };
+        const slidePaths = Object.keys(zip.files)
+            .filter(path => /^ppt\/slides\/slide\d+\.xml$/.test(path))
+            .sort((a, b) => slideNum(a) - slideNum(b));
+        if (!slidePaths.length) {
+            throw new Error('No slides were found in this PPTX file.');
+        }
+        const parts = [];
+        for (let i = 0; i < slidePaths.length; i++) {
+            const xml = await zip.files[slidePaths[i]].async('string');
+            const body = this.slideToMarkdown(xml);
+            parts.push(`## Slide ${i + 1}${body ? `\n\n${body}` : ''}`);
+        }
+        const markdown = parts.join('\n\n');
+        return this.options.collapseWhitespace ? collapseWhitespace(markdown) : markdown.trim();
+    }
+
+    slideToMarkdown(xml) {
+        const doc = new DOMParser().parseFromString(xml, 'application/xml');
+        const lines = [];
+        for (const paragraph of Array.from(doc.getElementsByTagName('a:p'))) {
+            const text = Array.from(paragraph.getElementsByTagName('a:t'))
+                .map(node => node.textContent)
+                .join('')
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (text) lines.push(`- ${text}`);
+        }
+        return lines.join('\n');
+    }
+}
+
 class MarkdownPreviewRenderer {
     render(markdown) {
         const escaped = escapeHtml(markdown).replace(/\r\n/g, '\n');
@@ -1106,8 +1241,9 @@ class ConverterApp {
     validate(file) {
         const ext = fileExtension(file.name);
         const isImage = OCR_IMAGE_EXTENSIONS.includes(ext);
-        if (!['pdf', 'docx'].includes(ext) && !isImage) {
-            throw new Error(`${file.name} is not supported. Use a PDF, DOCX, or image file.`);
+        const supported = ['pdf', 'docx', 'pptx', 'xlsx', 'xls', 'csv', 'html', 'htm'];
+        if (!supported.includes(ext) && !isImage) {
+            throw new Error(`${file.name} is not supported. Use PDF, DOCX, PPTX, XLSX, CSV, HTML, or an image file.`);
         }
         if (isImage && this.currentEngine() !== 'ocr') {
             throw new Error(`Image files need the OCR engine. Select "OCR (scanned PDFs & images)" first.`);
@@ -1173,6 +1309,15 @@ class ConverterApp {
             } else if (ext === 'docx') {
                 const docxConverter = new DocxToMarkdown(options);
                 markdown = await docxConverter.convert(file, message => this.setStatus(message, 'working'));
+            } else if (ext === 'html' || ext === 'htm') {
+                markdown = await new HtmlFileToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
+                engineNote = ' · HTML';
+            } else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
+                markdown = await new XlsxToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
+                engineNote = ` · ${ext.toUpperCase()}`;
+            } else if (ext === 'pptx') {
+                markdown = await new PptxToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
+                engineNote = ' · PPTX';
             }
             this.engineNote = engineNote;
 
