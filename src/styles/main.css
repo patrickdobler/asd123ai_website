@@ -1,0 +1,409 @@
+/* ASD123 AI Text Tools - E Ink Paper Style */
+
+:root {
+    /* E Ink Color Palette - Paper-like grayscale with improved contrast */
+    --bg-color: #e4e4dc;
+    --paper-texture: #f0f0e8;
+    --glass-bg: rgba(240, 240, 232, 0.9);
+    --border-color: rgba(60, 60, 60, 0.3);
+    --primary-color: #1a1a1a;
+    --secondary-color: #2a2a2a;
+    --text-primary: #0a0a0a;
+    --text-secondary: #3a3a3a;
+    --highlight-color: #000000;
+    --shadow-subtle: rgba(0, 0, 0, 0.12);
+    --eink-refresh: rgba(0, 0, 0, 0.03);
+
+    /* Semantic status tones (WCAG AA on paper surfaces) */
+    --tone-good: #28734d;
+    --tone-warning: #8a5a00;
+    --tone-danger: #9b2f2f;
+    --tone-good-soft: rgba(40, 115, 77, 0.11);
+    --tone-warning-soft: rgba(138, 90, 0, 0.12);
+    --tone-danger-soft: rgba(155, 47, 47, 0.12);
+
+    /* Enhanced Semantic Colors */
+    --hover-bg: rgba(10, 10, 10, 0.04);
+    --active-bg: rgba(10, 10, 10, 0.08);
+    --focus-ring: rgba(10, 10, 10, 0.15);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.16);
+
+    /* Spacing Scale (4px base) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-24: 96px;
+
+    /* Typography Scale */
+    --text-5xl: 56px;
+    --text-4xl: 40px;
+    --text-3xl: 32px;
+    --text-2xl: 24px;
+    --text-xl: 20px;
+    --text-lg: 18px;
+    --text-base: 16px;
+    --text-sm: 14px;
+    --text-xs: 12px;
+    
+    /* Additional Spacing for E-Ink Design */
+    --border-radius: 8px;
+    --border-radius-sm: 6px;
+    --border-radius-xs: 4px;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode Colors - Inverted E Ink Palette */
+    --bg-color: #111111;
+    --paper-texture: #1a1a1a;
+    --glass-bg: rgba(30, 30, 30, 0.95);
+    --border-color: rgba(255, 255, 255, 0.2);
+    --primary-color: #ffffff;
+    --secondary-color: #e4e4dc;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --highlight-color: #ffffff;
+    --shadow-subtle: rgba(0, 0, 0, 0.5);
+    --eink-refresh: rgba(255, 255, 255, 0.05);
+
+    /* Semantic status tones (lightened for dark surfaces) */
+    --tone-good: #7ac9a0;
+    --tone-warning: #e0b15e;
+    --tone-danger: #ef8d8d;
+    --tone-good-soft: rgba(122, 201, 160, 0.14);
+    --tone-warning-soft: rgba(224, 177, 94, 0.14);
+    --tone-danger-soft: rgba(239, 141, 141, 0.14);
+
+    /* Enhanced Semantic Colors */
+    --hover-bg: rgba(255, 255, 255, 0.15);
+    --active-bg: rgba(255, 255, 255, 0.2);
+    --focus-ring: rgba(255, 255, 255, 0.4);
+    
+    /* Shadows need to be more subtle or different in dark mode */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.7);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* E Ink Paper Background - Subtle texture */
+.aurora-bg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200vw;
+    height: 200vh;
+    z-index: 0;
+    background-image:
+        radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.015) 0%, transparent 50%);
+    filter: blur(40px);
+    overflow: hidden;
+}
+
+/* E Ink Paper Components - Matte finish with E Ink characteristics */
+.liquid-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    border-radius: 0.5rem;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 1px 4px 0 var(--shadow-subtle), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    transition: all 0.2s ease-in-out;
+}
+
+.liquid-glass:hover {
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+    border-color: rgba(60, 60, 60, 0.35);
+    background: rgba(242, 242, 234, 0.92);
+}
+
+/* Typography - E Ink readable text with strong contrast */
+.text-gradient {
+    color: var(--text-primary);
+    background: none;
+    -webkit-text-fill-color: var(--text-primary);
+}
+
+.main-title {
+    line-height: 1.1;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem !important;
+    overflow: visible;
+    display: block;
+}
+
+.text-primary {
+    color: var(--text-primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Skip to Main Link */
+.skip-to-main {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: var(--space-3) var(--space-4);
+    background: var(--text-primary);
+    color: var(--paper-texture);
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.skip-to-main:focus {
+    left: 50%;
+    transform: translateX(-50%);
+    top: var(--space-4);
+}
+
+/* Buttons - E Ink matte style */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+}
+
+.btn--primary {
+    background: var(--text-primary);
+    color: var(--paper-texture);
+    box-shadow: 0 2px 6px var(--shadow-subtle);
+    border-color: var(--text-primary);
+}
+
+.btn--primary:hover {
+    background: var(--highlight-color);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    border-color: var(--highlight-color);
+}
+
+/* Navigation */
+.nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link--active {
+    color: var(--text-primary);
+}
+
+/* Form Controls - E Ink paper style */
+.form-control {
+    background: rgba(255, 255, 255, 0.7);
+    border: 2px solid var(--border-color);
+    border-radius: 0.25rem;
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+/* Utility Classes */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.container--narrow {
+    max-width: 800px;
+}
+
+.container--wide {
+    max-width: 1400px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .aurora-bg {
+        width: 250vw;
+        height: 250vh;
+    }
+    
+    body {
+        font-size: 16px;
+        line-height: 1.7;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .aurora-bg {
+        animation: none;
+    }
+    
+    .liquid-glass,
+    .btn,
+    .nav-link {
+        transition: none;
+    }
+}
+
+/* ========================================
+   DARK THEME BASE STYLE OVERRIDES
+   ======================================== */
+
+/* Dark Theme: Aurora Background */
+[data-theme="dark"] .aurora-bg {
+    background-image:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.01) 0%, transparent 50%);
+}
+
+/* Dark Theme: Liquid Glass */
+[data-theme="dark"] .liquid-glass {
+    background: var(--glass-bg);
+    border-color: var(--border-color);
+    box-shadow: 0 1px 4px 0 var(--shadow-subtle), inset 0 1px 2px rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .liquid-glass:hover {
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(50, 50, 50, 0.95);
+}
+
+/* Dark Theme: Primary Button */
+[data-theme="dark"] .btn--primary {
+    background: var(--text-primary);
+    color: var(--bg-color);
+    border-color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn--primary:hover {
+    background: #e0e0e0;
+    color: var(--bg-color);
+    border-color: #e0e0e0;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .btn--primary:active {
+    background: #cccccc;
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1);
+}
+
+/* Dark Theme: Form Controls */
+[data-theme="dark"] .form-control {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus {
+    border-color: var(--text-primary);
+    background: rgba(40, 40, 40, 0.9);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+/* Dark Theme: Skip to Main Link */
+[data-theme="dark"] .skip-to-main {
+    background: var(--text-primary);
+    color: var(--bg-color);
+}
+
+/* Dark Theme: Scrollbar styling */
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Dark Theme: Selection highlight */
+[data-theme="dark"] ::selection {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] ::-moz-selection {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--text-primary);
+}
+
+/* ========== END DARK THEME BASE OVERRIDES ========== */

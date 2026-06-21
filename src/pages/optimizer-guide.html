@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <title>Optimizer User Guide - ASD123.ai</title>
+    <meta name="description" content="Current user guide for the ASD123.ai Optimizer. Learn how to clean AI-generated text locally in your browser.">
+    <meta name="keywords" content="optimizer guide, text cleaning, AI text processing, markdown cleanup, citation removal, language mapping">
+    <meta name="author" content="ASD123.ai">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Optimizer User Guide - ASD123.ai">
+    <meta property="og:description" content="Current user guide for the ASD123.ai Optimizer. Learn how to clean AI-generated text locally in your browser.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://asd123.ai/optimizer-guide">
+    <meta property="og:site_name" content="ASD123.ai">
+    <link rel="canonical" href="https://asd123.ai/optimizer-guide">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="styles/main.css" rel="stylesheet">
+    <link href="styles/components.css" rel="stylesheet">
+    <script src="scripts/shared.js"></script>
+    <meta property="og:image" content="https://asd123.ai/logo.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Optimizer User Guide - ASD123.ai">
+    <meta name="twitter:description" content="Current user guide for the ASD123.ai Optimizer. Learn how to clean AI-generated text locally in your browser.">
+    <meta name="twitter:image" content="https://asd123.ai/logo.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://asd123.ai/#organization",
+          "name": "ASD123.ai",
+          "url": "https://asd123.ai/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://asd123.ai/logo.png"
+          },
+          "sameAs": [
+            "https://github.com/patrickdobler/asd123.ai"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://asd123.ai/#website",
+          "url": "https://asd123.ai/",
+          "name": "ASD123.ai",
+          "description": "Privacy-first AI text tools that run entirely in your browser.",
+          "publisher": {
+            "@id": "https://asd123.ai/#organization"
+          },
+          "inLanguage": "en"
+        },
+        {
+          "@type": "TechArticle",
+          "@id": "https://asd123.ai/optimizer-guide#article",
+          "headline": "Optimizer User Guide - ASD123.ai",
+          "description": "Current user guide for the ASD123.ai Optimizer. Learn how to clean AI-generated text locally in your browser.",
+          "url": "https://asd123.ai/optimizer-guide",
+          "image": "https://asd123.ai/logo.png",
+          "inLanguage": "en",
+          "author": {
+            "@id": "https://asd123.ai/#organization"
+          },
+          "publisher": {
+            "@id": "https://asd123.ai/#organization"
+          },
+          "mainEntityOfPage": "https://asd123.ai/optimizer-guide"
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://asd123.ai/optimizer-guide#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://asd123.ai/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Documentation",
+              "item": "https://asd123.ai/documentation"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Optimizer Guide",
+              "item": "https://asd123.ai/optimizer-guide"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+<body class="bg-[var(--bg-color)] text-[var(--text-primary)] min-h-screen">
+    <div class="relative overflow-hidden">
+        <div class="aurora-bg"></div>
+        <div class="relative z-10 flex flex-col min-h-screen">
+            <header>
+                <nav role="navigation" aria-label="Main navigation">
+                    <a href="index.html" class="logo-link" aria-label="ASD123.ai Home">
+                        <span class="logo-text">ASD123.ai</span>
+                    </a>
+
+                    <div class="nav-links">
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                            <a href="context.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Context Estimator</span>
+                                <span class="nav-tool-description">Estimate useful LLM context size.</span>
+                            </a>
+                            <a href="converter.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Markdown Converter</span>
+                                <span class="nav-tool-description">Turn PDF and DOCX files into Markdown.</span>
+                            </a>
+                            <a href="tts.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Text to Speech</span>
+                                <span class="nav-tool-description">Generate speech locally from text.</span>
+                            </a>
+                        </div>
+                    </div>
+                    <a href="documentation.html" class="nav-link">Documentation</a>
+                    <a href="about.html" class="nav-link">About</a>
+                </div>
+                </nav>
+            </header>
+
+            <main class="flex-grow container mx-auto px-6 py-8 md:py-12">
+                <div class="page-header">
+                    <h1 class="page-title">Optimizer User Guide</h1>
+                    <p class="page-subtitle">
+                        Clean, normalize, and adapt generated text locally in your browser.
+                    </p>
+                </div>
+
+                <div class="max-w-6xl mx-auto">
+                    <div class="liquid-glass p-8 md:p-12">
+                        <div class="mb-12 p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h3>
+                            <div class="grid md:grid-cols-2 gap-3 text-sm">
+                                <a href="#overview" class="text-[var(--primary-color)] hover:underline">→ Overview</a>
+                                <a href="#workflow" class="text-[var(--primary-color)] hover:underline">→ Basic Workflow</a>
+                                <a href="#target-system" class="text-[var(--primary-color)] hover:underline">→ Target System</a>
+                                <a href="#language-mapping" class="text-[var(--primary-color)] hover:underline">→ Language Mapping</a>
+                                <a href="#processing-options" class="text-[var(--primary-color)] hover:underline">→ Processing Options</a>
+                                <a href="#common-presets" class="text-[var(--primary-color)] hover:underline">→ Common Presets</a>
+                                <a href="#privacy" class="text-[var(--primary-color)] hover:underline">→ Privacy</a>
+                                <a href="#tips" class="text-[var(--primary-color)] hover:underline">→ Tips</a>
+                            </div>
+                        </div>
+
+                        <div id="overview" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">1.</span> Overview
+                            </h3>
+                            <div class="space-y-4 text-[var(--text-secondary)]">
+                                <p class="leading-relaxed">
+                                    The Optimizer cleans AI-generated or copied text without sending it to a server. It is useful for removing Markdown, citations, fancy Unicode, bad encoding artifacts, inconsistent spaces, and region-specific character issues.
+                                </p>
+                                <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
+                                    <p class="text-sm text-[var(--text-secondary)]">
+                                        <strong class="text-[var(--text-primary)]">Always local:</strong> The Optimizer runs in browser JavaScript. Only preferences such as selected language and enabled options are saved locally.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="workflow" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">2.</span> Basic Workflow
+                            </h3>
+                            <div class="space-y-6 text-[var(--text-secondary)]">
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">1</div>
+                                    <div>
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-1">Paste text</h4>
+                                        <p class="text-sm">Paste generated text, copied web content, or text with encoding issues into the input area.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">2</div>
+                                    <div>
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-1">Choose target system and options</h4>
+                                        <p class="text-sm">Select a target system, choose a language mapping, then enable only the cleanup options you need.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">3</div>
+                                    <div>
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-1">Clean, review, copy</h4>
+                                        <p class="text-sm">Click <strong>Clean Text Now</strong>, review the result, then copy it to your clipboard or clear the input.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="target-system" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">3.</span> Target System
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Auto</h4>
+                                    <p class="text-sm">Default mode. Normalizes common encoding, invisible characters, unusual whitespace, and line endings for browser use.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Windows / Linux / macOS</h4>
+                                    <p class="text-sm">Use these when line endings matter. Windows outputs CRLF; Linux and macOS use LF.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="language-mapping" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">4.</span> Language Mapping
+                            </h3>
+                            <div class="space-y-4 text-[var(--text-secondary)]">
+                                <p class="leading-relaxed">
+                                    Language mappings replace quotes, dashes, ligatures, spaces, and language-specific characters according to the selected profile. They only run when <strong>Apply Language Character Mapping</strong> is enabled.
+                                </p>
+                                <div class="grid md:grid-cols-3 gap-4">
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Swiss German</h4>
+                                        <p class="text-sm">Useful for Swiss text conventions, including replacements such as ß to ss and normalized punctuation.</p>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">German, French, Italian</h4>
+                                        <p class="text-sm">Normalize quotes, dashes, spaces, ligatures, and common language-specific characters.</p>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">English US / International</h4>
+                                        <p class="text-sm">Normalize English punctuation, quote styles, ellipses, dashes, and spacing.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="processing-options" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">5.</span> Processing Options
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Apply Language Character Mapping</h4>
+                                    <p class="text-sm">Applies the selected language profile to punctuation, spaces, ligatures, and special characters.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Diacritics</h4>
+                                    <p class="text-sm">Converts accented characters to plain or language-compatible forms, for example ä to ae in Swiss-style output.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Reverse Diacritics</h4>
+                                    <p class="text-sm">Converts digraphs such as ae, oe, ue back to ä, ö, ü with common exceptions. This does not run when Remove Diacritics is enabled.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Fancy Text Font</h4>
+                                    <p class="text-sm">Normalizes stylized Unicode letters such as mathematical bold, italic, script, or monospace characters.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Citation References</h4>
+                                    <p class="text-sm">Removes common citation formats such as numbered brackets, source notes, URL citations, and superscript references.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Convert MD to Normal Text</h4>
+                                    <p class="text-sm">Turns Markdown-style AI output into plain text by removing syntax for headings, bold, italic, code, links, and lists.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Replace em dash with new sentence</h4>
+                                    <p class="text-sm">Experimental option that turns em-dash sentence breaks into full-stop sentence breaks. Review output carefully.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Line Breaks</h4>
+                                    <p class="text-sm">Joins single line breaks into spaces and reduces multiple line breaks. Useful for turning copied text into cleaner paragraphs.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="common-presets" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">6.</span> Common Presets
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Clean ChatGPT / Claude Output</h4>
+                                    <p class="text-sm">Enable Convert MD, Remove Citation References, and optionally Remove Fancy Text Font.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Perplexity / Research Output</h4>
+                                    <p class="text-sm">Enable Remove Citation References and Convert MD. Review links and footnotes after cleanup.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Swiss Standardization</h4>
+                                    <p class="text-sm">Choose Swiss German, enable Apply Language Character Mapping, and enable Remove Diacritics if you need ae/oe/ue output.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Paragraph Cleanup</h4>
+                                    <p class="text-sm">Use Remove Line Breaks for pasted content with unwanted line wraps. Keep it off for structured text where line breaks matter.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="privacy" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">7.</span> Privacy
+                            </h3>
+                            <div class="space-y-4 text-[var(--text-secondary)]">
+                                <div class="p-6 bg-[rgba(60,60,60,0.15)] border-2 border-[var(--border-color)] rounded-lg">
+                                    <ul class="space-y-2">
+                                        <li><strong class="text-[var(--text-primary)]">Local processing:</strong> Text cleanup runs in your browser.</li>
+                                        <li><strong class="text-[var(--text-primary)]">No text upload:</strong> Your text is not sent to ASD123.ai for processing.</li>
+                                        <li><strong class="text-[var(--text-primary)]">Local preferences:</strong> Settings are saved in browser storage; text content is not saved by the app.</li>
+                                        <li><strong class="text-[var(--text-primary)]">Local mappings:</strong> Language mapping JSON files are static assets loaded by the browser.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tips" class="mb-12">
+                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                <span class="text-[var(--primary-color)]">8.</span> Tips
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Use fewer toggles first</h4>
+                                    <p class="text-sm">Start with the smallest set of options, review the output, then add more cleanup if needed.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Review experimental changes</h4>
+                                    <p class="text-sm">The em-dash sentence option can change meaning in edge cases. Use it carefully.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Mind line breaks</h4>
+                                    <p class="text-sm">Remove Line Breaks is helpful for copied paragraphs, but not for lists, poems, code, or structured templates.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Use the character counter</h4>
+                                    <p class="text-sm">The live counter helps when preparing prompts, short posts, summaries, or field-limited text.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-12 text-center">
+                            <a href="optimizer.html" class="inline-block px-8 py-4 text-lg font-semibold text-[var(--text-primary)] bg-[rgba(60,60,60,0.15)] border-2 border-[var(--border-color)] rounded-lg hover:bg-[rgba(60,60,60,0.25)] transition-all duration-300">
+                                Try the Optimizer Now →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        <footer role="contentinfo">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>&copy; 2026 ASD123.ai. All rights reserved.</p>
+                    <div class="privacy-inline">
+                        <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                            <path d="m9 12 2 2 4-4" />
+                        </svg>
+                        <span>100% Local Processing</span>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                    <a href="terms.html" class="footer-link">Terms of Service</a>
+                    <a href="contact.html" class="footer-link">Contact</a>
+
+                    <div class="social-links">
+                        <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" target="_blank" rel="noopener" aria-label="X (Twitter)">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg>
+                        </a></div>
+
+                    <div class="theme-toggle-wrapper" style="margin-left: var(--space-6); display: flex; align-items: center;">
+                        <label class="toggle-switch" style="transform: scale(0.8);">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        </div>
+    </div>
+</body>
+</html>

@@ -7,16 +7,17 @@ const redirects = {
   '/chat.html': '/chat',
   '/context.html': '/context',
   '/converter.html': '/converter',
+  '/tts.html': '/tts',
   '/documentation.html': '/documentation',
   '/about.html': '/about',
   '/contact.html': '/contact',
   '/privacy.html': '/privacy',
   '/terms.html': '/terms',
-  '/test-optimizer.html': '/test',
   '/anonymizer-guide.html': '/anonymizer-guide',
   '/chat-guide.html': '/chat-guide',
   '/context-guide.html': '/context-guide',
   '/converter-guide.html': '/converter-guide',
+  '/tts-guide.html': '/tts-guide',
   '/optimizer-guide.html': '/optimizer-guide'
 };
 
@@ -26,16 +27,17 @@ const cleanUrls = {
   '/chat': '/chat.html',
   '/context': '/context.html',
   '/converter': '/converter.html',
+  '/tts': '/tts.html',
   '/documentation': '/documentation.html',
   '/about': '/about.html',
   '/contact': '/contact.html',
   '/privacy': '/privacy.html',
   '/terms': '/terms.html',
-  '/test': '/test-optimizer.html',
   '/anonymizer-guide': '/anonymizer-guide.html',
   '/chat-guide': '/chat-guide.html',
   '/context-guide': '/context-guide.html',
   '/converter-guide': '/converter-guide.html',
+  '/tts-guide': '/tts-guide.html',
   '/optimizer-guide': '/optimizer-guide.html'
 };
 
@@ -107,11 +109,13 @@ Pasted text and uploaded file contents remain in the user's browser. The tool do
 `,
   'converter': `# ASD123.ai Markdown Converter
 
-Use this skill when an agent needs to help a user convert PDF or DOCX documents to Markdown with the ASD123.ai browser converter.
+Use this skill when an agent needs to help a user convert PDF, DOCX, or image files to Markdown with the ASD123.ai browser converter.
 
 ## Capabilities
 
 - Convert PDF files to Markdown using pdf.js text extraction with font-size heading detection
+- Optional high-accuracy PDF engines (LiteParse and EdgeParse, both WebAssembly) for multi-column and table-heavy layouts
+- OCR engine (PP-OCRv6 Tiny on onnxruntime-web) for scanned PDFs and image files (PNG, JPG, WebP, BMP) with no text layer
 - Convert DOCX files to Markdown via mammoth.js style mapping
 - Preserve bold, italic, links, lists, and tables for DOCX sources
 - Toggle heading detection and whitespace collapsing
@@ -119,7 +123,24 @@ Use this skill when an agent needs to help a user convert PDF or DOCX documents 
 
 ## Privacy
 
-PDF and DOCX files are parsed entirely in the user's browser. Documents and generated Markdown remain on the user's device and are not transmitted to ASD123.ai.
+PDF, DOCX, and image files are parsed entirely in the user's browser. Documents and generated Markdown remain on the user's device and are not transmitted to ASD123.ai.
+`,
+  'tts': `# ASD123.ai Text to Speech
+
+Use this skill when an agent needs to help a user turn text into spoken audio with the ASD123.ai browser text-to-speech tool.
+
+## Capabilities
+
+- Generate natural speech from text locally with on-device models, no server inference
+- Language-first selection: pick English, German, French, Spanish, or Italian, then a model that supports it (sorted by quality, with download size shown)
+- Two models: Kokoro (highest quality; English with American and British voices, plus Spanish, French, and Italian; ~88-310 MB precision options) and Supertonic 3 (fast, multilingual; English, German, French, Spanish, Italian; ~380 MB, official ONNX via onnxruntime-web, language selected with a built-in language tag)
+- Kokoro speaks English natively; for Spanish, French, and Italian it uses a one-time eSpeak NG pronunciation pack (~19 MB) to phonemize locally
+- Adjust speaking speed before generating, plus a quality (inference steps) control for Supertonic
+- Play the audio in the browser, change playback speed, and download as WAV or locally encoded MP3
+
+## Privacy
+
+Text is processed entirely in the user's browser. Model files are downloaded from Hugging Face on first use and cached, and MP3 encoding runs locally with a self-hosted encoder, but the user's text and generated audio are not sent to ASD123.ai servers.
 `
 };
 
@@ -158,8 +179,10 @@ async function agentSkillsIndex() {
         : name === 'context'
           ? 'Estimate AI chat context windows locally with the ASD123.ai Context Estimator.'
           : name === 'converter'
-            ? 'Convert PDF and DOCX documents to Markdown locally with the ASD123.ai Markdown Converter.'
-            : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
+            ? 'Convert PDF, DOCX, and image files to Markdown locally with the ASD123.ai Markdown Converter, including OCR for scans.'
+            : name === 'tts'
+              ? 'Generate natural speech from text locally with the ASD123.ai Text to Speech tool.'
+              : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
     url: `${SITE_ORIGIN}/.well-known/agent-skills/${name}/SKILL.md`,
     digest: await sha256Digest(content)
   })));
@@ -476,10 +499,38 @@ async function wellKnownResponse(pathname) {
   return null;
 }
 
+// Same-origin proxy for the webml-community "Gemma4Mobile" Apple Silicon engine.
+// The engine is MIT-licensed (credited in the docs); we proxy it live from
+// Hugging Face rather than vendoring a copy so it always tracks upstream, and
+// because a direct browser import is blocked two ways: HF serves the file as
+// text/plain (rejected by the ES module loader) and without permissive CORS for
+// cross-origin fetches. The model weights it pulls
+// (google/gemma-4-E2B-it-qat-mobile-transformers, Gemma license) are fetched
+// directly from HF by the engine and need no proxy.
+const KERNEL_ENGINE_UPSTREAM = 'https://huggingface.co/spaces/webml-community/gemma-4-webgpu-kernels/resolve/main/gemma-4-e2b.js';
+
+async function proxyKernelEngine() {
+  const upstream = await fetch(KERNEL_ENGINE_UPSTREAM, { cf: { cacheEverything: true, cacheTtl: 86400 } });
+  if (!upstream.ok) {
+    return new Response(`// Failed to load the kernel engine (HTTP ${upstream.status}).`, {
+      status: 502,
+      headers: { 'content-type': 'text/javascript; charset=utf-8' }
+    });
+  }
+  const headers = new Headers();
+  headers.set('content-type', 'text/javascript; charset=utf-8');
+  headers.set('cache-control', 'public, max-age=86400');
+  return new Response(upstream.body, { status: 200, headers });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const originalPathname = url.pathname;
+
+    if (url.pathname === '/vendor/gemma4mobile-engine.js') {
+      return proxyKernelEngine();
+    }
 
     const discoveryResponse = await wellKnownResponse(url.pathname);
     if (discoveryResponse) {

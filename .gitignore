@@ -4,7 +4,6 @@ node_modules/
 # Build output
 dist/
 build/
-build.js
 offline-chat/models/
 offline-chat/**/*.onnx
 offline-chat/**/*.onnx_data
@@ -30,3 +29,7 @@ __pycache__/
 
 # Cloudflare Wrangler cache
 .wrangler/
+
+# Dev-only third-party benchmark engine (not for redistribution / deploy)
+vendor-dev/
+dev/chat-bench.html

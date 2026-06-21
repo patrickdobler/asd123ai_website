@@ -4,11 +4,11 @@
   "description": "ASD123.ai - Privacy-First AI Text Processing Tools",
   "main": "src/index.js",
   "scripts": {
-    "build": "node build.js",
-    "build:dev": "node build-dev.js",
+    "build": "node tools/build.js",
+    "build:dev": "node tools/build-dev.js",
     "package:chat-offline": "node tools/package-chat-offline.js",
-    "dev": "concurrently \"node build-dev.js\" \"wrangler dev\" --names \"watch,wrangler\" --prefix-colors \"blue,magenta\"",
-    "dev:watch": "node build-dev.js",
+    "dev": "concurrently \"node tools/build-dev.js\" \"wrangler dev\" --names \"watch,wrangler\" --prefix-colors \"blue,magenta\"",
+    "dev:watch": "node tools/build-dev.js",
     "dev:server": "wrangler dev",
     "deploy": "wrangler deploy --env production"
   },

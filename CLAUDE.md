@@ -30,7 +30,7 @@ npm run deploy
 ### Development Notes
 - The project uses a dev container setup - see `.devcontainer/README.md` for details
 - Development server runs on port 8787 by default
-- All source files are in the root directory; build outputs to `dist/`
+- Source is grouped into `pages/`, `dev/`, `public/`, `scripts/`, `styles/`, `components/`, `vendor/`; build flattens to `dist/` (see **File Structure**)
 - The build process minifies HTML, CSS, and JavaScript files using `build.js`
 
 ## Architecture Overview
@@ -42,26 +42,36 @@ npm run deploy
 - **Design**: Dark theme with glassmorphism effects, mobile-first responsive design
 
 ### File Structure
+Two top-level ideas: **`src/` + `public/` are what you edit; `dist/` is generated
+by the build and is gitignored — never edit `dist/` by hand.** The build copies
+`src/` and `public/` into `dist/`, flattening pages and public assets to the
+`dist/` root, so runtime URLs and the relative asset paths inside each page stay
+the same (e.g. `src/pages/index.html` → `dist/index.html`, served at `/`).
 ```
 /
-├── src/index.js                 # Cloudflare Workers entry point (routing)
-├── build.js                     # Production build script
-├── wrangler.toml               # Cloudflare Workers configuration
-├── *.html                      # HTML pages (root level)
-├── scripts/                    # JavaScript modules
-│   ├── shared.js              # Shared utilities, navigation
-│   ├── optimizer.js           # Text optimizer engine
-│   ├── anonymizer-core.js     # Anonymizer main logic
-│   ├── entity-manager.js      # Entity detection and mapping
-│   ├── model-loader.js        # AI model loading (transformers.js)
-│   ├── file-processor.js      # File upload handling (.txt, .docx, .pdf)
-│   └── ui-controller.js       # UI state management
-├── styles/
-│   ├── main.css               # Base styles and CSS variables
-│   └── components.css         # Reusable component styles
-├── components/                # Shared HTML components
-└── dist/                      # Build output directory
+├── src/                         # ALL editable source
+│   ├── index.js                 # Cloudflare Workers entry (routing + Apple-Silicon engine proxy) — wrangler `main`
+│   ├── pages/                   # Production HTML pages          → dist/*.html
+│   ├── scripts/                 # JavaScript modules             → dist/scripts/
+│   ├── styles/                  # main.css + components.css      → dist/styles/
+│   └── components/              # Shared HTML partials/mappings  → dist/components/
+├── public/                      # Static assets served as-is     → dist/ (root)
+│   ├── vendor/                  # Self-hosted third-party libs (onnxruntime-web, pdf.js, mammoth, lamejs, …)
+│   └── favicon.ico, logo.png, robots.txt, sitemap.xml, …
+├── tools/                       # Build + helper scripts (build.js, build-dev.js, make-favicons.py, package-chat-offline.js)
+├── docs/                        # Architecture/design notes, mockups, examples (not deployed)
+├── dist/                        # BUILD OUTPUT — generated, gitignored, do not edit
+├── dev/                         # Dev-only HTML (chat-bench) — gitignored, NOT in production
+├── vendor-dev/                  # Dev-only engine for chat-bench — gitignored, NOT deployed
+├── offline-chat/                # Generated offline bundle (output of tools/package-chat-offline.js)
+├── wrangler.toml, package.json, CLAUDE.md, AGENTS.md, README.md
 ```
+
+`npm run build` → `tools/build.js`; `npm run dev` → `tools/build-dev.js` (watch) +
+`wrangler dev`. Favicons are generated from `public/logo.png` by
+`tools/make-favicons.py` (the logo is black-on-transparent, so each favicon is
+composited onto a white rounded box to stay visible on dark browser tabs). Re-run
+after changing the logo.
 
 ### Cloudflare Workers Routing
 The `src/index.js` file handles:
@@ -160,13 +170,17 @@ The Anonymizer uses prioritized regex patterns (lower priority = checked first):
 ## Common Development Tasks
 
 ### Adding a New HTML Page
-1. Create `{page-name}.html` in root directory
-2. Add to `htmlFiles` array in `build.js`
+1. Create `pages/{page-name}.html` (dev/test-only pages go in `dev/` instead)
+2. Add `{page-name}.html` to the `htmlFiles` array in `build.js` (production).
+   `build-dev.js` picks up `pages/`/`dev/` automatically, no list to edit.
 3. Add routing in `src/index.js`:
    - Redirect: `'/page-name.html': '/page-name'`
    - Clean URL: `'/page-name': '/page-name.html'`
 4. Update navigation in shared header component
 5. Run `npm run build` to test
+6. **Verify mobile (required):** check the page at 375px (and glance at 320px) for
+   horizontal overflow — `document.body.scrollWidth` must be `<= viewport width`.
+   See **Mobile Responsiveness** below for the recurring gotchas.
 
 ### Adding a New Language Mapping
 1. Create JSON file in `components/mappings/{language}.json`
@@ -221,3 +235,38 @@ For deeper architectural understanding, see:
 - Modern browsers with ES6 module support
 - Cloudflare Workers edge runtime
 - Local file:// protocol support (embedded fallbacks)
+
+### Mobile Responsiveness (required for every page)
+Every page MUST be verified at **375px** (primary) and degrade gracefully down to
+**320px** before it is considered done. The test is objective: at a given viewport,
+`document.body.scrollWidth` must be `<=` the viewport width (no horizontal scroll).
+Quick check in the browser/preview:
+```js
+({ vw: innerWidth, scrollW: document.body.scrollWidth, ok: document.body.scrollWidth <= innerWidth + 1 })
+```
+
+Recurring gotchas that have bitten this codebase (check these first when a page overflows):
+- **CSS grid blowout — use `minmax(0, 1fr)`, never a bare `1fr`, for single-column
+  mobile grids.** A bare `1fr` resolves to `minmax(auto, 1fr)`, whose `auto` floor is
+  the content's *min-content* width (e.g. a `<textarea>` or a long word). On a narrow
+  screen that floor can exceed the container, so the grid track — and the card inside
+  it — overflow the right edge. This is why `.doc-card-grid`, `.features-grid`, and
+  `.content-grid` all use `minmax(0, 1fr)`. (Watch for duplicate later-in-file rules
+  re-introducing `1fr` and overriding the fix.)
+- **`main#main` is a centered flex column** (built for the homepage hero:
+  `display:flex; align-items:center`). Content pages reuse `id="main"` and wrap their
+  body in a Tailwind max-width container (e.g. `.max-w-6xl`). Under `align-items:center`
+  such a child shrinks-to-content and can grow *wider* than the viewport on mobile, and
+  — lacking a definite width — it breaks inner `overflow-x:auto` scrollers (tables).
+  A safety-net rule (`main#main > [class*="max-w-"] { width: 100% }`) handles this, but
+  if a new wrapper isn't a direct child of `main#main`, give it `w-full` explicitly.
+- **Wrap wide tables in a `overflow-x-auto` container** so they scroll inside their box
+  instead of pushing the page wide. (This only works once the wrapper has a definite
+  width — see the `main#main` point above.)
+- **Shared header:** the logo + three nav links are tight at ≤375px; `.logo-text` and
+  `.nav-links` gap are shrunk in the `@media (max-width: 768px)` block, with a further
+  `@media (max-width: 345px)` step for very small phones. Adding nav links risks
+  re-breaking this — re-verify the header at 375px and 320px.
+
+All page-level responsive rules live in `styles/components.css` (search for
+`@media (max-width:` — breakpoints at 1024px, 768px, and 345px).

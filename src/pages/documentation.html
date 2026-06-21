@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <title>ASD123.ai Documentation - AI Text Processing Guide</title>
+    <meta name="description" content="Documentation for ASD123.ai privacy-first browser tools, including Optimizer, Anonymizer, Local AI Chat, Context Estimator, and Markdown Converter.">
+    <meta name="keywords" content="ASD123 documentation, AI text processing guide, optimizer tutorial, anonymizer guide, local AI chat guide, context estimator guide, markdown converter guide, WebGPU chat">
+    <meta name="author" content="ASD123.ai">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="ASD123.ai Documentation - AI Text Processing Guide">
+    <meta property="og:description" content="Learn how to use ASD123.ai's privacy-first Optimizer, Anonymizer, Local AI Chat, and Context Estimator.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://asd123.ai/documentation">
+    <meta property="og:site_name" content="ASD123.ai">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ASD123.ai Documentation - AI Text Processing Guide">
+    <meta name="twitter:description" content="Learn how to use ASD123.ai's privacy-first Optimizer, Anonymizer, Local AI Chat, and Context Estimator.">
+    <link rel="canonical" href="https://asd123.ai/documentation">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <script src="scripts/shared.js"></script>
+    <meta property="og:image" content="https://asd123.ai/logo.png">
+    <meta name="twitter:image" content="https://asd123.ai/logo.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://asd123.ai/#organization",
+          "name": "ASD123.ai",
+          "url": "https://asd123.ai/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://asd123.ai/logo.png"
+          },
+          "sameAs": [
+            "https://github.com/patrickdobler/asd123.ai"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://asd123.ai/#website",
+          "url": "https://asd123.ai/",
+          "name": "ASD123.ai",
+          "description": "Privacy-first AI text tools that run entirely in your browser.",
+          "publisher": {
+            "@id": "https://asd123.ai/#organization"
+          },
+          "inLanguage": "en"
+        },
+        {
+          "@type": "CollectionPage",
+          "@id": "https://asd123.ai/documentation#webpage",
+          "name": "ASD123.ai Documentation - AI Text Processing Guide",
+          "description": "Documentation for ASD123.ai privacy-first browser tools, including Optimizer, Anonymizer, Local AI Chat, Context Estimator, and Markdown Converter.",
+          "url": "https://asd123.ai/documentation",
+          "inLanguage": "en",
+          "isPartOf": {
+            "@id": "https://asd123.ai/#website"
+          },
+          "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://asd123.ai/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "ASD123.ai Documentation",
+                "item": "https://asd123.ai/documentation"
+              }
+            ]
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <a href="#main" class="skip-to-main">Skip to main content</a>
+
+    <div class="aurora-bg"></div>
+
+    <div class="content-wrapper">
+        <header>
+            <nav role="navigation" aria-label="Main navigation">
+                <a href="index.html" class="logo-link" aria-label="ASD123.ai Home">
+                    <span class="logo-text">ASD123.ai</span>
+                </a>
+
+                <div class="nav-links">
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                            <a href="context.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Context Estimator</span>
+                                <span class="nav-tool-description">Estimate useful LLM context size.</span>
+                            </a>
+                            <a href="converter.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Markdown Converter</span>
+                                <span class="nav-tool-description">Turn PDF and DOCX files into Markdown.</span>
+                            </a>
+                            <a href="tts.html" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Text to Speech</span>
+                                <span class="nav-tool-description">Generate speech locally from text.</span>
+                            </a>
+                        </div>
+                    </div>
+                    <a href="documentation.html" class="nav-link">Documentation</a>
+                    <a href="about.html" class="nav-link">About</a>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main" role="main">
+            <div class="page-header">
+                <h1 class="page-title">Documentation</h1>
+                <p class="page-subtitle">
+                    Guides, privacy notes, and practical workflows for ASD123.ai's browser-based text, context, and chat tools.
+                </p>
+            </div>
+
+            <div class="doc-card-grid">
+                <div class="liquid-glass" style="padding: var(--space-12); display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--space-6);">
+                        <div style="width: 48px; height: 48px; border-radius: 8px; background: var(--text-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 24px; height: 24px; color: var(--paper-texture);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 4V2"/>
+                                <path d="M15 16v-2"/>
+                                <path d="M8 9h2"/>
+                                <path d="M20 9h2"/>
+                                <path d="M17.8 11.8 19 13"/>
+                                <path d="M15 9h0"/>
+                                <path d="M17.8 6.2 19 5"/>
+                                <path d="m3 21 9-9"/>
+                                <path d="M12.2 6.2 11 5"/>
+                            </svg>
+                        </div>
+                        <h2 style="font-size: var(--text-3xl); font-weight: 900; color: var(--text-primary);">Optimizer</h2>
+                    </div>
+
+                    <div style="flex: 1; margin-bottom: var(--space-6);">
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+                            Clean and standardize AI-generated text before publishing, pasting into business tools, or adapting content for regional conventions.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Language Mapping</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Region-specific mappings for Swiss German, German, French, Italian, and English variants.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Text Cleanup</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Remove citations, Markdown, diacritics, special spaces, and stylized Unicode text.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Local Preferences</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Settings can be remembered locally in your browser. Text content is not stored by ASD123.ai.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: stretch;">
+                        <a href="optimizer.html" class="btn btn--primary" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Try Optimizer</a>
+                        <a href="optimizer-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
+                    </div>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-12); display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--space-6);">
+                        <div style="width: 48px; height: 48px; border-radius: 8px; background: var(--text-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 24px; height: 24px; color: var(--paper-texture);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                                <path d="m9 12 2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <h2 style="font-size: var(--text-3xl); font-weight: 900; color: var(--text-primary);">Anonymizer</h2>
+                    </div>
+
+                    <div style="flex: 1; margin-bottom: var(--space-6);">
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+                            Explore local PII detection, reversible placeholder mappings, and LLM deanonymization workflows. Treat this tool as an experimental proof of concept and review aid.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Regex Default</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Fast local pattern matching for emails, phone numbers, IBANs, IDs, URLs, and other structured PII.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">OpenAI Privacy Filter</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Optional local AI detection via Hugging Face Transformers.js. First load is about 950 MB and requires WebGPU.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Legacy PoC AI4Privacy</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Available for comparison, but no longer the recommended AI path.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: stretch;">
+                        <a href="anonymizer.html" class="btn btn--primary" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Try Anonymizer</a>
+                        <a href="anonymizer-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
+                    </div>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-12); display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--space-6);">
+                        <div style="width: 48px; height: 48px; border-radius: 8px; background: var(--text-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 24px; height: 24px; color: var(--paper-texture);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/>
+                                <path d="M18 9h2a2 2 0 0 1 2 2v10l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+                            </svg>
+                        </div>
+                        <h2 style="font-size: var(--text-3xl); font-weight: 900; color: var(--text-primary);">Local AI Chat</h2>
+                    </div>
+
+                    <div style="flex: 1; margin-bottom: var(--space-6);">
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+                            Chat with WebGPU models directly in your browser. Prompts, uploads, generated text, and chat history stay on your device.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Local WebGPU Models</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Load Gemma 4 and Qwen3.5 models in the browser, plus an experimental Gemma 4 E2B Turbo build with WebGPU shaders tuned for Apple Silicon. Model files are downloaded, but prompts are not sent for remote inference.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Files and Images</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Attach images, text, Markdown, PDF, or DOCX files. Extraction happens locally before content is added to the prompt context.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">History and Export</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Chats are stored in browser IndexedDB, can be deleted locally, and can be exported as Markdown.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: stretch;">
+                        <a href="chat.html" class="btn btn--primary" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Try Chat</a>
+                        <a href="chat-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
+                    </div>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-12); display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--space-6);">
+                        <div style="width: 48px; height: 48px; border-radius: 8px; background: var(--text-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 24px; height: 24px; color: var(--paper-texture);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m12 14 4-4"/>
+                                <path d="M3.34 19a10 10 0 1 1 17.32 0"/>
+                                <path d="M12 20h.01"/>
+                            </svg>
+                        </div>
+                        <h2 style="font-size: var(--text-3xl); font-weight: 900; color: var(--text-primary);">Context Estimator</h2>
+                    </div>
+
+                    <div style="flex: 1; margin-bottom: var(--space-6);">
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+                            Estimate how much AI chat context you need for pasted text or local documents before choosing 4K, 8K, 16K, or larger model settings.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Context Recommendation</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Compare 4K through 128K windows and see which one leaves enough room for an answer.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Local File Extraction</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">TXT, DOCX, and PDF files are read in the browser. File contents are not uploaded for processing.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Model Profiles</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Generic, Llama / Mistral, Qwen, Gemma, and GPT-style profiles keep the estimate fast without tokenizer downloads.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: stretch;">
+                        <a href="context.html" class="btn btn--primary" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Try Context</a>
+                        <a href="context-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
+                    </div>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-12); display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--space-6);">
+                        <div style="width: 48px; height: 48px; border-radius: 8px; background: var(--text-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 24px; height: 24px; color: var(--paper-texture);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <line x1="10" y1="9" x2="8" y2="9"/>
+                            </svg>
+                        </div>
+                        <h2 style="font-size: var(--text-3xl); font-weight: 900; color: var(--text-primary);">Markdown Converter</h2>
+                    </div>
+
+                    <div style="flex: 1; margin-bottom: var(--space-6);">
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+                            Turn PDF and DOCX documents into clean Markdown locally. Useful before feeding text into AI chats, the Optimizer, or the Anonymizer.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">PDF and DOCX</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">pdf.js extracts PDF text with font-size based heading detection. mammoth.js maps Word styles to Markdown.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Selectable parsing engines</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Optional EdgeParse and LiteParse WebAssembly engines for better multi-column and table layout, plus PP-OCRv6 OCR for scanned PDFs and images (PNG, JPG, WebP). Each loads locally on demand.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Preview and Export</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Switch between raw Markdown and rendered preview, then copy to clipboard or download a .md file.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: stretch;">
+                        <a href="converter.html" class="btn btn--primary" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Try Converter</a>
+                        <a href="converter-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
+                    </div>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-12); display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: var(--space-6);">
+                        <div style="width: 48px; height: 48px; border-radius: 8px; background: var(--text-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 24px; height: 24px; color: var(--paper-texture);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                            </svg>
+                        </div>
+                        <h2 style="font-size: var(--text-3xl); font-weight: 900; color: var(--text-primary);">Text to Speech</h2>
+                    </div>
+
+                    <div style="flex: 1; margin-bottom: var(--space-6);">
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">
+                            Turn text into natural speech locally. Choose a language, then an on-device model, and generate audio without uploading anything.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Language-first models</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Kokoro for English, Spanish, French, and Italian; Supertonic 3 for English, German, French, Spanish, and Italian. Models load from Hugging Face on first use and are cached.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Voices and speed</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Pick a voice, set the speaking speed before generating, and adjust playback speed afterwards without re-rendering.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 6px; height: 6px; background: var(--primary-color); border-radius: 50%; margin-top: 8px; flex-shrink: 0;"></div>
+                                <div>
+                                    <h3 style="font-weight: 600; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">WAV and MP3 export</h3>
+                                    <p style="font-size: 14px; color: var(--text-secondary);">Play the audio in the browser, then download it as uncompressed WAV or a compact MP3 encoded locally.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: stretch;">
+                        <a href="tts.html" class="btn btn--primary" style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Try Speech</a>
+                        <a href="tts-guide.html" class="btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; white-space: nowrap;">User Guide</a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="max-width: 1100px; margin: var(--space-16) auto 0;">
+                <div class="liquid-glass" style="padding: var(--space-12); text-align: center;">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Privacy and Limits</h2>
+                    <p style="font-size: var(--text-lg); color: var(--text-secondary); margin-bottom: var(--space-6);">
+                        The tools are designed for local browser processing. Optional AI modes download model files into your browser, but your text, prompts, attachments, chat history, context estimates, anonymization mappings, and generated speech remain local. PII detection and context estimation can miss edge cases, so manual review is still required.
+                    </p>
+                    <div style="display: flex; justify-content: center; gap: var(--space-3); flex-wrap: wrap;">
+                        <a href="privacy.html" class="btn" style="text-decoration: none;">Privacy Policy</a>
+                        <a href="terms.html" class="btn" style="text-decoration: none;">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer role="contentinfo">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>&copy; 2026 ASD123.ai. All rights reserved.</p>
+                    <div class="privacy-inline">
+                        <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                            <path d="m9 12 2 2 4-4" />
+                        </svg>
+                        <span>100% Local Processing</span>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                    <a href="terms.html" class="footer-link">Terms of Service</a>
+                    <a href="contact.html" class="footer-link">Contact</a>
+
+                    <div class="social-links">
+                        <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" target="_blank" rel="noopener" aria-label="X (Twitter)">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg>
+                        </a></div>
+
+                    <div class="theme-toggle-wrapper" style="margin-left: var(--space-6); display: flex; align-items: center;">
+                        <label class="toggle-switch" style="transform: scale(0.8);">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
