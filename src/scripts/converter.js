@@ -1203,13 +1203,8 @@ class ConverterApp {
         if (this.elements.engineHint) {
             this.elements.engineHint.textContent = ENGINE_HINTS[engine] || ENGINE_HINTS.standard;
         }
-        // Accept image uploads only while OCR is selected.
-        if (this.elements.fileInput) {
-            this.elements.fileInput.setAttribute(
-                'accept',
-                engine === 'ocr' ? '.pdf,.docx,.png,.jpg,.jpeg,.webp,.bmp' : '.pdf,.docx'
-            );
-        }
+        // No `accept` filter: the picker must allow any file (PPTX, images, plain
+        // text, etc.). Format handling/validation happens after selection.
     }
 
     bindEvents() {
