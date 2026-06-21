@@ -209,7 +209,7 @@
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">1</div>
                                 <div>
                                     <h4 class="font-bold text-[var(--text-primary)] mb-1">Pick a document</h4>
-                                    <p class="text-sm">Drag a PDF, DOCX, PPTX, Excel/CSV, or HTML file into the drop area, or use the Choose file button. With the OCR engine you can also drop image files (PNG, JPG, WebP, BMP). The maximum size is 25&nbsp;MB.</p>
+                                    <p class="text-sm">Drag any file into the drop area, or use the Choose file button — there is no format filter. PDF, DOCX, PPTX, Excel/CSV, HTML, and plain-text files are converted; with the OCR engine you can also drop image files (PNG, JPG, WebP, BMP). The maximum size is 25&nbsp;MB.</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
@@ -253,6 +253,10 @@
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">HTML</h4>
                                 <p class="text-sm">Converted with a built-in renderer. Scripts, styles, and page chrome are stripped; headings, lists, links, and tables become clean Markdown. Prefers <code>&lt;main&gt;</code>/<code>&lt;article&gt;</code> content when present.</p>
+                            </div>
+                            <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Plain text &amp; other files</h4>
+                                <p class="text-sm">Any other file you pick is read as UTF-8 text and passed through (Markdown, TXT, JSON, code, logs, and similar). Files that are actually binary are detected and politely rejected.</p>
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">Images &amp; scanned PDFs <span class="text-xs font-normal text-[var(--text-secondary)]">(OCR engine)</span></h4>

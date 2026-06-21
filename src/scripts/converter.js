@@ -928,6 +928,35 @@ class PptxToMarkdown {
     }
 }
 
+// Fallback for any other extension: pass the file through as text if it is
+// readable text (Markdown/TXT/JSON/code/logs/…), otherwise reject binary files.
+class PlainTextToMarkdown {
+    constructor(options = {}) {
+        this.options = options;
+    }
+
+    async convert(file, statusCallback) {
+        const setStatus = statusCallback || (() => {});
+        setStatus('Reading file locally...');
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const sample = bytes.subarray(0, 4096);
+        let suspicious = 0;
+        for (const byte of sample) {
+            // NUL byte → definitely binary; otherwise count non-text control bytes.
+            if (byte === 0) { suspicious = Infinity; break; }
+            if (byte < 9 || (byte > 13 && byte < 32)) suspicious++;
+        }
+        if (suspicious > sample.length * 0.1) {
+            throw new Error(`${file.name} could not be read as a document or text. Supported: PDF, DOCX, PPTX, XLSX, CSV, HTML, images (OCR engine), or plain-text files.`);
+        }
+        const text = new TextDecoder('utf-8').decode(bytes);
+        if (!text.trim()) {
+            throw new Error(`${file.name} appears to be empty.`);
+        }
+        return this.options.collapseWhitespace ? collapseWhitespace(text) : text.replace(/\s+$/, '');
+    }
+}
+
 class MarkdownPreviewRenderer {
     render(markdown) {
         const escaped = escapeHtml(markdown).replace(/\r\n/g, '\n');
@@ -1242,16 +1271,16 @@ class ConverterApp {
         const ext = fileExtension(file.name);
         const isImage = OCR_IMAGE_EXTENSIONS.includes(ext);
         const supported = ['pdf', 'docx', 'pptx', 'xlsx', 'xls', 'csv', 'html', 'htm'];
-        if (!supported.includes(ext) && !isImage) {
-            throw new Error(`${file.name} is not supported. Use PDF, DOCX, PPTX, XLSX, CSV, HTML, or an image file.`);
-        }
         if (isImage && this.currentEngine() !== 'ocr') {
             throw new Error(`Image files need the OCR engine. Select "OCR (scanned PDFs & images)" first.`);
         }
         if (file.size > MAX_FILE_SIZE) {
             throw new Error(`${file.name} is larger than 25 MB. Convert a smaller file or split it first.`);
         }
-        return isImage ? 'image' : ext;
+        if (isImage) return 'image';
+        if (supported.includes(ext)) return ext;
+        // Anything else: try to read it as plain text (binary is caught at read time).
+        return 'text';
     }
 
     currentEngine() {
@@ -1318,6 +1347,9 @@ class ConverterApp {
             } else if (ext === 'pptx') {
                 markdown = await new PptxToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
                 engineNote = ' · PPTX';
+            } else if (ext === 'text') {
+                markdown = await new PlainTextToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
+                engineNote = ' · plain text';
             }
             this.engineNote = engineNote;
 
