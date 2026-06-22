@@ -209,7 +209,7 @@
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">1</div>
                                 <div>
                                     <h4 class="font-bold text-[var(--text-primary)] mb-1">Pick a document</h4>
-                                    <p class="text-sm">Drag any file into the drop area, or use the Choose file button — there is no format filter. PDF, DOCX, PPTX, Excel/CSV, HTML, and plain-text files are converted; with the OCR engine you can also drop image files (PNG, JPG, WebP, BMP). The maximum size is 25&nbsp;MB.</p>
+                                    <p class="text-sm">Drag any file into the drop area, or use the Choose file button — there is no format filter. PDF, DOCX, PPTX, Excel/CSV, HTML, and plain-text files are converted; image files (PNG, JPG, WebP, BMP) work too and switch the parsing engine to OCR automatically. Size limits are generous and exist only to keep your browser tab responsive: up to 75&nbsp;MB for PDFs and images, and up to 250&nbsp;MB for documents and text files (only their text is read, so embedded media never counts).</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
@@ -260,7 +260,7 @@
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">Images &amp; scanned PDFs <span class="text-xs font-normal text-[var(--text-secondary)]">(OCR engine)</span></h4>
-                                <p class="text-sm">Switch the parsing engine to OCR to read PNG, JPG, WebP, or BMP images and scanned PDFs that have no text layer. Recognition runs locally with PP-OCRv6; see the engines section below.</p>
+                                <p class="text-sm">Pick a PNG, JPG, WebP, or BMP image and the parsing engine switches to OCR automatically. For scanned PDFs with no text layer, select the OCR engine yourself. Recognition runs locally with PP-OCRv6; see the engines section below.</p>
                             </div>
                         </div>
                     </div>

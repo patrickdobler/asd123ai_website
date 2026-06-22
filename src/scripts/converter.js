@@ -1,4 +1,11 @@
-const MAX_FILE_SIZE = 25 * 1024 * 1024;
+// File-size guardrails. Everything runs in the browser, so a big file is never a
+// server limit — the only real risk is freezing the tab. PDFs and images are
+// processed in full (every page is rendered, every pixel is read by OCR), so they
+// keep a tighter cap. Container/text formats (PPTX/XLSX/DOCX/HTML/CSV/plain text)
+// only have their *text* extracted — embedded media is ignored — so the file size
+// barely reflects the work and they get a much larger allowance.
+const MAX_FILE_SIZE = 75 * 1024 * 1024;       // PDF, images (OCR)
+const MAX_TEXT_FILE_SIZE = 250 * 1024 * 1024; // PPTX, XLSX, XLS, DOCX, HTML, CSV, plain text
 
 const ENGINE_HINTS = {
     standard: 'Fast, lightweight pdf.js reader. Good for most single-column PDFs. PDF only; DOCX always uses mammoth.js.',
@@ -1266,12 +1273,24 @@ class ConverterApp {
         const ext = fileExtension(file.name);
         const isImage = OCR_IMAGE_EXTENSIONS.includes(ext);
         const supported = ['pdf', 'docx', 'pptx', 'xlsx', 'xls', 'csv', 'html', 'htm'];
-        if (isImage && this.currentEngine() !== 'ocr') {
-            throw new Error(`Image files need the OCR engine. Select "OCR (scanned PDFs & images)" first.`);
+
+        // Images can only be read by OCR. Instead of erroring out, switch the engine
+        // automatically so picking an image just works.
+        this.autoSelectedOcr = false;
+        if (isImage && this.currentEngine() !== 'ocr' && this.elements.engine) {
+            this.elements.engine.value = 'ocr';
+            this.updateEngineHint();
+            this.autoSelectedOcr = true;
         }
-        if (file.size > MAX_FILE_SIZE) {
-            throw new Error(`${file.name} is larger than 25 MB. Convert a smaller file or split it first.`);
+
+        // PDFs/images are processed in full; everything else only has its text
+        // extracted, so it gets the larger MAX_TEXT_FILE_SIZE allowance.
+        const limit = (ext === 'pdf' || isImage) ? MAX_FILE_SIZE : MAX_TEXT_FILE_SIZE;
+        if (file.size > limit) {
+            const mb = Math.round(limit / (1024 * 1024));
+            throw new Error(`${file.name} is larger than ${mb} MB. Convert a smaller file or split it first.`);
         }
+
         if (isImage) return 'image';
         if (supported.includes(ext)) return ext;
         // Anything else: try to read it as plain text (binary is caught at read time).
@@ -1352,7 +1371,8 @@ class ConverterApp {
             this.renderOutput(markdown);
             const wordCount = markdown.split(/\s+/).filter(Boolean).length;
             this.elements.meta.textContent = `${file.name} converted locally. ${markdown.length.toLocaleString('en-US')} characters · ${wordCount.toLocaleString('en-US')} words${engineNote}.`;
-            this.setStatus(`${file.name} converted locally. No upload happened.`, 'good');
+            const ocrSwitchNote = this.autoSelectedOcr ? 'Switched to the OCR engine for this image. ' : '';
+            this.setStatus(`${ocrSwitchNote}${file.name} converted locally. No upload happened.`, 'good');
             this.elements.copyBtn.disabled = !markdown;
             this.elements.downloadBtn.disabled = !markdown;
             if (this.elements.toTtsBtn) this.elements.toTtsBtn.disabled = !markdown;
