@@ -2739,6 +2739,20 @@ footer {
     border-color: rgba(60, 60, 60, 0.45);
 }
 
+/* The PDF engine selector only applies to PDFs; it is disabled (grayed out) for
+   every other input so the choice can't mislead. */
+.converter-engine-card--disabled {
+    opacity: 0.6;
+}
+
+.converter-engine-card--disabled:hover {
+    border-color: var(--border-color);
+}
+
+#converterEngine:disabled {
+    cursor: not-allowed;
+}
+
 .converter-engine-head {
     align-items: center;
     display: flex;

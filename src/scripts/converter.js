@@ -16,6 +16,22 @@ const ENGINE_HINTS = {
 
 const OCR_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'bmp'];
 
+// The engine selector only applies to PDFs. For every other input there is a
+// single fixed conversion path (or forced OCR for images), so the selector is
+// disabled and one of these hints explains what runs instead.
+const ENGINE_DISABLED_HINTS = {
+    image: "Images are read with OCR automatically. The PDF engine selector only applies to PDFs.",
+    docx: "Word (DOCX) is converted automatically with mammoth.js. The PDF engine selector only applies to PDFs.",
+    pptx: "PowerPoint (PPTX) is converted automatically. The PDF engine selector only applies to PDFs.",
+    xlsx: "Excel (XLSX) is converted automatically with SheetJS. The PDF engine selector only applies to PDFs.",
+    xls: "Excel (XLS) is converted automatically with SheetJS. The PDF engine selector only applies to PDFs.",
+    csv: "CSV is converted automatically with SheetJS. The PDF engine selector only applies to PDFs.",
+    html: "HTML is converted automatically. The PDF engine selector only applies to PDFs.",
+    htm: "HTML is converted automatically. The PDF engine selector only applies to PDFs.",
+    text: "Plain text is passed through automatically. The PDF engine selector only applies to PDFs.",
+    default: "This file is converted automatically. The PDF engine selector only applies to PDFs."
+};
+
 function loadExternalScript(src) {
     return new Promise((resolve, reject) => {
         const existing = document.querySelector(`script[src="${src}"]`);
@@ -1214,6 +1230,22 @@ class ConverterApp {
         // text, etc.). Format handling/validation happens after selection.
     }
 
+    // The engine selector is meaningful only for PDFs. Enable it for PDFs (and the
+    // no-file default); gray it out for everything else and explain what runs.
+    updateEngineAvailability(type) {
+        const sel = this.elements.engine;
+        if (!sel) return;
+        const card = sel.closest('.converter-engine-card');
+        const appliesToFile = type == null || type === 'pdf';
+        sel.disabled = !appliesToFile;
+        if (card) card.classList.toggle('converter-engine-card--disabled', !appliesToFile);
+        if (appliesToFile) {
+            this.updateEngineHint();
+        } else if (this.elements.engineHint) {
+            this.elements.engineHint.textContent = ENGINE_DISABLED_HINTS[type] || ENGINE_DISABLED_HINTS.default;
+        }
+    }
+
     bindEvents() {
         this.elements.chooseFileBtn.addEventListener('click', () => this.elements.fileInput.click());
         this.elements.fileInput.addEventListener('change', event => this.handleFiles(event.target.files));
@@ -1274,15 +1306,6 @@ class ConverterApp {
         const isImage = OCR_IMAGE_EXTENSIONS.includes(ext);
         const supported = ['pdf', 'docx', 'pptx', 'xlsx', 'xls', 'csv', 'html', 'htm'];
 
-        // Images can only be read by OCR. Instead of erroring out, switch the engine
-        // automatically so picking an image just works.
-        this.autoSelectedOcr = false;
-        if (isImage && this.currentEngine() !== 'ocr' && this.elements.engine) {
-            this.elements.engine.value = 'ocr';
-            this.updateEngineHint();
-            this.autoSelectedOcr = true;
-        }
-
         // PDFs/images are processed in full; everything else only has its text
         // extracted, so it gets the larger MAX_TEXT_FILE_SIZE allowance.
         const limit = (ext === 'pdf' || isImage) ? MAX_FILE_SIZE : MAX_TEXT_FILE_SIZE;
@@ -1304,6 +1327,8 @@ class ConverterApp {
     async convertFile(file) {
         try {
             const ext = this.validate(file);
+            // Reflect that the PDF engine selector only applies to PDFs.
+            this.updateEngineAvailability(ext);
             this.setStatus(`Preparing ${file.name}...`, 'working');
             this.elements.chooseFileBtn.disabled = true;
             this.lastFile = file;
@@ -1371,8 +1396,7 @@ class ConverterApp {
             this.renderOutput(markdown);
             const wordCount = markdown.split(/\s+/).filter(Boolean).length;
             this.elements.meta.textContent = `${file.name} converted locally. ${markdown.length.toLocaleString('en-US')} characters · ${wordCount.toLocaleString('en-US')} words${engineNote}.`;
-            const ocrSwitchNote = this.autoSelectedOcr ? 'Switched to the OCR engine for this image. ' : '';
-            this.setStatus(`${ocrSwitchNote}${file.name} converted locally. No upload happened.`, 'good');
+            this.setStatus(`${file.name} converted locally. No upload happened.`, 'good');
             this.elements.copyBtn.disabled = !markdown;
             this.elements.downloadBtn.disabled = !markdown;
             if (this.elements.toTtsBtn) this.elements.toTtsBtn.disabled = !markdown;

@@ -209,7 +209,7 @@
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">1</div>
                                 <div>
                                     <h4 class="font-bold text-[var(--text-primary)] mb-1">Pick a document</h4>
-                                    <p class="text-sm">Drag any file into the drop area, or use the Choose file button — there is no format filter. PDF, DOCX, PPTX, Excel/CSV, HTML, and plain-text files are converted; image files (PNG, JPG, WebP, BMP) work too and switch the parsing engine to OCR automatically. Size limits are generous and exist only to keep your browser tab responsive: up to 75&nbsp;MB for PDFs and images, and up to 250&nbsp;MB for documents and text files (only their text is read, so embedded media never counts).</p>
+                                    <p class="text-sm">Drag any file into the drop area, or use the Choose file button — there is no format filter. PDF, DOCX, PPTX, Excel/CSV, HTML, and plain-text files are converted; image files (PNG, JPG, WebP, BMP) are read with OCR automatically. Each format has a single fixed conversion path, so the only choice you ever make is the parsing engine for PDFs — for any other file that selector is disabled. Size limits are generous and exist only to keep your browser tab responsive: up to 75&nbsp;MB for PDFs and images, and up to 250&nbsp;MB for documents and text files (only their text is read, so embedded media never counts).</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
@@ -260,7 +260,7 @@
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">Images &amp; scanned PDFs <span class="text-xs font-normal text-[var(--text-secondary)]">(OCR engine)</span></h4>
-                                <p class="text-sm">Pick a PNG, JPG, WebP, or BMP image and the parsing engine switches to OCR automatically. For scanned PDFs with no text layer, select the OCR engine yourself. Recognition runs locally with PP-OCRv6; see the engines section below.</p>
+                                <p class="text-sm">Pick a PNG, JPG, WebP, or BMP image and it is read with OCR automatically — no engine to choose. For scanned PDFs with no text layer, select the OCR engine in the PDF parsing engine selector. Recognition runs locally with PP-OCRv6; see the engines section below.</p>
                             </div>
                         </div>
                     </div>
@@ -271,7 +271,7 @@
                         </h3>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
-                                For PDFs, the <strong class="text-[var(--text-primary)]">PDF parsing engine</strong> selector offers four choices. The default <strong class="text-[var(--text-primary)]">EdgeParse</strong> is a Rust engine compiled to WebAssembly that handles multi-column pages and tables well and emits Markdown directly. <strong class="text-[var(--text-primary)]">LiteParse</strong> is a second high-accuracy WebAssembly engine, <strong class="text-[var(--text-primary)]">Standard (pdf.js)</strong> is the lightest option with no extra download, and <strong class="text-[var(--text-primary)]">OCR</strong> reads scanned PDFs and images that have no text layer. Every engine loads locally the first time you pick it; everything runs entirely in your browser.
+                                The <strong class="text-[var(--text-primary)]">PDF parsing engine</strong> selector applies to PDFs only — for every other format the conversion path is fixed, so the selector is disabled. It offers four choices. The default <strong class="text-[var(--text-primary)]">EdgeParse</strong> is a Rust engine compiled to WebAssembly that handles multi-column pages and tables well and emits Markdown directly. <strong class="text-[var(--text-primary)]">LiteParse</strong> is a second high-accuracy WebAssembly engine, <strong class="text-[var(--text-primary)]">Standard (pdf.js)</strong> is the lightest option with no extra download, and <strong class="text-[var(--text-primary)]">OCR</strong> reads scanned PDFs that have no text layer (standalone images are sent to OCR automatically). Every engine loads locally the first time you pick it; everything runs entirely in your browser.
                             </p>
                             <div class="grid md:grid-cols-2 gap-4">
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
