@@ -231,7 +231,7 @@
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-3">
                                         <h3 class="font-bold text-[var(--text-primary)] mb-2">Gemma 4 E2B Turbo (Apple Silicon) <span class="text-xs font-normal text-[var(--text-secondary)]">experimental</span></h3>
-                                        <p class="text-sm">The same Gemma 4 E2B, but run through a different engine that uses hand-optimized WebGPU compute shaders tuned for Apple Silicon GPUs. On an Apple&nbsp;M-series Mac it decodes several times faster than the standard path; on other GPUs it still runs but the speed-up is smaller. English text only — no images, and it needs a network connection on first use to download its weights. If it fails to load, switch back to the standard Gemma&nbsp;4&nbsp;E2B.</p>
+                                        <p class="text-sm">The same Gemma 4 E2B, but run through a different engine that uses hand-optimized WebGPU compute shaders tuned for Apple Silicon GPUs. On an Apple&nbsp;M-series Mac it decodes several times faster than the standard path; on other GPUs it still runs but the speed-up is smaller. English text only — no images, and it needs a network connection on first use to download its weights. If it fails to load, switch back to the standard Gemma&nbsp;4&nbsp;E2B. This engine is English-only and text-only: attachments and images are not supported, and non-English prompts may produce weak results.</p>
                                     </div>
                                 </div>
                             </div>
@@ -251,7 +251,7 @@
                                     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">2</div>
                                     <div>
                                         <h3 class="font-bold text-[var(--text-primary)] mb-1">Load the model</h3>
-                                        <p class="text-sm">Click <strong>Load Model</strong> and wait until the status says the model is ready. The Stop button can cancel loading or generation.</p>
+                                        <p class="text-sm">Click <strong>Load Model</strong> and wait until the status says the model is ready. The Stop button cancels loading or generation: stopping a <em>generation</em> keeps the partial reply and (on supported runtimes) the loaded model; stopping a <em>model load</em> discards it, so start the load again afterwards.</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-4">
@@ -268,7 +268,7 @@
                             <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4">5. Attachments</h2>
                             <div class="space-y-4 text-[var(--text-secondary)]">
                                 <p class="leading-relaxed">
-                                    Use the attachment button to add images or documents. Supported file types include images, TXT, Markdown, PDF, and DOCX. Text extraction happens in the browser before the content is inserted into the chat context.
+                                    Use the attachment button to add images or documents. Supported file types include images, TXT, Markdown, CSV, JSON, log files, PDF, and DOCX (up to 15&nbsp;MB per file). Text extraction happens in the browser before the content is inserted into the chat context.
                                 </p>
                                 <ul class="list-disc list-inside space-y-2 ml-4">
                                     <li>Images are sent to multimodal-capable model paths when supported by the selected model.</li>
@@ -301,11 +301,11 @@
                             <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h3 class="font-bold text-[var(--text-primary)] mb-2">Local history</h3>
-                                    <p class="text-sm">Chats are stored in browser IndexedDB. New Chat starts a fresh thread. Delete All Chats clears saved chat records from the browser.</p>
+                                    <p class="text-sm">Chats are stored in browser IndexedDB. New Chat starts a fresh thread. Delete All Chats clears saved chat records from the browser. Click a chat title to rename it; the small × on a history entry deletes that single chat (Delete All removes everything).</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h3 class="font-bold text-[var(--text-primary)] mb-2">Edit and regenerate</h3>
-                                    <p class="text-sm">Edit a sent user message to regenerate the following assistant response from that point in the conversation.</p>
+                                    <p class="text-sm">Edit a sent user message to regenerate the following assistant response from that point in the conversation. Every assistant reply has a copy button (raw Markdown), and the newest reply has a regenerate button to try again without retyping.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h3 class="font-bold text-[var(--text-primary)] mb-2">Markdown export</h3>

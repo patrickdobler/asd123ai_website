@@ -108,6 +108,45 @@ class ChatModelRunner {
         this.abortReason = '';
         this.fetchAbortPatched = false;
         this.abortableFetch = null;
+        // Interruptable stopping criteria: lets Stop end a transformers.js
+        // generation gracefully (partial reply, model stays loaded).
+        this.generationCriteria = null;
+        this.gracefulStopRequested = false;
+    }
+
+    // Stop the current work. Generation via transformers.js is interrupted
+    // gracefully (model survives); everything else falls back to a hard abort.
+    requestStop() {
+        if (this.generationCriteria) {
+            this.gracefulStopRequested = true;
+            try {
+                this.generationCriteria.interrupt();
+                return 'graceful';
+            } catch (error) {
+                // Fall through to a hard abort below.
+            }
+        }
+        return this.cancelCurrentOperation() ? 'aborted' : 'none';
+    }
+
+    consumeGracefulStop() {
+        const stopped = this.gracefulStopRequested;
+        this.gracefulStopRequested = false;
+        return stopped;
+    }
+
+    // After an aborted generation on the kernel engine the model itself is
+    // fine — only its per-conversation state needs a reset.
+    async recoverAfterGenerationAbort() {
+        if (this.gmModel) {
+            try {
+                await this.gmModel.reset?.();
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+        return false;
     }
 
     beginAbortableOperation(reason = 'operation') {
@@ -151,12 +190,18 @@ class ChatModelRunner {
 
     async ensure(modelId, wantsMultimodal = false, { force = false } = {}) {
         this.throwIfAborted();
-        const modelKey = `${modelId}:${wantsMultimodal ? 'multimodal' : 'text'}`;
+        const config = getModelConfig(modelId);
+        // Key by the artifacts that are actually loaded: for models whose text
+        // and multimodal variants share one class (Gemma), attaching an image
+        // must NOT trigger a reload of identical files.
+        const variant = config.engine === 'gemma4mobile'
+            ? 'engine'
+            : (this.getClassName(config, wantsMultimodal) || (wantsMultimodal ? 'multimodal' : 'text'));
+        const modelKey = `${modelId}:${variant}`;
         if (!force && this.currentModelKey === modelKey && ((this.model && this.processor) || this.gmModel)) {
             return;
         }
 
-        const config = getModelConfig(modelId);
         if (config.status === 'unavailable') {
             throw new Error(config.disabledReason || 'This model is not available.');
         }
@@ -174,7 +219,10 @@ class ChatModelRunner {
         this.updateStatus('Loading runtime...');
 
         try {
-            if (force) {
+            // ALWAYS free the previous model before loading a different one.
+            // Loading a second multi-GB model while the first is still resident
+            // used to leak GPU memory until the WebGPU session failed.
+            if (force || this.model || this.gmModel) {
                 await this.resetLoadedModel();
             }
 
@@ -716,7 +764,19 @@ class ChatModelRunner {
             }
         }
 
-        return turns.length ? turns : [{ role: 'user', content: '' }];
+        // Merge consecutive same-role turns (e.g. compact summary + user
+        // message) — strict chat templates require alternating roles.
+        const merged = [];
+        for (const turn of turns) {
+            const last = merged.at(-1);
+            if (last && last.role === turn.role) {
+                last.content = `${last.content}\n\n${turn.content}`.trim();
+            } else {
+                merged.push(turn);
+            }
+        }
+
+        return merged.length ? merged : [{ role: 'user', content: '' }];
     }
 
     extractTextContent(content) {
@@ -795,9 +855,29 @@ class ChatModelRunner {
             generationOptions.temperature = Number(temperature) || DEFAULT_TEMPERATURE;
         }
 
-        const outputs = await this.model.generate(generationOptions);
-        this.throwIfAborted();
-        return { outputs, streamed };
+        // Graceful-stop support: Stop interrupts the token loop instead of
+        // tearing the whole model down (when the runtime exposes it).
+        const Criteria = this.hf.InterruptableStoppingCriteria;
+        let criteria = null;
+        if (typeof Criteria === 'function') {
+            try {
+                criteria = new Criteria();
+                generationOptions.stopping_criteria = criteria;
+                this.generationCriteria = criteria;
+            } catch (error) {
+                criteria = null;
+            }
+        }
+
+        try {
+            const outputs = await this.model.generate(generationOptions);
+            this.throwIfAborted();
+            return { outputs, streamed };
+        } finally {
+            if (criteria && this.generationCriteria === criteria) {
+                this.generationCriteria = null;
+            }
+        }
     }
 
     shouldSample(modelId, temperature, inputTokenCount) {
@@ -1007,17 +1087,30 @@ class ChatModelRunner {
     }
 
     formatGemmaPrompt(messages) {
+        // Gemma's actual chat format: <start_of_turn>role ... <end_of_turn>.
+        // The system message is folded into the first user turn (Gemma has no
+        // system role).
         const bos = this.processor?.tokenizer?.bos_token || '';
         const turns = [bos];
+        let systemText = '';
 
         messages.forEach(message => {
-            const role = message.role === 'assistant' ? 'model' : message.role;
-            turns.push(`<|turn>${role}\n`);
-            turns.push(this.flattenGemmaContent(message.content, role === 'model'));
-            turns.push('<turn|>\n');
+            if (message.role === 'system') {
+                systemText += (systemText ? '\n' : '') + this.flattenGemmaContent(message.content);
+                return;
+            }
+            const role = message.role === 'assistant' ? 'model' : 'user';
+            let content = this.flattenGemmaContent(message.content, role === 'model');
+            if (systemText && role === 'user') {
+                content = `${systemText}\n\n${content}`.trim();
+                systemText = '';
+            }
+            turns.push(`<start_of_turn>${role}\n`);
+            turns.push(content);
+            turns.push('<end_of_turn>\n');
         });
 
-        turns.push('<|turn>model\n');
+        turns.push('<start_of_turn>model\n');
         return turns.join('');
     }
 
@@ -1052,10 +1145,22 @@ class ChatModelRunner {
             throw new Error('The loaded Transformers.js runtime does not expose RawImage for image inputs.');
         }
 
+        // Decoded images are cached per attachment so historical images are
+        // not re-decoded on every conversation turn.
+        this.imageCache = this.imageCache || new Map();
         const images = [];
         for (const attachment of attachments) {
             this.throwIfAborted();
-            images.push(await RawImage.read(attachment.dataUrl));
+            const key = attachment.id || attachment.dataUrl;
+            let image = this.imageCache.get(key);
+            if (!image) {
+                image = await RawImage.read(attachment.dataUrl);
+                this.imageCache.set(key, image);
+                if (this.imageCache.size > 16) {
+                    this.imageCache.delete(this.imageCache.keys().next().value);
+                }
+            }
+            images.push(image);
         }
         return images;
     }
@@ -1408,8 +1513,12 @@ class LocalChatApp {
         });
         this.elements.messageInput.addEventListener('input', () => {
             this.resizeComposer();
-            this.updateContextBudget();
+            // The context measure walks the whole history + attachments;
+            // debounce it so typing stays smooth in long chats.
+            clearTimeout(this.contextBudgetTimer);
+            this.contextBudgetTimer = setTimeout(() => this.updateContextBudget(), 150);
         });
+        this.elements.currentChatTitle?.addEventListener('click', () => this.renameCurrentChat());
     }
 
     populateModels() {
@@ -1447,7 +1556,6 @@ class LocalChatApp {
             updatedAt: now,
             modelId,
             contextWindow: getModelConfig(modelId).defaultContextWindow,
-            temperature: DEFAULT_TEMPERATURE,
             messages: [],
             isDraft: !persist
         };
@@ -1506,7 +1614,6 @@ class LocalChatApp {
             this.elements.contextSelect.value
         );
         this.elements.contextSelect.value = String(this.currentChat.contextWindow);
-        this.currentChat.temperature = this.currentChat.temperature ?? DEFAULT_TEMPERATURE;
 
         if (this.currentChat.isDraft) {
             return;
@@ -1790,9 +1897,66 @@ class LocalChatApp {
             meta.className = 'chat-history-meta';
             meta.textContent = this.formatDate(chat.updatedAt);
 
-            button.append(title, meta);
+            const remove = document.createElement('span');
+            remove.className = 'chat-history-delete';
+            remove.setAttribute('role', 'button');
+            remove.setAttribute('aria-label', `Delete chat: ${this.getDisplayTitle(chat)}`);
+            remove.title = 'Delete this chat';
+            remove.textContent = '\u00d7';
+            remove.addEventListener('click', event => {
+                event.stopPropagation();
+                this.deleteChat(chat.id);
+            });
+
+            button.append(title, meta, remove);
             this.elements.chatHistory.appendChild(button);
         });
+    }
+
+    async deleteChat(id) {
+        const chat = this.chats.find(item => item.id === id);
+        const confirmed = window.confirm(`Delete "${this.getDisplayTitle(chat)}" from this browser?`);
+        if (!confirmed) {
+            return;
+        }
+
+        await this.storage.deleteChat(id);
+        this.chats = await this.storage.listChats();
+
+        if (this.currentChat?.id === id) {
+            if (this.chats.length) {
+                await this.openChat(this.chats[0].id);
+            } else {
+                await this.createNewChat({ persist: false });
+            }
+        } else {
+            this.renderHistory();
+        }
+        this.setModelStatus('Chat deleted');
+    }
+
+    async renameCurrentChat() {
+        if (!this.currentChat || this.generating) {
+            return;
+        }
+
+        const next = window.prompt('Rename chat', this.getDisplayTitle(this.currentChat));
+        if (next === null) {
+            return;
+        }
+
+        const title = next.trim();
+        if (!title) {
+            return;
+        }
+
+        this.currentChat.title = title;
+        if (!this.currentChat.isDraft) {
+            this.currentChat = await this.storage.saveChat(this.currentChat);
+            this.chats = await this.storage.listChats();
+        }
+        this.elements.currentChatTitle.textContent = title;
+        this.renderHistory();
     }
 
     renderMessages() {
@@ -1847,6 +2011,28 @@ class LocalChatApp {
             edit.innerHTML = this.icon('edit');
             edit.addEventListener('click', () => this.editMessage(message.id, index));
             header.appendChild(edit);
+        }
+
+        if (message.role === 'assistant' && !this.runner.isCompactMessage(message)) {
+            const copy = document.createElement('button');
+            copy.type = 'button';
+            copy.className = 'chat-icon-btn';
+            copy.title = 'Copy reply as Markdown';
+            copy.setAttribute('aria-label', 'Copy reply');
+            copy.innerHTML = this.icon('copy');
+            copy.addEventListener('click', () => this.copyMessage(message.id));
+            header.appendChild(copy);
+
+            if (index === (this.currentChat?.messages?.length || 0) - 1) {
+                const regen = document.createElement('button');
+                regen.type = 'button';
+                regen.className = 'chat-icon-btn';
+                regen.title = 'Regenerate this reply';
+                regen.setAttribute('aria-label', 'Regenerate reply');
+                regen.innerHTML = this.icon('refresh');
+                regen.addEventListener('click', () => this.regenerateLastReply());
+                header.appendChild(regen);
+            }
         }
 
         const body = this.renderMessageBody(message.content || '');
@@ -2335,7 +2521,7 @@ class LocalChatApp {
                 modelId: this.currentChat.modelId,
                 messages: this.currentChat.messages.filter(message => message.id !== assistantMessage.id),
                 contextWindow: this.currentChat.contextWindow,
-                temperature: this.currentChat.temperature,
+                temperature: DEFAULT_TEMPERATURE,
                 onToken: text => {
                     assistantMessage.content = text;
                     this.updateAssistantMessage(assistantMessage.id, text);
@@ -2343,21 +2529,30 @@ class LocalChatApp {
             });
 
             assistantMessage.content = content || assistantMessage.content || 'No response was generated.';
-            this.updateAssistantMessage(assistantMessage.id, assistantMessage.content);
+            this.updateAssistantMessage(assistantMessage.id, assistantMessage.content, { immediate: true });
             await this.persistCurrentChat();
+            if (this.runner.consumeGracefulStop()) {
+                this.setModelStatus('Generation stopped — partial reply kept, model stays loaded.');
+            }
         } catch (error) {
             if (this.runner.isAbortError(error)) {
                 assistantMessage.content = assistantMessage.content || 'Generation stopped.';
-                this.updateAssistantMessage(assistantMessage.id, assistantMessage.content);
+                this.updateAssistantMessage(assistantMessage.id, assistantMessage.content, { immediate: true });
                 await this.persistCurrentChat();
-                await this.runner.resetLoadedModel();
-                this.setModelStatus('Generation stopped. Reload the model to continue.');
+                // Kernel-engine aborts only need a state reset; the model stays
+                // loaded. Other aborts tear the session down (old behavior).
+                if (await this.runner.recoverAfterGenerationAbort()) {
+                    this.setModelStatus('Generation stopped.');
+                } else {
+                    await this.runner.resetLoadedModel();
+                    this.setModelStatus('Generation stopped. Reload the model to continue.');
+                }
                 return;
             }
 
             const message = this.describeGenerationFailure(error);
             assistantMessage.content = `Local generation failed: ${message}`;
-            this.updateAssistantMessage(assistantMessage.id, assistantMessage.content);
+            this.updateAssistantMessage(assistantMessage.id, assistantMessage.content, { immediate: true });
             await this.persistCurrentChat();
             await this.runner.resetLoadedModel();
             this.setModelStatus('Generation failed. Reload the model to continue.');
@@ -2398,8 +2593,10 @@ class LocalChatApp {
         }
 
         const label = this.operationType === 'loading' ? 'model loading' : 'generation';
-        const stopped = this.runner.cancelCurrentOperation();
-        if (stopped) {
+        const result = this.runner.requestStop();
+        if (result === 'graceful') {
+            this.setModelStatus('Stopping generation (model stays loaded)...');
+        } else if (result === 'aborted') {
             this.setModelStatus(`Stopping ${label}...`);
         }
         this.updateStopButton({ stopping: true });
@@ -2454,8 +2651,38 @@ class LocalChatApp {
         throw new Error('Browser blocked direct access to local model files. Use Chrome or Edge and allow folder access when prompted.');
     }
 
-    updateAssistantMessage(messageId, text) {
-        const article = this.elements.messageList.querySelector(`[data-message-id="${messageId}"]`);
+    updateAssistantMessage(messageId, text, { immediate = false } = {}) {
+        // Streaming updates are coalesced to one DOM render per animation
+        // frame — re-rendering the whole message per token forced a layout
+        // pass for every generated token.
+        this.pendingStreamUpdate = { messageId, text };
+
+        if (immediate) {
+            if (this.streamRenderRaf) {
+                cancelAnimationFrame(this.streamRenderRaf);
+                this.streamRenderRaf = null;
+            }
+            this.flushAssistantMessage();
+            return;
+        }
+
+        if (this.streamRenderRaf) {
+            return;
+        }
+        this.streamRenderRaf = requestAnimationFrame(() => {
+            this.streamRenderRaf = null;
+            this.flushAssistantMessage();
+        });
+    }
+
+    flushAssistantMessage() {
+        const update = this.pendingStreamUpdate;
+        if (!update) {
+            return;
+        }
+        this.pendingStreamUpdate = null;
+
+        const article = this.elements.messageList.querySelector(`[data-message-id="${update.messageId}"]`);
         if (!article) {
             return;
         }
@@ -2463,7 +2690,7 @@ class LocalChatApp {
         const shouldAutoScroll = this.isMessageListNearBottom();
         const body = article.querySelector('.chat-message-body');
         if (body) {
-            body.replaceWith(this.renderMessageBody(text));
+            body.replaceWith(this.renderMessageBody(update.text));
         }
 
         if (shouldAutoScroll) {
@@ -2474,7 +2701,6 @@ class LocalChatApp {
     async persistCurrentChat() {
         this.currentChat.modelId = this.elements.modelSelect.value;
         this.currentChat.contextWindow = Number(this.elements.contextSelect.value);
-        this.currentChat.temperature = this.currentChat.temperature ?? DEFAULT_TEMPERATURE;
         delete this.currentChat.isDraft;
         this.currentChat = await this.storage.saveChat(this.currentChat);
         this.chats = await this.storage.listChats();
@@ -2596,6 +2822,36 @@ class LocalChatApp {
         this.chats = [];
         await this.createNewChat({ persist: false });
         this.setModelStatus('Local chat history deleted');
+    }
+
+    async copyMessage(messageId) {
+        const message = this.currentChat?.messages?.find(item => item.id === messageId);
+        if (!message?.content) {
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(message.content);
+            this.setModelStatus('Reply copied to clipboard');
+        } catch (error) {
+            this.setModelStatus('Clipboard access was blocked by the browser');
+        }
+    }
+
+    async regenerateLastReply() {
+        if (this.generating || !this.currentChat?.messages?.length) {
+            return;
+        }
+
+        const last = this.currentChat.messages.at(-1);
+        if (last.role !== 'assistant') {
+            return;
+        }
+
+        this.currentChat.messages.pop();
+        await this.persistCurrentChat();
+        this.renderMessages();
+        await this.generateAssistantReply();
     }
 
     exportCurrentChat() {
@@ -2772,7 +3028,9 @@ class LocalChatApp {
 
     icon(name) {
         const icons = {
-            edit: '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>'
+            edit: '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+            copy: '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
+            refresh: '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>'
         };
         return icons[name] || '';
     }
