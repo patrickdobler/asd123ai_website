@@ -1,59 +1,59 @@
 User-agent: *
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 # AI and Search Engine Bots - Explicitly Allow
 User-agent: GPTBot
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: ClaudeBot
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: PerplexityBot
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: ChatGPT-User
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: Googlebot
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: Bingbot
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: Slurp
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: DuckDuckBot
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: Baiduspider
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: YandexBot
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: facebookexternalhit
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: Twitterbot
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 User-agent: LinkedInBot
 Allow: /
-Content-Signal: ai-train=no, search=yes, ai-input=no
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 
 # Sitemap
 Sitemap: https://asd123.ai/sitemap.xml

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { execFile } = require('child_process');
 
 // Dev build: copy source into dist/ unminified and watch for changes.
 // Mirrors tools/build.js layout exactly, so dev and prod serve identical paths.
@@ -50,6 +51,26 @@ function copyHtmlFlat(dir) {
         .forEach(f => copyFile(path.join(dir, f), path.join(distDir, f)));
 }
 
+// Compile Tailwind utilities used in pages/scripts into dist/styles/tailwind.css
+// (replaces the former in-browser Play runtime). Async so the watcher stays alive.
+let tailwindRunning = false;
+let tailwindQueued = false;
+function runTailwind() {
+    if (tailwindRunning) { tailwindQueued = true; return; }
+    tailwindRunning = true;
+    execFile('npx', [
+        'tailwindcss',
+        '-c', 'tools/tailwind.config.js',
+        '-i', 'tools/tailwind.input.css',
+        '-o', path.join(distDir, 'styles', 'tailwind.css')
+    ], (error, _stdout, stderr) => {
+        tailwindRunning = false;
+        if (error) console.error('✗ Tailwind build failed:', stderr || error.message);
+        else console.log(`[${new Date().toLocaleTimeString()}] ✓ tailwind.css rebuilt`);
+        if (tailwindQueued) { tailwindQueued = false; runTailwind(); }
+    });
+}
+
 function initialBuild() {
     console.log('=== Initial Development Build ===');
     copyHtmlFlat('src/pages');   // production pages
@@ -58,6 +79,7 @@ function initialBuild() {
     copyDir('src/scripts', path.join(distDir, 'scripts'));
     copyDir('public', distDir);          // favicons, logo, robots, sitemap, vendor/
     copyDir('vendor-dev', path.join(distDir, 'vendor-dev')); // dev-only engine
+    runTailwind();
     console.log('=== Build Complete ===\n');
 }
 
@@ -74,6 +96,10 @@ function watchDirectory(dir, distSubDir) {
             } else if (fs.existsSync(destPath)) {
                 fs.unlinkSync(destPath);
                 console.log(`[${new Date().toLocaleTimeString()}] ✗ Deleted: ${destPath}`);
+            }
+            // Utility classes may have changed in pages/scripts.
+            if (dir === 'src/pages' || dir === 'src/scripts' || dir === 'dev') {
+                debounce('tailwind-rebuild', runTailwind);
             }
         });
     });

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <title>Anonymize Text Before Pasting It Into ChatGPT | ASD123.ai</title>
+    <meta name="description" content="Remove names, emails, phone numbers, IBANs, and other personal data from text before sharing it with ChatGPT or any AI - locally in your browser, with reversible placeholders.">
+    <meta name="keywords" content="anonymize text for chatgpt, remove pii from text, anonymize before ai, pii redaction tool, gdpr chatgpt, pseudonymize text online">
+    <meta name="author" content="ASD123.ai">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Anonymize Text Before Pasting It Into ChatGPT | ASD123.ai">
+    <meta property="og:description" content="Remove names, emails, phone numbers, IBANs, and other personal data from text before sharing it with ChatGPT or any AI - locally in your browser, with reversible placeholders.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://asd123.ai/anonymize-text-for-ai">
+    <meta property="og:site_name" content="ASD123.ai">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Anonymize Text Before Pasting It Into ChatGPT | ASD123.ai">
+    <meta name="twitter:description" content="Remove names, emails, phone numbers, IBANs, and other personal data from text before sharing it with ChatGPT or any AI - locally in your browser, with reversible placeholders.">
+    <link rel="canonical" href="https://asd123.ai/anonymize-text-for-ai">
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <script src="scripts/shared.js"></script>
+    <meta property="og:image" content="https://asd123.ai/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="ASD123.ai - private AI text tools, 100% in your browser">
+    <meta name="twitter:image" content="https://asd123.ai/og-image.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://asd123.ai/#organization",
+          "name": "ASD123.ai",
+          "url": "https://asd123.ai/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://asd123.ai/logo.png"
+          },
+          "sameAs": [
+            "https://github.com/patrickdobler/asd123.ai"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://asd123.ai/#website",
+          "url": "https://asd123.ai/",
+          "name": "ASD123.ai",
+          "description": "Privacy-first AI text tools that run entirely in your browser.",
+          "publisher": {
+            "@id": "https://asd123.ai/#organization"
+          },
+          "inLanguage": "en"
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://asd123.ai/anonymize-text-for-ai#webpage",
+          "name": "Anonymize Text Before Pasting It Into ChatGPT | ASD123.ai",
+          "description": "Remove names, emails, phone numbers, IBANs, and other personal data from text before sharing it with ChatGPT or any AI - locally in your browser, with reversible placeholders.",
+          "url": "https://asd123.ai/anonymize-text-for-ai",
+          "inLanguage": "en",
+          "isPartOf": {
+            "@id": "https://asd123.ai/#website"
+          },
+          "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://asd123.ai/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Anonymize Text Before Sharing It With AI",
+                "item": "https://asd123.ai/anonymize-text-for-ai"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://asd123.ai/anonymize-text-for-ai#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What kinds of personal data does it detect?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Names, titles, emails, phone numbers, addresses, dates of birth, IBANs, credit cards, ID numbers, companies, URLs, IP addresses, UUIDs, and other identifiers - grouped in categories you can toggle."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is the detection really local?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Regex detection is plain JavaScript in the browser, and the optional AI mode downloads model weights once but runs inference locally - text is never uploaded."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I restore the original names in the AI\u2019s answer?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. One click replaces the placeholders in the AI\u2019s answer with the original values. The mapping lives only in your browser session and can be exported as CSV."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is this enough for GDPR or nDSG compliance?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "It is a strong technical aid, not a legal guarantee. Automated detection can miss context-dependent personal data, so review the anonymized text before sharing sensitive material."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <a href="#main" class="skip-to-main">Skip to main content</a>
+
+    <div class="aurora-bg"></div>
+
+    <div class="content-wrapper">
+        <header>
+            <nav role="navigation" aria-label="Main navigation">
+                <a href="/" class="logo-link" aria-label="ASD123.ai Home">
+                    <span class="logo-text">ASD123.ai</span>
+                </a>
+
+                <div class="nav-links">
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="/optimizer" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="/anonymizer" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="/chat" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                            <a href="/context" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Context Estimator</span>
+                                <span class="nav-tool-description">Estimate useful LLM context size.</span>
+                            </a>
+                            <a href="/converter" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Markdown Converter</span>
+                                <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
+                            </a>
+                            <a href="/tts" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Text to Speech</span>
+                                <span class="nav-tool-description">Generate speech locally from text.</span>
+                            </a>
+                        </div>
+                    </div>
+                    <a href="/documentation" class="nav-link">Documentation</a>
+                    <a href="/about" class="nav-link">About</a>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main" role="main">
+            <div class="page-header">
+                <h1 class="page-title">Anonymize Text Before Sharing It With AI</h1>
+                <p class="page-subtitle">
+                    Replace names, emails, and account numbers with placeholders before the text goes to a chatbot - then restore them in the answer.
+                </p>
+            </div>
+
+            <div style="max-width: 900px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: var(--space-8);">
+                <div class="liquid-glass" style="padding: var(--space-8);">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">The problem with pasting real data into chatbots</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">"Summarize this client email." "Draft a reply to this complaint." The fastest way to use AI at work is to paste real correspondence into it - together with real names, phone numbers, addresses, and account details. Under Swiss data protection law (nDSG) and the GDPR, that can already be a disclosure to a third party, and many company policies forbid it outright.</p>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">The practical middle ground is pseudonymization: swap the personal data for placeholders before the text leaves your hands, and swap the real values back into the AI’s answer afterwards. The <a href="/anonymizer" style="color: var(--text-primary); font-weight: 600;">ASD123.ai Anonymizer</a> automates exactly this round trip - locally in your browser.</p>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-8);">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">How the round trip works</h2>
+                    <ol style="list-style-type: decimal; padding-left: 24px; color: var(--text-secondary); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
+                        <li>Paste your text (or upload a .txt, .docx, or .pdf file). Detection runs instantly in your browser.</li>
+                        <li>Review what was found: names, emails, phone numbers, addresses, IBANs, credit cards, IDs, URLs, IP addresses, companies, dates, and more - grouped by category, with a highlight view and per-entity toggles.</li>
+                        <li>Copy the anonymized text, where every entity is a placeholder like <strong style="color: var(--text-primary);">[PERSON_1]</strong> or <strong style="color: var(--text-primary);">[EMAIL_1]</strong>.</li>
+                        <li>Use it in ChatGPT, Claude, or any other service.</li>
+                        <li>Paste the AI’s answer back and click deanonymize - the placeholders turn back into the original values.</li>
+                    </ol>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-top: var(--space-4);">The mapping between placeholders and real values stays in your browser’s memory only - it is never written to disk or sent anywhere, and you can export it as CSV if you need to continue later.</p>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-8);">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Detection modes</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Fast regex patterns cover structured data (emails, phone numbers, IBANs, credit cards, IDs) and common name patterns out of the box. For unstructured text you can optionally load a local AI detection model via WebGPU - the model files are downloaded once, but your text still never leaves the browser. Whichever mode you use, review the result before sharing: automated detection is an aid, not a guarantee.</p>
+                </div>
+                <div class="liquid-glass" style="padding: var(--space-8);">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Frequently asked questions</h2>
+                    <div style="margin-bottom: var(--space-6);">
+                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">What kinds of personal data does it detect?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Names and titles, email addresses, phone numbers, street addresses, dates of birth, IBANs, credit card numbers, social security and ID numbers, companies, URLs, IP addresses, UUIDs, and other identifier patterns - each in its own category that you can switch on or off.</p>
+                    </div>
+                    <div style="margin-bottom: var(--space-6);">
+                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Is the detection really local?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Yes. Regex detection is plain JavaScript in your browser. The optional AI mode downloads model weights once from Hugging Face, but the inference runs locally - your text is never uploaded.</p>
+                    </div>
+                    <div style="margin-bottom: var(--space-6);">
+                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Can I restore the original names in the AI’s answer?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Yes. As long as the answer still contains the placeholders, one click replaces them with the original values. The mapping lives only in your browser session, and you can export it as CSV to continue later.</p>
+                    </div>
+                    <div style="">
+                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Is this enough for GDPR or nDSG compliance?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">It is a strong technical aid, not a legal guarantee. Automated detection can miss context-dependent personal data (for example, "our CFO" identifies a person without naming them), so review the anonymized text before sharing anything sensitive.</p>
+                    </div>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-8); text-align: center;">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Protect the data, keep the workflow</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Free, reversible, and everything stays in your browser.</p>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <a href="/anonymizer" class="btn btn--primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Open Anonymizer</a>
+                        <a href="/anonymizer-guide" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Read the User Guide</a>
+                    </div>
+                </div>
+
+                <p style="color: var(--text-secondary); text-align: center; font-size: var(--text-sm);">
+                    Related: <a href="/clean-chatgpt-text" style="color: var(--text-primary); font-weight: 600;">Clean ChatGPT text</a>  ·  <a href="/run-ai-chat-locally" style="color: var(--text-primary); font-weight: 600;">Run AI chat locally</a>
+                </p>
+            </div>
+        </main>
+        <footer role="contentinfo">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>&copy; 2026 ASD123.ai. All rights reserved.</p>
+                    <div class="privacy-inline">
+                        <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                            <path d="m9 12 2 2 4-4" />
+                        </svg>
+                        <span>100% Local Processing</span>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <a href="/privacy" class="footer-link">Privacy Policy</a>
+                    <a href="/terms" class="footer-link">Terms of Service</a>
+                    <a href="/contact" class="footer-link">Contact</a>
+
+                    <div class="social-links">
+                        <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z" />
+                            </svg>
+                        </a></div>
+
+                    <div class="theme-toggle-wrapper" style="margin-left: var(--space-6); display: flex; align-items: center;">
+                        <label class="toggle-switch" style="transform: scale(0.8);">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

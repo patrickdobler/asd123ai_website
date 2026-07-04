@@ -56,7 +56,7 @@ the same (e.g. `src/pages/index.html` → `dist/index.html`, served at `/`).
 │   └── styles/                  # main.css + components.css      → dist/styles/
 ├── public/                      # Static assets served as-is     → dist/ (root)
 │   ├── vendor/                  # Self-hosted third-party libs (onnxruntime-web, pdf.js, mammoth, lamejs, …)
-│   └── favicon.ico, logo.png, robots.txt, sitemap.xml, …
+│   └── favicon.ico, logo.png, og-image.png, robots.txt, fonts/ (self-hosted Inter), …
 ├── tools/                       # Build + helper scripts (build.js, build-dev.js, make-favicons.py, package-chat-offline.js)
 ├── docs/                        # Architecture/design notes, mockups, examples (not deployed)
 ├── dist/                        # BUILD OUTPUT — generated, gitignored, do not edit
@@ -145,8 +145,10 @@ The build script:
 2. Minifies all HTML files (removes comments, whitespace, minifies inline CSS/JS)
 3. Minifies and copies CSS files from `styles/` (excludes `anonymizer.css` which is merged)
 4. Minifies and uglifies all JavaScript files from `scripts/`
-5. Copies static assets (sitemap.xml, robots.txt, public/vendor/)
-6. Console logging for each processed file
+5. Compiles Tailwind utilities used in `src/pages`/`src/scripts` into `dist/styles/tailwind.css` (via `tools/tailwind.config.js` + `tools/tailwind.input.css`; there is NO runtime Tailwind — pages link the compiled file after `components.css`)
+6. Copies static assets (robots.txt, fonts/, public/vendor/)
+7. Generates `dist/sitemap.xml` from `src/pages/*.html` with per-page `lastmod` from git history (no hand-maintained sitemap)
+8. Console logging for each processed file
 
 **Important**: The build process drops console logs and debugger statements from JavaScript.
 
@@ -168,8 +170,8 @@ The Anonymizer uses prioritized regex patterns (lower priority = checked first):
 
 ### Adding a New HTML Page
 1. Create `pages/{page-name}.html` (dev/test-only pages go in `dev/` instead)
-2. Add `{page-name}.html` to the `htmlFiles` array in `build.js` (production).
-   `build-dev.js` picks up `pages/`/`dev/` automatically, no list to edit.
+2. Both `build.js` and `build-dev.js` pick up `src/pages/*.html` automatically —
+   there is no page list to edit, and the sitemap entry is generated too.
 3. Add routing in `src/index.js`:
    - Redirect: `'/page-name.html': '/page-name'`
    - Clean URL: `'/page-name': '/page-name.html'`
@@ -215,6 +217,8 @@ For deeper architectural understanding, see:
 ## Important Constraints
 
 ### Privacy Constraints
+- Fonts and all page assets are self-hosted (NO Google Fonts / third-party CDNs for page delivery — this is a stated Privacy Policy promise)
+- `src/index.js` sets a CSP on every HTML response; if a tool needs a new remote origin (model CDN etc.), extend the CSP there or the browser will block it
 - Never add server-side processing for user text/files
 - Never send analytics data containing user text
 - Keep entity mappings in memory only (not localStorage)

@@ -22,15 +22,16 @@
     <meta name="twitter:title" content="ASD123.ai Documentation - AI Text Processing Guide">
     <meta name="twitter:description" content="Learn how to use ASD123.ai's privacy-first Optimizer, Anonymizer, Local AI Chat, and Context Estimator.">
     <link rel="canonical" href="https://asd123.ai/documentation">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <script src="vendor/tailwind-play-3.4.16.min.js"></script>
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/components.css">
+    <link href="styles/tailwind.css" rel="stylesheet">
     <script src="scripts/shared.js"></script>
-    <meta property="og:image" content="https://asd123.ai/logo.png">
-    <meta name="twitter:image" content="https://asd123.ai/logo.png">
+    <meta property="og:image" content="https://asd123.ai/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="ASD123.ai - private AI text tools, 100% in your browser">
+    <meta name="twitter:image" content="https://asd123.ai/og-image.png">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -448,6 +449,23 @@
                 </div>
             </div>
 
+            <div style="max-width: 1100px; margin: var(--space-16) auto 0; width: 100%;">
+                <div class="liquid-glass" style="padding: var(--space-12);">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4); text-align: center;">Guides &amp; Articles</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-6); text-align: center;">
+                        Practical walkthroughs for common workflows - each one explains how the local processing works.
+                    </p>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; color: var(--text-secondary); line-height: 1.6;">
+                        <li><a href="/convert-pdf-to-markdown" style="color: var(--text-primary); font-weight: 600;">Convert PDF to Markdown without uploading it</a> - private document conversion, OCR for scans included.</li>
+                        <li><a href="/clean-chatgpt-text" style="color: var(--text-primary); font-weight: 600;">Clean up ChatGPT text before you publish</a> - remove em dashes, smart quotes, and Markdown leftovers.</li>
+                        <li><a href="/anonymize-text-for-ai" style="color: var(--text-primary); font-weight: 600;">Anonymize text before sharing it with AI</a> - reversible placeholders for names, emails, and account data.</li>
+                        <li><a href="/count-tokens-offline" style="color: var(--text-primary); font-weight: 600;">Count LLM tokens offline</a> - instant estimates and exact tokenizer counts for GPT, Llama, Qwen, and Gemma.</li>
+                        <li><a href="/run-ai-chat-locally" style="color: var(--text-primary); font-weight: 600;">Run AI chat locally in your browser</a> - WebGPU models with no install and no account.</li>
+                        <li><a href="/private-text-to-speech" style="color: var(--text-primary); font-weight: 600;">Private text to speech in five languages</a> - natural voices generated on your own device.</li>
+                    </ul>
+                </div>
+            </div>
+
             <div style="max-width: 1100px; margin: var(--space-16) auto 0;">
                 <div class="liquid-glass" style="padding: var(--space-12); text-align: center;">
                     <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Privacy and Limits</h2>
@@ -483,11 +501,6 @@
                         <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
                             <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z" />
-                            </svg>
-                        </a>
-                        <a href="#" class="social-link" target="_blank" rel="noopener" aria-label="X (Twitter)">
-                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                             </svg>
                         </a></div>
 

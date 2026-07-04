@@ -18,7 +18,13 @@ const redirects = {
   '/context-guide.html': '/context-guide',
   '/converter-guide.html': '/converter-guide',
   '/tts-guide.html': '/tts-guide',
-  '/optimizer-guide.html': '/optimizer-guide'
+  '/optimizer-guide.html': '/optimizer-guide',
+  '/convert-pdf-to-markdown.html': '/convert-pdf-to-markdown',
+  '/clean-chatgpt-text.html': '/clean-chatgpt-text',
+  '/anonymize-text-for-ai.html': '/anonymize-text-for-ai',
+  '/count-tokens-offline.html': '/count-tokens-offline',
+  '/run-ai-chat-locally.html': '/run-ai-chat-locally',
+  '/private-text-to-speech.html': '/private-text-to-speech'
 };
 
 const cleanUrls = {
@@ -38,7 +44,13 @@ const cleanUrls = {
   '/context-guide': '/context-guide.html',
   '/converter-guide': '/converter-guide.html',
   '/tts-guide': '/tts-guide.html',
-  '/optimizer-guide': '/optimizer-guide.html'
+  '/optimizer-guide': '/optimizer-guide.html',
+  '/convert-pdf-to-markdown': '/convert-pdf-to-markdown.html',
+  '/clean-chatgpt-text': '/clean-chatgpt-text.html',
+  '/anonymize-text-for-ai': '/anonymize-text-for-ai.html',
+  '/count-tokens-offline': '/count-tokens-offline.html',
+  '/run-ai-chat-locally': '/run-ai-chat-locally.html',
+  '/private-text-to-speech': '/private-text-to-speech.html'
 };
 
 const skillArtifacts = {
@@ -53,7 +65,8 @@ Use this skill when an agent needs to clean, normalize, or standardize text with
 - Normalize fancy Unicode text
 - Normalize target line endings for Auto, Windows, Linux, and macOS
 - Apply language character mappings for Swiss German, German, French, Italian, English International, and English US
-- Remove or reverse German diacritics
+- Remove diacritics (language-aware: German umlauts become ae/oe/ue digraphs)
+- One-click presets (ChatGPT/Claude, Perplexity/Research, Swiss Standardization, Paragraph Mode) and undo
 
 ## Privacy
 
@@ -68,6 +81,7 @@ Use this skill when an agent needs to help a user anonymize or redact personally
 - Regex-based local PII detection
 - Optional OpenAI Privacy Filter model loaded through Hugging Face Transformers.js
 - Legacy AI4Privacy proof-of-concept models
+- Entity category filters, per-entity toggles, and an inline highlight view
 - Reversible placeholder mappings for deanonymization workflows
 - CSV import and export of entity mappings
 
@@ -82,10 +96,10 @@ Use this skill when an agent needs to help a user work with the ASD123.ai Local 
 ## Capabilities
 
 - Browser-based WebGPU chat with supported ONNX models
-- Local chat history in IndexedDB
+- Local chat history in IndexedDB with rename and delete
 - File and image attachments processed in the browser
-- Editable user messages and Markdown export
-- Context window and temperature controls
+- Editable user messages, copy and regenerate replies, Markdown export
+- Context window control and graceful stop during generation
 
 ## Privacy
 
@@ -100,7 +114,8 @@ Use this skill when an agent needs to help a user estimate an AI chat context wi
 - Estimate useful context windows for pasted text
 - Extract TXT, DOCX, and PDF text locally in the browser
 - Compare 4K, 8K, 16K, 32K, 64K, and 128K context sizes
-- Apply lightweight model-family profiles without tokenizer downloads
+- Apply lightweight model-family profiles instantly, no download needed
+- Optional exact token count using the selected model family's real tokenizer
 - Reserve answer and reasoning budget before recommending a window
 
 ## Privacy
@@ -109,7 +124,7 @@ Pasted text and uploaded file contents remain in the user's browser. The tool do
 `,
   'converter': `# ASD123.ai Markdown Converter
 
-Use this skill when an agent needs to help a user convert PDF, DOCX, or image files to Markdown with the ASD123.ai browser converter.
+Use this skill when an agent needs to help a user convert PDF, DOCX, PPTX, Excel, CSV, HTML, or image files to Markdown with the ASD123.ai browser converter.
 
 ## Capabilities
 
@@ -117,9 +132,11 @@ Use this skill when an agent needs to help a user convert PDF, DOCX, or image fi
 - Optional high-accuracy PDF engines (LiteParse and EdgeParse, both WebAssembly) for multi-column and table-heavy layouts
 - OCR engine (PP-OCRv6 Tiny on onnxruntime-web) for scanned PDFs and image files (PNG, JPG, WebP, BMP) with no text layer
 - Convert DOCX files to Markdown via mammoth.js style mapping
-- Preserve bold, italic, links, lists, and tables for DOCX sources
+- Convert PPTX slides (including speaker notes), Excel/CSV tables, HTML pages, and plain text
+- Preserve bold, italic, links, lists, and tables for DOCX and HTML sources
+- Convert several files at once into one combined Markdown document
 - Toggle heading detection and whitespace collapsing
-- Copy or download the resulting Markdown as a .md file
+- Copy or download the resulting Markdown as a .md file, or send it to the Text to Speech tool
 
 ## Privacy
 
@@ -136,6 +153,7 @@ Use this skill when an agent needs to help a user turn text into spoken audio wi
 - Two models: Kokoro (highest quality; English with American and British voices, plus Spanish, French, and Italian; ~88-310 MB precision options) and Supertonic 3 (fast, multilingual; English, German, French, Spanish, Italian; ~380 MB, official ONNX via onnxruntime-web, language selected with a built-in language tag)
 - Kokoro speaks English natively; for Spanish, French, and Italian it uses a one-time eSpeak NG pronunciation pack (~19 MB) to phonemize locally
 - Adjust speaking speed before generating, plus a quality (inference steps) control for Supertonic
+- Stop long generations at any time
 - Play the audio in the browser, change playback speed, and download as WAV or locally encoded MP3
 
 ## Privacy
@@ -179,7 +197,7 @@ async function agentSkillsIndex() {
         : name === 'context'
           ? 'Estimate AI chat context windows locally with the ASD123.ai Context Estimator.'
           : name === 'converter'
-            ? 'Convert PDF, DOCX, and image files to Markdown locally with the ASD123.ai Markdown Converter, including OCR for scans.'
+            ? 'Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to Markdown locally with the ASD123.ai Markdown Converter, including OCR for scans.'
             : name === 'tts'
               ? 'Generate natural speech from text locally with the ASD123.ai Text to Speech tool.'
               : 'Anonymize and redact PII locally with the ASD123.ai Anonymizer.',
@@ -456,6 +474,55 @@ async function maybeMarkdownResponse(request, response) {
   });
 }
 
+// Content-Security-Policy for HTML pages. The tools run entirely client-side,
+// so the only remote origins ever needed are the model/library CDNs the tools
+// download from on demand (jsDelivr for transformers.js/kokoro-js/eSpeak,
+// Hugging Face + its CDN domains for model weights). Everything else is 'self'.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self' blob: data: https://huggingface.co https://*.huggingface.co https://*.hf.co https://cdn.jsdelivr.net",
+  "media-src 'self' blob:",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'"
+].join('; ');
+
+// Immutable-ish static assets: vendored libraries, self-hosted fonts, images.
+// (Vendor library updates in this repo change the filename or ship alongside a
+// worker/build change, so a week of browser caching is safe and saves megabytes
+// of revalidation on repeat visits.)
+const LONG_CACHE_RE = /^\/(vendor\/|fonts\/)|\.(png|ico|svg|jpg|jpeg|webp)$/;
+
+function withSiteHeaders(response, pathname) {
+  const headers = new Headers(response.headers);
+  headers.set('x-content-type-options', 'nosniff');
+  headers.set('strict-transport-security', 'max-age=31536000; includeSubDomains');
+
+  const contentType = headers.get('content-type') || '';
+  if (contentType.includes('text/html')) {
+    headers.set('content-security-policy', CSP);
+    headers.set('referrer-policy', 'strict-origin-when-cross-origin');
+    headers.set('permissions-policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+    headers.set('x-frame-options', 'DENY');
+  }
+
+  if (response.ok && LONG_CACHE_RE.test(pathname)) {
+    headers.set('cache-control', 'public, max-age=604800, stale-while-revalidate=86400');
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
 function assetRequest(request, pathname) {
   const assetUrl = new URL(request.url);
   assetUrl.pathname = pathname;
@@ -529,7 +596,7 @@ export default {
     const originalPathname = url.pathname;
 
     if (url.pathname === '/vendor/gemma4mobile-engine.js') {
-      return proxyKernelEngine();
+      return withSiteHeaders(await proxyKernelEngine(), originalPathname);
     }
 
     const discoveryResponse = await wellKnownResponse(url.pathname);
@@ -561,17 +628,17 @@ export default {
     if (cleanUrls[url.pathname]) {
       const response = await env.ASSETS.fetch(assetRequest(request, cleanUrls[url.pathname]));
       const negotiated = await maybeMarkdownResponse(request, response);
-      return addDiscoveryLinks(negotiated, originalPathname);
+      return withSiteHeaders(addDiscoveryLinks(negotiated, originalPathname), originalPathname);
     }
 
     if (url.pathname === '/') {
       const response = await env.ASSETS.fetch(assetRequest(request, '/index.html'));
       const negotiated = await maybeMarkdownResponse(request, response);
-      return addDiscoveryLinks(negotiated, originalPathname);
+      return withSiteHeaders(addDiscoveryLinks(negotiated, originalPathname), originalPathname);
     }
 
     const response = await env.ASSETS.fetch(request);
     const negotiated = await maybeMarkdownResponse(request, response);
-    return addDiscoveryLinks(negotiated, originalPathname);
+    return withSiteHeaders(addDiscoveryLinks(negotiated, originalPathname), originalPathname);
   }
 };

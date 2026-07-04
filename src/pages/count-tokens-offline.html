@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <title>Count LLM Tokens Offline - GPT, Llama, Qwen, Gemma | ASD123.ai</title>
+    <meta name="description" content="Count AI tokens and estimate context-window needs for GPT, Llama, Qwen, and Gemma models - instantly in your browser, with an optional exact tokenizer count. No upload.">
+    <meta name="keywords" content="count tokens offline, llm token counter, gpt token counter, context window calculator, how many tokens, tokenizer online private">
+    <meta name="author" content="ASD123.ai">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Count LLM Tokens Offline - GPT, Llama, Qwen, Gemma | ASD123.ai">
+    <meta property="og:description" content="Count AI tokens and estimate context-window needs for GPT, Llama, Qwen, and Gemma models - instantly in your browser, with an optional exact tokenizer count. No upload.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://asd123.ai/count-tokens-offline">
+    <meta property="og:site_name" content="ASD123.ai">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Count LLM Tokens Offline - GPT, Llama, Qwen, Gemma | ASD123.ai">
+    <meta name="twitter:description" content="Count AI tokens and estimate context-window needs for GPT, Llama, Qwen, and Gemma models - instantly in your browser, with an optional exact tokenizer count. No upload.">
+    <link rel="canonical" href="https://asd123.ai/count-tokens-offline">
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <script src="scripts/shared.js"></script>
+    <meta property="og:image" content="https://asd123.ai/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="ASD123.ai - private AI text tools, 100% in your browser">
+    <meta name="twitter:image" content="https://asd123.ai/og-image.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://asd123.ai/#organization",
+          "name": "ASD123.ai",
+          "url": "https://asd123.ai/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://asd123.ai/logo.png"
+          },
+          "sameAs": [
+            "https://github.com/patrickdobler/asd123.ai"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://asd123.ai/#website",
+          "url": "https://asd123.ai/",
+          "name": "ASD123.ai",
+          "description": "Privacy-first AI text tools that run entirely in your browser.",
+          "publisher": {
+            "@id": "https://asd123.ai/#organization"
+          },
+          "inLanguage": "en"
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://asd123.ai/count-tokens-offline#webpage",
+          "name": "Count LLM Tokens Offline - GPT, Llama, Qwen, Gemma | ASD123.ai",
+          "description": "Count AI tokens and estimate context-window needs for GPT, Llama, Qwen, and Gemma models - instantly in your browser, with an optional exact tokenizer count. No upload.",
+          "url": "https://asd123.ai/count-tokens-offline",
+          "inLanguage": "en",
+          "isPartOf": {
+            "@id": "https://asd123.ai/#website"
+          },
+          "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://asd123.ai/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Count AI Tokens Without Sending Text Anywhere",
+                "item": "https://asd123.ai/count-tokens-offline"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://asd123.ai/count-tokens-offline#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How accurate is the instant estimate?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Typically within a few percent for natural language. When it matters, the exact mode runs the model family\u2019s actual tokenizer locally and is precise."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Which model families are supported?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "GPT-style (o200k), Llama, Qwen, and Gemma profiles. Counts differ between families because each uses its own tokenizer vocabulary."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Why do different models report different token counts?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Tokenizers split text differently - the same word can be one token in one vocabulary and three in another. Pick the model family to get the right count."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does it work offline?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The instant estimate works fully offline once the page is loaded. The exact mode needs a one-time tokenizer download, which is then cached."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <a href="#main" class="skip-to-main">Skip to main content</a>
+
+    <div class="aurora-bg"></div>
+
+    <div class="content-wrapper">
+        <header>
+            <nav role="navigation" aria-label="Main navigation">
+                <a href="/" class="logo-link" aria-label="ASD123.ai Home">
+                    <span class="logo-text">ASD123.ai</span>
+                </a>
+
+                <div class="nav-links">
+                    <div class="nav-tools">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            Tools
+                            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
+                            <a href="/optimizer" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Optimizer</span>
+                                <span class="nav-tool-description">Clean and standardize generated text.</span>
+                            </a>
+                            <a href="/anonymizer" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Anonymizer</span>
+                                <span class="nav-tool-description">Detect and anonymize PII locally.</span>
+                            </a>
+                            <a href="/chat" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Local AI Chat</span>
+                                <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
+                            </a>
+                            <a href="/context" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Context Estimator</span>
+                                <span class="nav-tool-description">Estimate useful LLM context size.</span>
+                            </a>
+                            <a href="/converter" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Markdown Converter</span>
+                                <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
+                            </a>
+                            <a href="/tts" class="nav-tool-item" role="menuitem">
+                                <span class="nav-tool-title">Text to Speech</span>
+                                <span class="nav-tool-description">Generate speech locally from text.</span>
+                            </a>
+                        </div>
+                    </div>
+                    <a href="/documentation" class="nav-link">Documentation</a>
+                    <a href="/about" class="nav-link">About</a>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main" role="main">
+            <div class="page-header">
+                <h1 class="page-title">Count AI Tokens Without Sending Text Anywhere</h1>
+                <p class="page-subtitle">
+                    Instant token estimates for your text or documents - plus an exact count using the model family’s real tokenizer.
+                </p>
+            </div>
+
+            <div style="max-width: 900px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: var(--space-8);">
+                <div class="liquid-glass" style="padding: var(--space-8);">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Why token counts matter</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Every LLM measures text in tokens, and every model has a context window - the maximum number of tokens it can consider at once. If your document plus your question plus the model’s answer do not fit, the model silently loses the beginning of the conversation or refuses the input. Knowing the token count before you start saves you from truncated answers, and for API users it is what the bill is based on.</p>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Most online token counters send your text to a server to count it - which is ironic, given that people often check tokens precisely for confidential documents. The <a href="/context" style="color: var(--text-primary); font-weight: 600;">ASD123.ai Context Estimator</a> counts in your browser instead.</p>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-8);">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Two counting modes</h2>
+                    <ul style="list-style-type: disc; padding-left: 24px; color: var(--text-secondary); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
+                        <li><strong style="color: var(--text-primary);">Instant estimate</strong> - a model-family-aware heuristic (GPT-style, Llama, Qwen, Gemma) that accounts for words, punctuation, and non-Latin scripts. It responds as you type, with no downloads at all.</li>
+                        <li><strong style="color: var(--text-primary);">Exact count</strong> - one click downloads the model family’s real tokenizer (a few megabytes, cached afterwards) and tokenizes your text locally. The number you see is mathematically exact for that tokenizer.</li>
+                    </ul>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-top: var(--space-4);">You can paste text or drop TXT, DOCX, and PDF files - extraction also happens in the browser. A reserve setting keeps room for the model’s answer and reasoning, and the tool recommends the smallest context window (4K to 128K+) that comfortably fits.</p>
+                </div>
+                <div class="liquid-glass" style="padding: var(--space-8);">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Frequently asked questions</h2>
+                    <div style="margin-bottom: var(--space-6);">
+                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">How accurate is the instant estimate?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Typically within a few percent of the real count for natural language, because the heuristic is tuned per model family and handles non-Latin scripts separately. When it matters, use the exact mode - it runs the model family’s actual tokenizer.</p>
+                    </div>
+                    <div style="margin-bottom: var(--space-6);">
+                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Which model families are supported?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">GPT-style models (o200k tokenizer), Llama, Qwen, and Gemma profiles - covering the most common cloud and local models. Counts differ between families because each uses its own vocabulary.</p>
+                    </div>
+                    <div style="margin-bottom: var(--space-6);">
+                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Why do different models report different token counts?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">Tokenizers split text differently: a word that is one token in GPT’s vocabulary may be two or three tokens for Llama. That is why the estimator lets you pick the model family first.</p>
+                    </div>
+                    <div style="">
+                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Does it work offline?</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">The instant estimate works fully offline once the page is loaded. The exact mode needs a one-time tokenizer download; after that it is cached by your browser.</p>
+                    </div>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-8); text-align: center;">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Check your document before you paste it</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Instant estimates, exact counts on demand, and no text ever leaves your browser.</p>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <a href="/context" class="btn btn--primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Open Context Estimator</a>
+                        <a href="/context-guide" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Read the User Guide</a>
+                    </div>
+                </div>
+
+                <p style="color: var(--text-secondary); text-align: center; font-size: var(--text-sm);">
+                    Related: <a href="/convert-pdf-to-markdown" style="color: var(--text-primary); font-weight: 600;">Convert PDF to Markdown</a>  ·  <a href="/run-ai-chat-locally" style="color: var(--text-primary); font-weight: 600;">Run AI chat locally</a>
+                </p>
+            </div>
+        </main>
+        <footer role="contentinfo">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>&copy; 2026 ASD123.ai. All rights reserved.</p>
+                    <div class="privacy-inline">
+                        <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                            <path d="m9 12 2 2 4-4" />
+                        </svg>
+                        <span>100% Local Processing</span>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <a href="/privacy" class="footer-link">Privacy Policy</a>
+                    <a href="/terms" class="footer-link">Terms of Service</a>
+                    <a href="/contact" class="footer-link">Contact</a>
+
+                    <div class="social-links">
+                        <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
+                            <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.300 24 12c0-6.627-5.373-12-12-12z" />
+                            </svg>
+                        </a></div>
+
+                    <div class="theme-toggle-wrapper" style="margin-left: var(--space-6); display: flex; align-items: center;">
+                        <label class="toggle-switch" style="transform: scale(0.8);">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
