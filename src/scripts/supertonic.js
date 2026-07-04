@@ -128,7 +128,11 @@ class Supertonic {
 
     async _style(voice) {
         if (!this.voiceCache.has(voice)) {
-            const vs = await (await fetch(`${VOICE_BASE}${voice}.json`)).json();
+            const res = await fetch(`${VOICE_BASE}${voice}.json`);
+            if (!res.ok) {
+                throw new Error(`Could not load the "${voice}" voice style (HTTP ${res.status}). Try another voice.`);
+            }
+            const vs = await res.json();
             this.voiceCache.set(voice, {
                 ttl: new this.ort.Tensor('float32', Float32Array.from(vs.style_ttl.data.flat(Infinity)), vs.style_ttl.dims),
                 dp: new this.ort.Tensor('float32', Float32Array.from(vs.style_dp.data.flat(Infinity)), vs.style_dp.dims)

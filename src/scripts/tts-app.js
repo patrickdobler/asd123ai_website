@@ -18,6 +18,7 @@ class TtsApp {
             speed: document.getElementById('ttsSpeed'),
             speedValue: document.getElementById('ttsSpeedValue'),
             generateBtn: document.getElementById('ttsGenerateBtn'),
+            stopBtn: document.getElementById('ttsStopBtn'),
             modelHint: document.getElementById('ttsModelHint'),
             status: document.getElementById('ttsStatus'),
             audioStage: document.getElementById('ttsAudioStage'),
@@ -86,7 +87,8 @@ class TtsApp {
                 model: this.elements.model.value,
                 voice: this.elements.voice.value,
                 speed: this.elements.speed.value,
-                steps: this.elements.steps.value
+                steps: this.elements.steps.value,
+                rate: this.playbackRate
             }));
         } catch (_) {
             /* storage unavailable; ignore */
@@ -117,6 +119,7 @@ class TtsApp {
         this.elements.steps.addEventListener('input', () => this.updateStepsLabel());
         this.elements.steps.addEventListener('change', () => this.saveSettings());
         this.elements.generateBtn.addEventListener('click', () => this.generate());
+        this.elements.stopBtn?.addEventListener('click', () => this.stopGeneration());
         this.elements.downloadWavBtn.addEventListener('click', () => this.downloadWav());
         this.elements.downloadMp3Btn.addEventListener('click', () => this.downloadMp3());
 
@@ -128,6 +131,7 @@ class TtsApp {
 
         if (this.saved.speed) { this.elements.speed.value = this.saved.speed; this.updateSpeedLabel(); }
         if (this.saved.steps) { this.elements.steps.value = this.saved.steps; this.updateStepsLabel(); }
+        if (this.saved.rate && Number(this.saved.rate) > 0) this.setPlaybackRate(Number(this.saved.rate));
     }
 
     // -- Selector population ------------------------------------------------
@@ -305,6 +309,9 @@ class TtsApp {
 
         this.busy = true;
         this.elements.generateBtn.disabled = true;
+        // Stopping works by terminating the worker; without one there is
+        // nothing we can safely abort, so the button only shows with a worker.
+        if (this.elements.stopBtn && this.worker) this.elements.stopBtn.hidden = false;
 
         const needsPhon = this.engine.needsPhonemizer(engine, lang) && !this.phonemizerLoaded;
         if (!this.loaded.has(key)) {
@@ -354,11 +361,31 @@ class TtsApp {
             this.showAudio(result);
             this.setStatus('Speech generated locally. No text was uploaded.', 'good');
         } catch (error) {
-            this.setStatus(error.message || 'Speech generation failed.', 'danger');
+            if (error && error.message === '__stopped__') {
+                this.setStatus('Generation stopped.', 'neutral');
+            } else {
+                this.setStatus(error.message || 'Speech generation failed.', 'danger');
+            }
         } finally {
             this.busy = false;
             this.elements.generateBtn.disabled = false;
+            if (this.elements.stopBtn) this.elements.stopBtn.hidden = true;
         }
+    }
+
+    // Abort the current synthesis by terminating the worker and starting a
+    // fresh one. Model files stay in the shared browser HTTP cache, so the
+    // next run reloads them quickly; only the worker's in-memory runtime is
+    // lost (tracked via this.loaded so the status text stays honest).
+    stopGeneration() {
+        if (!this.busy || !this.worker) return;
+        try { this.worker.terminate(); } catch (_) {}
+        this.worker = null;
+        for (const p of this.pending.values()) p.reject(new Error('__stopped__'));
+        this.pending.clear();
+        this.loaded.clear();
+        this.phonemizerLoaded = false;
+        this.setupWorker();
     }
 
     reportProgress(file, pct) {
@@ -426,7 +453,7 @@ class TtsApp {
             this.stopWaveformLoop();
         };
         audio.addEventListener('pause', () => { showPlay(); this.syncPlayhead(); });
-        audio.addEventListener('ended', () => { showPlay(); currentTime.textContent = '0:00'; this.renderWaveform(0); });
+        audio.addEventListener('ended', () => { showPlay(); this.elements.currentTime.textContent = '0:00'; this.renderWaveform(0); });
 
         audio.addEventListener('loadedmetadata', () => {
             const d = isFinite(audio.duration) ? audio.duration : this.currentDuration;
@@ -581,6 +608,7 @@ class TtsApp {
     setPlaybackRate(rate) {
         this.playbackRate = rate;
         this.elements.audio.playbackRate = rate;
+        this.saveSettings();
         this.elements.controls.querySelectorAll('button[data-rate]').forEach(b => {
             const active = Number(b.dataset.rate) === rate;
             b.classList.toggle('is-active', active);

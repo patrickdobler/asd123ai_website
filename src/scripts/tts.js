@@ -2,7 +2,8 @@
 //
 // - Supertonic 3 (official ONNX, onnxruntime-web) is genuinely multilingual:
 //   the language is conditioned by wrapping text in <lang> tags. See
-//   ./supertonic.js. Used for English, German, French, Spanish.
+//   ./supertonic.js. It is the only option for German and an alternative for
+//   English, French, Spanish, and Italian.
 // - Kokoro (kokoro-js) covers English natively; for Spanish/French/Italian we
 //   phonemize with the standalone eSpeak NG phonemizer and call
 //   generate_from_ids() directly (the voice check is bypassed there).
@@ -165,7 +166,6 @@ function modelLabel(engine) {
 // ---------------------------------------------------------------------------
 const runtimeCache = new Map();
 let espeakFactoryPromise = null;
-let espeakReady = false;
 
 function runtimeKey(engine, dtype) {
     return `${engine}:${dtype}`;
@@ -203,18 +203,33 @@ async function loadEspeakFactory() {
     return espeakFactoryPromise;
 }
 
+// The eSpeak module runs main() once per call, so a fresh instance is needed
+// for every phonemization — but the ~19 MB wasm binary itself is fetched and
+// kept once, so repeat generations skip the download/decode entirely.
+let espeakBinaryPromise = null;
+function loadEspeakBinary() {
+    if (!espeakBinaryPromise) {
+        espeakBinaryPromise = fetch(`${ESPEAK_BASE}espeak-ng.wasm`)
+            .then(res => res.ok ? res.arrayBuffer() : null)
+            .catch(() => null);
+    }
+    return espeakBinaryPromise;
+}
+
 // Phonemize `text` to IPA for an eSpeak voice (e.g. "es", "fr-fr", "it"),
 // matching the phoneme format kokoro-js's tokenizer expects.
 async function phonemizeToIpa(text, espeakVoice) {
     const ESpeakNg = await loadEspeakFactory();
+    const wasmBinary = await loadEspeakBinary();
     const bytes = new TextEncoder().encode(text);
-    const espeak = await ESpeakNg({
+    const options = {
         locateFile: p => `${ESPEAK_BASE}${p}`,
         preRun: [M => { M.FS.writeFile('in.txt', bytes); }],
         // -b 1 (NOT -b=1, which eSpeak misparses) selects UTF-8 input.
         arguments: ['--phonout', 'out', '--ipa', '--sep=', '-q', '-b', '1', '-v', espeakVoice, '-f', 'in.txt']
-    });
-    espeakReady = true;
+    };
+    if (wasmBinary) options.wasmBinary = wasmBinary;
+    const espeak = await ESpeakNg(options);
     let out = '';
     try {
         out = espeak.FS.readFile('out', { encoding: 'utf8' });
@@ -340,17 +355,9 @@ class TtsEngine {
         return modelLabel(engine);
     }
 
-    isReady(engine, dtype) {
-        return runtimeCache.has(runtimeKey(engine, dtype));
-    }
-
     // Non-English Kokoro needs the eSpeak NG pronunciation pack.
     needsPhonemizer(engine, langCode) {
         return engine === 'kokoro' && langCode !== 'en';
-    }
-
-    isPhonemizerReady() {
-        return espeakReady;
     }
 
     /**

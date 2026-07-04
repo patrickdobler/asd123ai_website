@@ -187,7 +187,7 @@
                         </h3>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
-                                Text to Speech turns written text into spoken audio directly in your browser. Two on-device models are available: <strong class="text-[var(--text-primary)]">Kokoro</strong>, an 82M-parameter model with very natural voices in English, Spanish, French, and Italian, and <strong class="text-[var(--text-primary)]">Supertonic 3</strong>, a fast multilingual model covering English, German, French, Spanish, and Italian.
+                                Text to Speech turns written text into spoken audio directly in your browser. Tip: the <a href="/converter" class="text-[var(--primary-color)] hover:underline">Markdown Converter</a> has a <strong>To Speech</strong> button that sends a converted document straight into this tool. Two on-device models are available: <strong class="text-[var(--text-primary)]">Kokoro</strong>, an 82M-parameter model with very natural voices in English, Spanish, French, and Italian, and <strong class="text-[var(--text-primary)]">Supertonic 3</strong>, a fast multilingual model covering English, German, French, Spanish, and Italian.
                             </p>
                             <p class="leading-relaxed">
                                 You choose a language first, then the models that support it — sorted by quality, with the download size shown for each. The model files are fetched from Hugging Face the first time you use them and then cached by your browser; your text is processed locally and is never sent to ASD123.ai.
@@ -209,7 +209,7 @@
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">1</div>
                                 <div>
                                     <h4 class="font-bold text-[var(--text-primary)] mb-1">Pick a language</h4>
-                                    <p class="text-sm">Choose English, German, French, or Spanish. The model list updates to show only the models that speak that language.</p>
+                                    <p class="text-sm">Choose English, German, French, Spanish, or Italian. The model list updates to show only the models that speak that language.</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
@@ -317,7 +317,7 @@
                         <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">Kokoro voices</h4>
-                                <p class="text-sm">Named voices per language. English has 28, grouped into American (Heart, Bella, Michael) and British (Emma, George, Daniel) accents. Spanish adds Dora, Alex, and Santa; French has Siwis; Italian has Sara and Nicola. English voices show their upstream overall grade (Heart is A, Bella A-) so you can pick the best one.</p>
+                                <p class="text-sm">Named voices per language. English has 28, grouped into American (Heart, Bella, Michael) and British (Emma, George, Daniel) accents. Spanish adds Dora, Alex, and Santa; French has Siwis; Italian has Sara and Nicola. English voices show their upstream overall grade — the community quality rating from the Kokoro project (A = best, F = worst; Heart is A, Bella A-) — so you can pick the best one.</p>
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">Supertonic voices</h4>
@@ -394,10 +394,10 @@
                         </h3>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
-                                Your text is converted to audio entirely on your device. The Kokoro and Supertonic model files are downloaded from Hugging Face and cached by your browser, but the text you type, the generated audio, and the MP3 encoding all stay local. ASD123.ai never receives your text or the resulting speech.
+                                Your text is converted to audio entirely on your device — synthesis runs in a background Web Worker, so the page stays responsive while it works. On first use the tool downloads runtime and model files: the Kokoro/Supertonic model weights come from Hugging Face, and the kokoro-js library plus the ~19&nbsp;MB eSpeak&nbsp;NG pronunciation pack (needed only for non-English Kokoro voices) come from the jsDelivr CDN. All of these are cached afterwards. The text you type, the generated audio, and the MP3 encoding never leave the browser — ASD123.ai never receives your text or the resulting speech.
                             </p>
                             <p class="leading-relaxed">
-                                Nothing from this tool is stored in localStorage. Cached model files live in the browser's standard cache and can be cleared like any other site data. Closing the tab discards the current text and audio.
+                                Only your tool preferences (language, model, voice, speed, playback rate) are stored in localStorage — never your text or audio. Cached model files live in the browser's standard cache and can be cleared like any other site data. Closing the tab discards the current text and audio.
                             </p>
                         </div>
                     </div>
@@ -413,7 +413,7 @@
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">Voice over for content</h4>
-                                <p class="text-sm">Generate a quick narration track for a slide, demo, or video without a microphone or a cloud service.</p>
+                                <p class="text-sm">Generate a quick narration track for a slide, demo, or video without a microphone or a cloud service. Playback starts automatically when the audio is ready, and a Stop button lets you abort a long generation at any time.</p>
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">Language practice</h4>
