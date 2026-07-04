@@ -82,29 +82,32 @@ class FileProcessor {
     }
 
     /**
-     * Lazy load mammoth.js library
+     * Lazy load mammoth.js from the self-hosted vendor copy (same build the
+     * converter uses) — no CDN request, works offline.
      * @returns {Promise<Object>} - The mammoth library
      */
     async loadMammoth() {
         if (!window.mammoth) {
-            // Load mammoth from CDN
-            await this.loadScript('https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js');
+            await this.loadScript('vendor/mammoth.browser.min.js');
         }
         return window.mammoth;
     }
 
     /**
-     * Lazy load PDF.js library
-     * @returns {Promise<Object>} - The PDF.js library
+     * Lazy load the self-hosted PDF.js 6 ESM build (same as the converter).
+     * @returns {Promise<Object>} - The PDF.js module
      */
     async loadPdfJs() {
-        if (!window.pdfjsLib) {
-            // Load PDF.js from CDN
-            await this.loadScript('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js');
-            // Set worker path
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        if (!this.pdfjsModulePromise) {
+            this.pdfjsModulePromise = import('../vendor/pdf.min.mjs').then(module => {
+                module.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.mjs';
+                return module;
+            }).catch(error => {
+                this.pdfjsModulePromise = null;
+                throw error;
+            });
         }
-        return window.pdfjsLib;
+        return this.pdfjsModulePromise;
     }
 
     /**

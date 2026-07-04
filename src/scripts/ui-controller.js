@@ -332,16 +332,21 @@ class UIController {
                 });
             }
             
-            // Sort by actual position in output text
+            // Sort by actual position in output text. Positions are computed
+            // once up front — indexOf inside the comparator would rescan the
+            // whole output on every comparison.
+            const positions = new Map(
+                entitiesCopy.map(e => [e.placeholder, outputText.indexOf(e.placeholder)])
+            );
             return entitiesCopy.sort((a, b) => {
-                const posA = outputText.indexOf(a.placeholder);
-                const posB = outputText.indexOf(b.placeholder);
-                
+                const posA = positions.get(a.placeholder);
+                const posB = positions.get(b.placeholder);
+
                 // If either placeholder is not found, put it at the end
                 if (posA === -1 && posB === -1) return 0;
                 if (posA === -1) return 1;
                 if (posB === -1) return -1;
-                
+
                 return posA - posB;
             });
         }
@@ -372,6 +377,9 @@ class UIController {
         const item = document.createElement('div');
         item.className = `entity-item ${entity.active ? '' : 'inactive'}`;
         item.dataset.placeholder = entity.placeholder;
+        item.title = entity.active
+            ? 'Click to restore the original in the output'
+            : 'Click to anonymize again';
 
         item.innerHTML = `
             <div>
@@ -388,6 +396,11 @@ class UIController {
         removeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             this.dispatchCustomEvent('entityRemove', { placeholder: entity.placeholder });
+        });
+
+        // Clicking the tile toggles the entity between anonymized and restored
+        item.addEventListener('click', () => {
+            this.dispatchCustomEvent('entityToggle', { placeholder: entity.placeholder });
         });
 
         return item;

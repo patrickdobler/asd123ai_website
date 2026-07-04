@@ -70,17 +70,18 @@ class EntityManager {
     importEntities(entityData) {
         this.clear();
         entityData.forEach(entity => {
+            // Malformed rows (no [TYPE_n] placeholder) are skipped, not fatal
+            const index = parseInt(entity.placeholder?.match(/_(\d+)\]/)?.[1] ?? '', 10);
+            if (!entity.placeholder || Number.isNaN(index)) return;
             this.entityMap.set(entity.placeholder, {
                 original: entity.original,
                 type: entity.type,
-                index: parseInt(entity.placeholder.match(/_(\d+)\]/)[1]),
+                index: index,
                 isActive: entity.active
             });
             this.reverseLookup.set(entity.original, entity.placeholder);
-            
-            const type = entity.type;
-            const index = parseInt(entity.placeholder.match(/_(\d+)\]/)[1]);
-            this.entityCounters[type] = Math.max(this.entityCounters[type] || 0, index);
+
+            this.entityCounters[entity.type] = Math.max(this.entityCounters[entity.type] || 0, index);
         });
     }
 

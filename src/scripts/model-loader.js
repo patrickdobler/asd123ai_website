@@ -5,8 +5,20 @@
 // IMPORTANT: This implementation uses local token classification models,
 // not server-side processing or regex pattern matching.
 
-// Import transformers.js from CDN for browser compatibility
-import { AutoModel, AutoTokenizer, pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';
+// transformers.js is loaded lazily and ONLY when an AI model is selected.
+// The static CDN import used to run on every page load and, when the CDN was
+// blocked (adblocker/offline), broke the whole module graph incl. Regex mode.
+const TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';
+let transformersModulePromise = null;
+function loadTransformers() {
+    if (!transformersModulePromise) {
+        transformersModulePromise = import(TRANSFORMERS_CDN).catch(error => {
+            transformersModulePromise = null;
+            throw new Error('Could not load the AI library (offline or CDN blocked). Regex mode keeps working without it.');
+        });
+    }
+    return transformersModulePromise;
+}
 
 /**
  * Model configuration map - defines all available AI models
@@ -95,7 +107,9 @@ class AIModelProcessor {
 
             // Show loading indicator
             this.updateLoadingStatus('Loading...');
-            
+
+            const { AutoModel, AutoTokenizer } = await loadTransformers();
+
             // Load tokenizer from HuggingFace
             this.tokenizer = await AutoTokenizer.from_pretrained(modelPath);
             
@@ -132,6 +146,8 @@ class AIModelProcessor {
 
         this.updateLoadingStatus('Downloading...');
 
+        const { pipeline } = await loadTransformers();
+
         this.classifier = await pipeline(
             'token-classification',
             config.path,
@@ -160,10 +176,60 @@ class AIModelProcessor {
             throw new Error('Model not loaded');
         }
 
-        if (this.currentConfig?.type === 'pipeline-token-classification') {
-            return this.processWithPipeline(text, threshold);
+        const isPipeline = this.currentConfig?.type === 'pipeline-token-classification';
+
+        // Token-classification models have a bounded context (~512 tokens).
+        // Long inputs are processed in chunks; the shared counters object keeps
+        // placeholder numbering unique across chunks.
+        const chunks = this.splitIntoChunks(text);
+        const counters = {};
+        const maskedParts = [];
+        const allReplacements = [];
+
+        for (const chunk of chunks) {
+            const result = isPipeline
+                ? await this.processWithPipeline(chunk, threshold, counters)
+                : await this.processLegacyChunk(chunk, threshold, counters);
+            maskedParts.push(result.maskedText);
+            allReplacements.push(...result.replacements);
         }
 
+        // The pipeline path preserves whitespace exactly (join as-is); the
+        // legacy path trims each chunk, so restore paragraph separation.
+        return {
+            maskedText: maskedParts.join(isPipeline ? '' : '\n\n'),
+            replacements: allReplacements
+        };
+    }
+
+    /**
+     * Split text into model-sized chunks at paragraph/sentence boundaries.
+     */
+    splitIntoChunks(text, maxLen = 1500) {
+        if (text.length <= maxLen) return [text];
+        const chunks = [];
+        let current = '';
+        const parts = text.split(/(\n{2,})/);
+        const flush = () => { if (current) { chunks.push(current); current = ''; } };
+
+        for (const part of parts) {
+            if (current.length + part.length <= maxLen) { current += part; continue; }
+            flush();
+            if (part.length <= maxLen) { current = part; continue; }
+            let rest = part;
+            while (rest.length > maxLen) {
+                let cut = rest.lastIndexOf('. ', maxLen);
+                cut = cut >= maxLen * 0.5 ? cut + 2 : maxLen;
+                chunks.push(rest.slice(0, cut));
+                rest = rest.slice(cut);
+            }
+            current = rest;
+        }
+        flush();
+        return chunks;
+    }
+
+    async processLegacyChunk(text, threshold, counters) {
         // Step 1: Tokenize the input text
         const inputs = await this.tokenizer(text);
         const inputTokens = inputs.input_ids.data;
@@ -204,19 +270,19 @@ class AIModelProcessor {
 
         // Step 6: Aggregate consecutive privacy tokens into entities
         const aggregated = this.aggregatePrivacyTokens(tokenPredictions, threshold);
-        
+
         // Step 7: Create masked text with placeholders
-        const { maskedText, replacements } = this.maskText(tokenPredictions, aggregated);
-        
+        const { maskedText, replacements } = this.maskText(tokenPredictions, aggregated, counters);
+
         return { maskedText, replacements };
     }
 
-    async processWithPipeline(text, threshold) {
+    async processWithPipeline(text, threshold, counters = {}) {
         const predictions = await this.classifier(text, {
             aggregation_strategy: 'simple'
         });
         const spans = this.normalizePipelinePredictions(text, predictions, threshold);
-        return this.maskTextBySpans(text, spans);
+        return this.maskTextBySpans(text, spans, counters);
     }
 
     normalizePipelinePredictions(text, predictions, threshold) {
@@ -312,8 +378,7 @@ class AIModelProcessor {
         return { start: cleanStart, end: cleanEnd };
     }
 
-    maskTextBySpans(text, spans) {
-        const counters = {};
+    maskTextBySpans(text, spans, counters = {}) {
         const replacements = spans.map(span => {
             counters[span.type] = (counters[span.type] || 0) + 1;
             return {
@@ -418,11 +483,10 @@ class AIModelProcessor {
      * @param {Array} aggregatedGroups - Grouped entity spans to mask
      * @returns {Object} - { maskedText, replacements }
      */
-    maskText(tokenPredictions, aggregatedGroups) {
+    maskText(tokenPredictions, aggregatedGroups, counters = {}) {
         const maskedTokens = [];
         const replacements = [];
         const maskedIndices = new Set();
-        let piiCounter = 1;
         
         // Mark all indices that belong to privacy groups
         aggregatedGroups.forEach(group => {
@@ -444,14 +508,14 @@ class AIModelProcessor {
                         .map((token, i) => (i === 0 && group.startsWithSpace ? token.trimStart() : token))
                         .join('');
                     
-                    // Create placeholder
-                    const placeholder = `[PII_${piiCounter}]`;
-                    replacements.push({ 
-                        original: originalText, 
+                    // Create placeholder (counter shared across chunks)
+                    counters.PII = (counters.PII || 0) + 1;
+                    const placeholder = `[PII_${counters.PII}]`;
+                    replacements.push({
+                        original: originalText,
                         placeholder: placeholder,
                         activation: Math.max(...group.scores)
                     });
-                    piiCounter++;
                     
                     // Add masked token with proper spacing
                     const maskWithSpace = group.startsWithSpace ? ` ${placeholder}` : placeholder;

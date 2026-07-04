@@ -168,6 +168,10 @@
                         100% Local
                     </span>
                 </div>
+                <div class="model-card category-card">
+                    <span class="model-label">Detect:</span>
+                    <div id="categoryFilters" class="category-filters" aria-label="Entity categories to detect"></div>
+                </div>
             </div>
 
             <!-- Main Content -->
@@ -244,6 +248,13 @@ All processing happens in your browser."></textarea>
                                         </svg>
                                         Anonymize Selected Text
                                     </button>
+                                    <button id="highlightViewBtn" class="btn btn-secondary btn-small" title="Show entities as clickable highlights">
+                                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                        Highlight
+                                    </button>
                                     <button id="copyOutputBtn" class="btn btn-secondary btn-small">
                                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
@@ -254,6 +265,7 @@ All processing happens in your browser."></textarea>
                                 </div>
                             </div>
                             <textarea id="outputText" class="textarea-field" readonly placeholder="Anonymized text will appear here..."></textarea>
+                            <div id="outputHighlight" class="output-highlight" style="display: none;" aria-label="Anonymized output with clickable entities"></div>
                         </div>
                     </div>
 

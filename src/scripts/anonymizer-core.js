@@ -18,7 +18,10 @@ const entityPatterns = {
         priority: 81
     },
     PERSON_TITLE: {
-        pattern: /\b(?:Mr\.?|Mrs\.?|Miss|Ms\.?|Sir|Madam|Dr\.?\s?med\.?|Dr\.?\s?phil\.?|Dr\.?\s?jur\.?|Dr\.?\s?rer\.?\s?nat\.?|Dr\.?|Professor|Prof\.?\s?Dr\.?|Prof\.?|Herr|Frau|lic\.?\s?iur\.?|lic\.?\s?phil\.?|Reverend|Rev\.?|Captain|Capt\.?|Colonel|Col\.?|Lieutenant|Lt\.?|Sergeant|Sgt\.?|Officer|Officer\.?|Judge|Justice|Honorable|Hon\.?|Senator|Sen\.?|Rep\.?|Mayor|President|Pres\.?|Vice President|VP|CEO|CFO|CTO|Director|Officer|Chief)\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+)?(?:\s+[A-ZÀ-ÖØ-Þ]\.?)?(?:\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+)?)?\b/gi,
+        // The title itself stays in the text (a lookbehind, not part of the
+        // match); only the NAME is captured. That way "Dr. Anna Keller" and a
+        // later plain "Anna Keller" share one placeholder via dedup.
+        pattern: /(?<=\b(?:Mr\.?|Mrs\.?|Miss|Ms\.?|Sir|Madam|Dr\.?\s?med\.?|Dr\.?\s?phil\.?|Dr\.?\s?jur\.?|Dr\.?\s?rer\.?\s?nat\.?|Dr\.?|Professor|Prof\.?\s?Dr\.?|Prof\.?|Herr|Frau|lic\.?\s?iur\.?|lic\.?\s?phil\.?|Reverend|Rev\.?|Captain|Capt\.?|Colonel|Col\.?|Lieutenant|Lt\.?|Sergeant|Sgt\.?|Judge|Justice|Honorable|Hon\.?|Senator|Sen\.?|Rep\.?|Mayor|President|Pres\.?|Vice President|VP|CEO|CFO|CTO|Director|Chief)\s+)[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+)?(?:\s+[A-ZÀ-ÖØ-Þ]\.?)?(?:\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+(?:-[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿß]+)?)?\b/g,
         priority: 3
     },
     EMAIL: {
@@ -134,8 +137,13 @@ const entityPatterns = {
         priority: 31
     },
     COMPANY: {
-        pattern: /\b(?:[A-Za-z0-9&.'-]+\s+){0,3}[A-Za-z0-9&.'-]+(?:,?\s*)(?:LLC|L\.L\.C\.|Ltd\.?|Inc\.?|Corp\.?|GmbH|PLC|LP|L\.P\.|LLP|L\.L\.P\.|GP|G\.P\.|DAO|SA|Foundation|Association|Cooperative|Corporation|Incorporated|Limited Company|Financial Group|& Co\.|& Partners|Limited Liability Company|Limited Partnership|Limited Liability Partnership|Sociedad Anonima|S\.A\.|S\.A\.S\.|S\.A\.S\.S\.)\b/gi,
+        pattern: /\b(?:[A-Za-z0-9&.'-]+\s+){0,3}[A-Za-z0-9&.'-]+(?:,?\s*)(?:LLC|L\.L\.C\.|Ltd\.?|Inc\.?|Corp\.?|GmbH|AG|S\.?à\.?\s?r\.?l\.?|Sàrl|KG|OHG|e\.V\.|UG|PLC|LP|L\.P\.|LLP|L\.L\.P\.|GP|G\.P\.|DAO|SA|Foundation|Association|Cooperative|Corporation|Incorporated|Limited Company|Financial Group|& Co\.|& Partners|Limited Liability Company|Limited Partnership|Limited Liability Partnership|Sociedad Anonima|S\.A\.|S\.A\.S\.|S\.A\.S\.S\.)\b/g,
         priority: 32
+    },
+    ID_CODE: {
+        // Hyphenated reference codes such as KD-2026-88421 or CUST-88421
+        pattern: /\b[A-Z]{1,5}-\d[A-Z0-9]*(?:-[A-Z0-9]{2,12}){0,3}\b/g,
+        priority: 34
     },
     PASSPORT: {
         pattern: /\b(?:[A-Z]{2}\d{6,8}|[A-Z]\d{8})\b/gi,
@@ -146,11 +154,14 @@ const entityPatterns = {
         priority: 35
     },
     VIN: {
-        pattern: /\b[A-HJ-NPR-Z0-9]{17}\b/g,
+        // 17-char VIN; must contain at least one letter (pure digit runs are
+        // handled by NUMBER_ID instead of being mislabeled as a VIN)
+        pattern: /\b(?=[A-HJ-NPR-Z0-9]{17}\b)(?![0-9]{17})[A-HJ-NPR-Z0-9]{17}\b/g,
         priority: 36
     },
     LICENSE: {
-        pattern: /\b(?:(?:DL|Driver's?\s+License|License|ID|Identification)\s*:?\s*)?(?:[A-Z]{1,3}\d{6,18}|\d{6,18}|[A-Z]{7}\*\d{3})\b/gi,
+        // Label required — an unlabeled digit run is not a "license"
+        pattern: /\b(?:DL|Driver'?s?\s+Licen[cs]e|Licen[cs]e|Identification)\s*(?:No\.?|Number|Nr\.?)?\s*[:#]?\s*(?:[A-Z]{1,3}\d{6,18}|\d{6,18}|[A-Z]{7}\*\d{3})\b/gi,
         priority: 37
     },
     GPS: {
@@ -160,10 +171,6 @@ const entityPatterns = {
     MEDICARE_ID: {
         pattern: /\b[0-9][ACDEFGHJKMNPQRTUVWXY][ACDEFGHJKMNPQRTUVWXY][0-9](?:[-\s]?)[ACDEFGHJKMNPQRTUVWXY][ACDEFGHJKMNPQRTUVWXY][0-9](?:[-\s]?)[ACDEFGHJKMNPQRTUVWXY][ACDEFGHJKMNPQRTUVWXY][0-9][0-9]\b/g,
         priority: 39
-    },
-    MEDICAL_RECORD: {
-        pattern: /\b[A-Z]{0,2}\d{6,10}\b/g,
-        priority: 40
     },
     TRADEMARK: {
         pattern: /\b[A-Z][a-zA-Z0-9]*(?:\u2122|\u00ae|\(TM\)|\(R\)|\(tm\)|\(r\))/g,
@@ -189,21 +196,11 @@ const entityPatterns = {
         pattern: /\b[A-Z]\d[A-Z]\s?\d[A-Z]\d\b/gi,
         priority: 46
     },
-    EMAIL_RFC5322: {
-        pattern: /[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/g,
-        priority: 47
-    },
-    EMAIL_SIMPLE: {
-        pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
-        priority: 48
-    },
-    IP_ADDRESS_IPV4: {
-        pattern: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
-        priority: 49
-    },
-    IP_ADDRESS_IPV6_COMPRESSED: {
-        pattern: /\b(?:(?:[A-F0-9]{1,4}:)*)?::(?:(?:[A-F0-9]{1,4}:)*[A-F0-9]{1,4})?\b/gi,
-        priority: 50
+    NUMBER_ID: {
+        // Honest last-resort label for any long digit run (order numbers,
+        // account-like numbers, ...). Runs after every specific pattern.
+        pattern: /\b\d{6,}\b/g,
+        priority: 95
     },
     CH_PHONE_MOBILE: {
         pattern: /(?:^|[\s(])(?:\+41|0041|0)\s?7[5-9]\s?\d\s?\d{2,3}\s?\d{2}\s?\d{2}\b/g,
@@ -319,6 +316,43 @@ const entityPatterns = {
     }
 };
 
+// Detection categories: every pattern belongs to exactly one category so the
+// UI can offer coarse on/off switches instead of all-or-nothing detection.
+const CATEGORY_LABELS = {
+    people: 'People & Companies',
+    contact: 'Contact',
+    financial: 'Financial',
+    ids: 'IDs & Numbers',
+    addresses: 'Addresses & Locations',
+    dates: 'Dates & Age',
+    tech: 'Web & Tech'
+};
+
+const ENTITY_CATEGORIES = {
+    PERSON_NAME: 'people', PERSON_FULL: 'people', PERSON_TITLE: 'people', COMPANY: 'people', TRADEMARK: 'people',
+    EMAIL: 'contact', PHONE: 'contact', HANDLE: 'contact',
+    CH_PHONE_MOBILE: 'contact', CH_PHONE_LANDLINE: 'contact', DE_PHONE_MOBILE: 'contact', DE_PHONE_LANDLINE: 'contact',
+    CREDIT_CARD: 'financial', IBAN: 'financial', CH_BANK_IBAN: 'financial', DE_BANK_IBAN: 'financial',
+    ACCOUNT: 'financial', PIN: 'financial', EURO: 'financial', POUND: 'financial', YEN: 'financial',
+    MONEY: 'financial', MONEY_CRYPTO: 'financial', CRYPTO_ADDRESS: 'financial',
+    SSN: 'ids', US_PASSPORT: 'ids', UK_NINO: 'ids', UK_NHS: 'ids', CA_SIN: 'ids', AU_MEDICARE: 'ids', AU_TFN: 'ids',
+    PASSPORT: 'ids', LICENSE: 'ids', VIN: 'ids', MEDICARE_ID: 'ids', ID_CODE: 'ids', NUMBER_ID: 'ids',
+    CH_PASSPORT_NUMBER: 'ids', CH_TAX_AHV_NUMBER: 'ids', CH_SOCIAL_SECURITY_OASI: 'ids', CH_DRIVER_LICENSE: 'ids',
+    CH_NATIONAL_ID_CARD: 'ids', CH_VAT_UID: 'ids', CH_HEALTH_INSURANCE_NUMBER: 'ids', CH_INSURANCE_NUMBER: 'ids',
+    CH_LICENSE_PLATE: 'ids', DE_PASSPORT_NUMBER: 'ids', DE_REISEPASS_LABELLED: 'ids', DE_TAX_ID: 'ids',
+    DE_SOCIAL_SECURITY_NUMBER: 'ids', DE_DRIVER_LICENSE: 'ids', DE_NATIONAL_ID_CARD: 'ids', DE_VAT_UST_ID: 'ids',
+    DE_HEALTH_INSURANCE_NUMBER: 'ids',
+    ADDRESS: 'addresses', STREET_ADDRESS: 'addresses', DE_CH_ADDRESS: 'addresses', GPS: 'addresses',
+    ZIP: 'addresses', ZIP_US: 'addresses', ZIP_UK: 'addresses', ZIP_CA: 'addresses',
+    CH_POSTAL_CODE: 'addresses', DE_POSTAL_CODE: 'addresses',
+    DATE: 'dates', CH_DATE_DDMMYYYY: 'dates', DE_DATE_DDMMYYYY: 'dates', AGE: 'dates',
+    URL: 'tech', IP_ADDRESS: 'tech', IP_ADDRESS_IPV6: 'tech', UUID: 'tech', MAC_ADDRESS: 'tech', FILE: 'tech'
+};
+
+// Organization keywords: a "person name" containing one of these is really an
+// organization (Zürcher Kantonalbank, Praxis Sonnenhof, ...) — retype it.
+const ORG_KEYWORD_RE = /(bank|versicherung|kasse|praxis|klinik|spital|hospital|apotheke|amt|verband|verein|stiftung|agentur|kanzlei|institut|zentrum|center|clinic|insurance|agency|foundation)/i;
+
 class AnonymizerApp {
     constructor() {
         this.entityManager = new EntityManager();
@@ -329,21 +363,63 @@ class AnonymizerApp {
         this.currentMode = 'regex';
         this.isProcessing = false;
         this.isRedactMode = false;
-        
+        // Text-order list of placeholders behind [redacted] markers, so
+        // deanonymization can restore redacted slots positionally.
+        this.redactionOrder = [];
+        // Category toggles (non-sensitive preference, persisted locally)
+        this.enabledCategories = this.loadCategoryPrefs();
+        this.highlightViewActive = false;
+
         this.initializeApp();
+    }
+
+    loadCategoryPrefs() {
+        try {
+            const stored = JSON.parse(localStorage.getItem('asd123-anonymizer-categories') || '{}');
+            return { ...stored };
+        } catch (e) {
+            return {};
+        }
+    }
+
+    saveCategoryPrefs() {
+        try {
+            localStorage.setItem('asd123-anonymizer-categories', JSON.stringify(this.enabledCategories));
+        } catch (e) { /* preferences only — safe to ignore */ }
     }
 
     async initializeApp() {
         // Set up event listeners
         this.setupEventListeners();
-        
+
         // Initialize UI
         this.uiController.initialize();
-        
+
         // Set up drag and drop
         this.setupDragAndDrop();
-        
-        console.log('Anonymizer initialized successfully');
+
+        // Category checkboxes + highlight view
+        this.setupCategoryControls();
+        this.setupHighlightView();
+    }
+
+    setupCategoryControls() {
+        const container = document.getElementById('categoryFilters');
+        if (!container) return;
+        Object.entries(CATEGORY_LABELS).forEach(([key, label]) => {
+            const wrapper = document.createElement('label');
+            wrapper.className = 'category-filter';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = this.enabledCategories[key] !== false;
+            checkbox.addEventListener('change', () => {
+                this.enabledCategories[key] = checkbox.checked;
+                this.saveCategoryPrefs();
+            });
+            wrapper.appendChild(checkbox);
+            wrapper.appendChild(document.createTextNode(' ' + label));
+            container.appendChild(wrapper);
+        });
     }
 
     setupEventListeners() {
@@ -439,6 +515,110 @@ class AnonymizerApp {
         document.addEventListener('entityRemove', (e) => {
             this.removeEntity(e.detail.placeholder);
         });
+
+        // Entity toggle event (click on an entity tile or highlight chip)
+        document.addEventListener('entityToggle', (e) => {
+            this.toggleEntity(e.detail.placeholder);
+        });
+    }
+
+    /**
+     * Toggle an entity between anonymized (active) and restored (inactive).
+     * Active -> inactive: the placeholder in the output is replaced by the
+     * original text. Inactive -> active: the original text is re-replaced.
+     */
+    toggleEntity(placeholder) {
+        const entity = this.entityManager.getEntity(placeholder);
+        if (!entity) return;
+
+        const outputTextArea = document.getElementById('outputText');
+        const escaped = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        if (entity.isActive) {
+            outputTextArea.value = outputTextArea.value.replace(
+                new RegExp(escaped(placeholder), 'g'), entity.original);
+        } else {
+            outputTextArea.value = outputTextArea.value.replace(
+                new RegExp(escaped(entity.original), 'g'), placeholder);
+        }
+        this.entityManager.toggleEntity(placeholder);
+
+        this.uiController.updateEntityList(this.entityManager.exportEntities());
+        this.refreshHighlightView();
+        this.uiController.showInfo(entity.isActive
+            ? `${placeholder} is now anonymized again`
+            : `${placeholder} restored in output (click to re-anonymize)`);
+    }
+
+    /**
+     * Highlight view: renders the anonymized output as read-only rich text
+     * where every entity is a clickable chip (click = toggle on/off).
+     */
+    setupHighlightView() {
+        const btn = document.getElementById('highlightViewBtn');
+        const container = document.getElementById('outputHighlight');
+        if (!btn || !container) return;
+
+        btn.addEventListener('click', () => {
+            this.highlightViewActive = !this.highlightViewActive;
+            btn.classList.toggle('btn-primary', this.highlightViewActive);
+            btn.classList.toggle('btn-secondary', !this.highlightViewActive);
+            this.refreshHighlightView();
+        });
+
+        container.addEventListener('click', (e) => {
+            const chip = e.target.closest('[data-ph]');
+            if (chip) this.toggleEntity(chip.dataset.ph);
+        });
+    }
+
+    refreshHighlightView() {
+        const container = document.getElementById('outputHighlight');
+        const outputTextArea = document.getElementById('outputText');
+        if (!container || !outputTextArea) return;
+
+        if (!this.highlightViewActive) {
+            container.style.display = 'none';
+            outputTextArea.style.display = '';
+            return;
+        }
+
+        const escapeHtml = str => str.replace(/[&<>"']/g, ch => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
+        ));
+        const escapeRe = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        // Two-phase render: first swap every entity occurrence for an opaque
+        // token (so later replacements can never match inside generated HTML
+        // attributes), then expand the tokens into chip markup.
+        const entities = this.entityManager.exportEntities();
+        let text = outputTextArea.value;
+        const tokens = [];
+        entities.forEach((entity, idx) => {
+            const needle = entity.active ? entity.placeholder : entity.original;
+            if (!needle) return;
+            const token = '\u0000' + idx + '\u0000';
+            const before = text;
+            text = text.split(needle).join(token);
+            if (text !== before) tokens[idx] = { entity, needle };
+        });
+
+        let html = escapeHtml(text);
+        tokens.forEach((info, idx) => {
+            if (!info) return;
+            const { entity, needle } = info;
+            const chipClass = entity.active ? 'entity-chip' : 'entity-chip entity-chip--inactive';
+            const title = entity.active
+                ? `${escapeHtml(entity.original)} — click to restore`
+                : `${escapeHtml(entity.placeholder)} — click to anonymize`;
+            html = html.split('\u0000' + idx + '\u0000').join(
+                `<span class="${chipClass}" data-ph="${escapeHtml(entity.placeholder)}" title="${title}">${escapeHtml(needle)}</span>`
+            );
+        });
+
+        container.innerHTML = html;
+        container.style.display = 'block';
+        outputTextArea.style.display = 'none';
     }
 
     setupDragAndDrop() {
@@ -531,6 +711,7 @@ Michael Turner`
         this.isProcessing = true;
         this.uiController.showProcessing(true);
         this.entityManager.clear();
+        this.redactionOrder = [];
 
         try {
             let anonymizedText = inputText;
@@ -563,6 +744,7 @@ Michael Turner`
             // Update UI
             document.getElementById('outputText').value = anonymizedText;
             this.uiController.updateEntityList(this.entityManager.exportEntities());
+            this.refreshHighlightView();
             
             const entityCount = this.entityManager.exportEntities().length;
             this.uiController.showSuccess(`Anonymization complete! Detected ${entityCount} entities`);
@@ -612,6 +794,14 @@ Michael Turner`
     }
 
     convertAIPlaceholdersToRedactions(maskedText, replacements) {
+        // Record the placeholders in the order they appear in the masked text
+        // so redacted slots can be restored positionally.
+        this.redactionOrder = replacements
+            .map(r => ({ placeholder: r.placeholder, pos: maskedText.indexOf(r.placeholder) }))
+            .filter(r => r.pos !== -1)
+            .sort((a, b) => a.pos - b.pos)
+            .map(r => r.placeholder);
+
         return replacements.reduce((text, replacement) => {
             const placeholderRegex = new RegExp(
                 replacement.placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
@@ -669,7 +859,13 @@ Michael Turner`
             'Vollständige', 'Vollständig',
             'Bereits', 'Darüber', 'Ausgestellt', 'Nachreichen',
             'Prüfen', 'Kontaktieren',
-            'Korrekt', 'Abgerechnet'
+            'Korrekt', 'Abgerechnet',
+            'Kundennummer', 'Vertragsnummer', 'Referenznummer', 'Rechnungsnummer', 'Policennummer',
+            'Hausarzt', 'Hausärztin', 'Zahnarzt', 'Zahnärztin', 'Facharzt', 'Fachärztin',
+            'Praxis', 'Klinik', 'Spital', 'Krankenhaus', 'Postfach',
+            'Geehrte', 'Geehrter', 'Geehrtes', 'Betreffend', 'Anbei', 'Beiliegend', 'Hiermit',
+            'Vielen', 'Herzliche', 'Herzlichen', 'Beste', 'Besten', 'Liebe', 'Lieber',
+            'Rückerstattung', 'Behandlung', 'Termin', 'Unterlagen', 'Dokumente'
         ]);
         
         // Helper function to check if a PERSON_NAME match is likely a false positive
@@ -683,29 +879,46 @@ Michael Turner`
             });
         };
         
-        // Helper function to check if a range overlaps with existing ranges
-        const hasOverlap = (start, end) => {
-            return occupiedRanges.some(range => {
-                return !(end <= range.start || start >= range.end);
-            });
+        // Overlap check against accepted ranges, kept sorted by start position
+        // so a binary search replaces the former O(n^2) linear scan.
+        const findInsertIndex = (start) => {
+            let lo = 0, hi = occupiedRanges.length;
+            while (lo < hi) {
+                const mid = (lo + hi) >> 1;
+                if (occupiedRanges[mid].start < start) lo = mid + 1;
+                else hi = mid;
+            }
+            return lo;
         };
-        
-        // Sort patterns by priority
+        const hasOverlap = (start, end) => {
+            const idx = findInsertIndex(start);
+            // Neighbor on the left may reach into [start, end); neighbor on the
+            // right may begin before end.
+            if (idx > 0 && occupiedRanges[idx - 1].end > start) return true;
+            if (idx < occupiedRanges.length && occupiedRanges[idx].start < end) return true;
+            return false;
+        };
+        const occupy = (start, end) => {
+            occupiedRanges.splice(findInsertIndex(start), 0, { start, end });
+        };
+
+        // Sort patterns by priority, skipping disabled categories
         const sortedPatterns = Object.entries(entityPatterns)
+            .filter(([type]) => this.isCategoryEnabled(ENTITY_CATEGORIES[type]))
             .sort((a, b) => a[1].priority - b[1].priority);
-        
+
         // First pass: collect ALL matches from all patterns
         for (const [type, config] of sortedPatterns) {
             const matches = [...text.matchAll(config.pattern)];
-            
+
             for (const match of matches) {
                 const matchText = match[0];
-                
+
                 // Filter out false positive person names
                 if ((type === 'PERSON_NAME' || type === 'PERSON_FULL') && isNameFalsePositive(matchText)) {
                     continue;
                 }
-                
+
                 // For patterns that use leading whitespace/punctuation in lookahead,
                 // trim leading whitespace from the match for cleaner output
                 let startPos = match.index;
@@ -717,20 +930,28 @@ Michael Turner`
                         cleanText = cleanText.substring(leadingWhitespace[0].length);
                     }
                 }
-                
+
+                // A "person" containing an organization keyword is a company
+                // (Zürcher Kantonalbank, Praxis Sonnenhof, ...): fix the label.
+                let finalType = type;
+                if ((type === 'PERSON_NAME' || type === 'PERSON_FULL' || type === 'PERSON_TITLE') &&
+                    ORG_KEYWORD_RE.test(cleanText)) {
+                    finalType = 'COMPANY';
+                }
+
                 allMatches.push({
                     text: cleanText,
-                    type: type,
+                    type: finalType,
                     startPos: startPos,
                     endPos: startPos + cleanText.length,
                     priority: config.priority
                 });
             }
         }
-        
+
         // Sort all matches by priority first (lower = higher priority), then by position
         allMatches.sort((a, b) => a.priority - b.priority || a.startPos - b.startPos);
-        
+
         // Second pass: process matches in priority order, checking for overlaps
         const entities = [];
         for (const match of allMatches) {
@@ -742,36 +963,40 @@ Michael Turner`
                     startPos: match.startPos,
                     endPos: match.endPos
                 });
-                
+
                 // Mark this range as occupied
-                occupiedRanges.push({ start: match.startPos, end: match.endPos });
+                occupy(match.startPos, match.endPos);
             }
         }
-        
+
         // Sort final entities by position for correct output order
         entities.sort((a, b) => a.startPos - b.startPos);
-        
+
         return entities;
+    }
+
+    isCategoryEnabled(category) {
+        if (!category) return true;
+        return this.enabledCategories[category] !== false;
     }
 
     applyAnonymization(text, entities) {
         // First, generate placeholders in text order (forward)
         const entityPlaceholders = new Map();
         entities.forEach(entity => {
-            let placeholder;
-            if (this.isRedactMode) {
-                // In redact mode, still generate unique placeholders internally
-                // but they will all be replaced with [redacted]
-                placeholder = this.entityManager.generatePlaceholder(entity.type, entity.text);
-            } else {
-                placeholder = this.entityManager.generatePlaceholder(entity.type, entity.text);
-            }
+            const placeholder = this.entityManager.generatePlaceholder(entity.type, entity.text);
             entityPlaceholders.set(entity, placeholder);
         });
-        
+
+        // In redact mode, remember which placeholder sits behind each
+        // [redacted] marker IN TEXT ORDER — deanonymization restores by position.
+        this.redactionOrder = this.isRedactMode
+            ? entities.map(entity => entityPlaceholders.get(entity))
+            : [];
+
         // Then sort entities by position (reverse order for replacement to avoid position shifting)
         entities.sort((a, b) => b.startPos - a.startPos);
-        
+
         let result = text;
         for (const entity of entities) {
             const placeholder = entityPlaceholders.get(entity);
@@ -780,7 +1005,7 @@ Michael Turner`
                      displayText +
                      result.substring(entity.endPos);
         }
-        
+
         return result;
     }
 
@@ -801,6 +1026,7 @@ Michael Turner`
 
         // Update UI
         this.uiController.updateEntityList(this.entityManager.exportEntities());
+        this.refreshHighlightView();
         this.uiController.showSuccess('Entity removed and restored in output');
     }
 
@@ -813,38 +1039,47 @@ Michael Turner`
 
         let deanonymizedText = llmInputText;
         let replacedCount = 0;
-        
-        // Replace typed placeholders like [PERSON_1], [EMAIL_2], etc.
-        this.entityManager.entityMap.forEach((entity, placeholder) => {
-            if (entity.isActive) {
-                const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-                const matches = deanonymizedText.match(regex);
-                if (matches) {
-                    deanonymizedText = deanonymizedText.replace(regex, entity.original);
-                    replacedCount += matches.length;
-                }
-            }
-        });
-        
-        // Handle [redacted] replacements - replace each occurrence with corresponding entity
-        if (deanonymizedText.includes('[redacted]')) {
-            // Get all active entities in order
-            const activeEntities = Array.from(this.entityManager.entityMap.entries())
-                .filter(([placeholder, entity]) => entity.isActive)
-                .sort((a, b) => {
-                    // Sort by placeholder to maintain consistent order
-                    return a[0].localeCompare(b[0]);
-                });
-            
-            // Replace [redacted] one by one with corresponding entities
-            activeEntities.forEach(([placeholder, entity]) => {
-                if (deanonymizedText.includes('[redacted]')) {
-                    deanonymizedText = deanonymizedText.replace('[redacted]', entity.original);
-                    replacedCount++;
-                }
+
+        // Replace typed placeholders like [PERSON_1], [EMAIL_2] in ONE pass
+        // with a combined alternation regex (instead of one scan per entity).
+        const activeEntries = Array.from(this.entityManager.entityMap.entries())
+            .filter(([, entity]) => entity.isActive);
+        if (activeEntries.length > 0) {
+            const lookup = new Map(activeEntries.map(([ph, entity]) => [ph, entity.original]));
+            const combined = new RegExp(
+                activeEntries
+                    .map(([ph]) => ph.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+                    .join('|'),
+                'g'
+            );
+            deanonymizedText = deanonymizedText.replace(combined, match => {
+                replacedCount++;
+                return lookup.get(match);
             });
         }
-        
+
+        // Handle [redacted] markers: restore them positionally using the
+        // text-order recorded during redaction (NOT alphabetical order, which
+        // used to swap values between slots).
+        if (deanonymizedText.includes('[redacted]')) {
+            const order = this.redactionOrder.length > 0
+                ? this.redactionOrder
+                : activeEntries.map(([ph]) => ph).sort((a, b) => {
+                    // Fallback: numeric-aware placeholder sort ([X_2] before [X_10])
+                    const [, typeA, numA] = a.match(/^\[(.+)_(\d+)\]$/) || [];
+                    const [, typeB, numB] = b.match(/^\[(.+)_(\d+)\]$/) || [];
+                    return (typeA || '').localeCompare(typeB || '') || (Number(numA) - Number(numB));
+                });
+
+            for (const placeholder of order) {
+                if (!deanonymizedText.includes('[redacted]')) break;
+                const entity = this.entityManager.getEntity(placeholder);
+                if (!entity || !entity.isActive) continue;
+                deanonymizedText = deanonymizedText.replace('[redacted]', entity.original);
+                replacedCount++;
+            }
+        }
+
         document.getElementById('llmOutput').value = deanonymizedText;
         this.uiController.showSuccess(`Text deanonymized successfully! Replaced ${replacedCount} entities`);
     }
@@ -924,9 +1159,18 @@ Michael Turner`
             e.type,
             e.active
         ]);
-        
+
+        // RFC 4180: double inner quotes; values may contain commas/newlines.
+        // Cells starting with =+-@ get a leading apostrophe so spreadsheet apps
+        // don't execute them as formulas (stripped again on import).
+        const escapeCell = (cell) => {
+            let value = String(cell);
+            if (/^[=+\-@]/.test(value)) value = "'" + value;
+            return '"' + value.replace(/"/g, '""') + '"';
+        };
+
         return [headers, ...rows]
-            .map(row => row.map(cell => `"${cell}"`).join(','))
+            .map(row => row.map(escapeCell).join(','))
             .join('\n');
     }
 
@@ -946,22 +1190,51 @@ Michael Turner`
     }
 
     parseCSV(csvText) {
-        const lines = csvText.split('\n');
-        const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
-        
-        return lines.slice(1)
-            .filter(line => line.trim())
-            .map(line => {
-                const values = line.match(/(".*?"|[^,]+)/g)
-                    .map(v => v.replace(/"/g, '').trim());
-                
-                return {
-                    placeholder: values[0],
-                    original: values[1],
-                    type: values[2],
-                    active: values[3] === 'true'
-                };
-            });
+        // Full RFC 4180 parser: handles "" escapes and commas/newlines inside
+        // quoted fields (the old regex parser corrupted such values).
+        const rows = [];
+        let row = [];
+        let field = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < csvText.length; i++) {
+            const char = csvText[i];
+            if (inQuotes) {
+                if (char === '"') {
+                    if (csvText[i + 1] === '"') { field += '"'; i++; }
+                    else inQuotes = false;
+                } else {
+                    field += char;
+                }
+            } else if (char === '"') {
+                inQuotes = true;
+            } else if (char === ',') {
+                row.push(field);
+                field = '';
+            } else if (char === '\n' || char === '\r') {
+                if (char === '\r' && csvText[i + 1] === '\n') i++;
+                row.push(field);
+                field = '';
+                if (row.length > 1 || row[0] !== '') rows.push(row);
+                row = [];
+            } else {
+                field += char;
+            }
+        }
+        row.push(field);
+        if (row.length > 1 || row[0] !== '') rows.push(row);
+
+        // Strip the formula-injection guard added on export
+        const unguard = value => value.replace(/^'(?=[=+\-@])/, '');
+
+        return rows.slice(1)
+            .filter(values => values.length >= 4 && /^\[.+_\d+\]$/.test(values[0].trim()))
+            .map(values => ({
+                placeholder: values[0].trim(),
+                original: unguard(values[1]),
+                type: values[2].trim(),
+                active: values[3].trim() === 'true'
+            }));
     }
 
     processLlmOutput() {
@@ -976,19 +1249,26 @@ Michael Turner`
         document.getElementById('llmInput').value = '';
         document.getElementById('llmOutput').value = '';
         this.entityManager.clear();
+        this.redactionOrder = [];
         this.uiController.updateEntityList([]);
+        this.refreshHighlightView();
         this.uiController.showInfo('All fields cleared');
     }
 
-    copyOutput() {
+    async copyOutput() {
         const outputText = document.getElementById('outputText');
         if (!outputText.value) {
             this.uiController.showError('No text to copy');
             return;
         }
-        
-        outputText.select();
-        document.execCommand('copy');
+
+        try {
+            await navigator.clipboard.writeText(outputText.value);
+        } catch (error) {
+            // Fallback for older browsers / denied permission
+            outputText.select();
+            document.execCommand('copy');
+        }
         this.uiController.showSuccess('Copied to clipboard');
     }
 }

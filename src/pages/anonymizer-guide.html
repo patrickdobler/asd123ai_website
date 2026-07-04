@@ -214,7 +214,7 @@ The Anonymizer is a privacy-first proof of concept that detects and anonymizes P
 <span class="text-[var(--primary-color)]">2.</span> Detection Methods
 </h3>
 <p class="text-[var(--text-secondary)] mb-6 leading-relaxed">
-The Anonymizer offers several detection methods. Regex is the default and recommended starting point. OpenAI Privacy Filter is the advanced local AI option. AI4Privacy modes remain available as Legacy PoC options for comparison.
+The Anonymizer offers several detection methods. Regex is the default and recommended starting point. OpenAI Privacy Filter is the advanced local AI option. AI4Privacy modes remain available as Legacy PoC options for comparison. With the <strong class="text-[var(--text-primary)]">Detect</strong> checkboxes you can limit detection to the categories you care about (people, contact, financial, IDs, addresses, dates, web/tech). Long texts are processed in chunks automatically in the AI modes.
 </p>
 <div class="grid md:grid-cols-3 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
@@ -259,7 +259,7 @@ The Anonymizer offers several detection methods. Regex is the default and recomm
 </div>
 <div class="mt-4 p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
 <p class="text-sm text-[var(--text-secondary)]">
-<strong class="text-[var(--text-primary)]">Model download note:</strong> When OpenAI Privacy Filter is selected, the browser downloads model weights, tokenizer, and configuration files. Your text, files, entities, mappings, and output are not sent to Hugging Face, OpenAI, or ASD123.ai for processing.
+<strong class="text-[var(--text-primary)]">Download note:</strong> The AI modes fetch the transformers.js library (jsDelivr CDN) and the model weights, tokenizer, and configuration files (Hugging Face) the first time you select them &mdash; never before. Regex mode makes no external requests at all and keeps working even when those CDNs are blocked or you are offline. Your text, files, entities, mappings, and output are never sent anywhere.
 </p>
 </div>
 </div>
@@ -304,7 +304,7 @@ Result: "My name is [PERSON_NAME_1], email [EMAIL_1], phone [PHONE_1]"
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">4</div>
 <div class="flex-1">
 <h4 class="font-bold text-[var(--text-primary)] mb-2">Review & Copy</h4>
-<p class="text-sm text-[var(--text-secondary)]">Check the <strong>Detected Entities</strong> panel, review the anonymized output, and click <strong>📋 Copy</strong> to use elsewhere.</p>
+<p class="text-sm text-[var(--text-secondary)]">Check the <strong>Detected Entities</strong> panel, review the anonymized output, and click <strong>📋 Copy</strong> to use elsewhere. The <strong>Highlight</strong> button shows the output with every entity as a clickable chip &mdash; click a chip (or an entity tile) to toggle it between anonymized and restored, or use the 🗑️ button to remove a false positive entirely.</p>
 </div>
 </div>
 </div>
@@ -365,7 +365,7 @@ The Anonymizer supports multiple file formats for easy text extraction:
 </ul>
 <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
 <p class="text-sm text-[var(--text-secondary)]">
-<strong class="text-[var(--text-primary)]">⚠ Limits:</strong> Maximum file size is 10MB. Scanned PDFs (images) are not supported.
+<strong class="text-[var(--text-primary)]">⚠ Limits:</strong> Maximum file size is 10MB. Scanned PDFs (images) are not supported here &mdash; run them through the <a href="/converter" class="text-[var(--primary-color)] hover:underline">Markdown Converter</a> (OCR engine) first and paste the result. File parsing uses the same self-hosted libraries as the converter; no CDN request is made.
 </p>
 </div>
 </div>
@@ -496,7 +496,7 @@ For maximum privacy when sharing with untrusted parties, use <strong class="text
 </ul>
 <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
 <p class="text-sm text-[var(--text-secondary)]">
-<strong class="text-[var(--text-primary)]">✓ Good to know:</strong> Even in Redact Mode, you can still deanonymize using the entity list, as the mapping is preserved internally!
+<strong class="text-[var(--text-primary)]">✓ Good to know:</strong> Even in Redact Mode you can deanonymize: the mapping stays in memory and each [redacted] marker is restored by its position in the text. This only works reliably if the LLM output keeps all [redacted] markers in their original order &mdash; if markers were dropped or reordered, review the result carefully.
 </p>
 </div>
 </div>
@@ -570,7 +570,7 @@ Preserve your entity mappings for later use or share them with trusted recipient
 </li>
 <li class="flex items-start gap-2">
 <span class="text-[var(--text-primary)]">✓</span>
-<span><strong class="text-[var(--text-primary)]">Optional Model Downloads:</strong> OpenAI Privacy Filter downloads model files from Hugging Face, but not your text or mappings.</span>
+<span><strong class="text-[var(--text-primary)]">Optional AI Downloads:</strong> Only the AI modes download the transformers.js library (CDN) and model files (Hugging Face) &mdash; on first use, never on page load. Regex mode is 100% offline. Your text and mappings are never transmitted.</span>
 </li>
 </ul>
 </div>
@@ -579,6 +579,7 @@ Preserve your entity mappings for later use or share them with trusted recipient
 <li>Use on trusted devices only (not public computers)</li>
 <li>Clear browser cache after processing highly sensitive data</li>
 <li>Encrypt CSV exports before storing</li>
+<li>Open exported CSVs with care: values are quoted and formula-guarded, but they still contain the original sensitive data</li>
 <li>Always review anonymized output before sharing</li>
 <li>Use Redact Mode for untrusted recipients</li>
 </ul>
