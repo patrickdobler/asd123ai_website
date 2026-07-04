@@ -56,7 +56,6 @@ function initialBuild() {
     copyHtmlFlat('dev');         // dev-only pages (chat-bench)
     copyDir('src/styles', path.join(distDir, 'styles'));
     copyDir('src/scripts', path.join(distDir, 'scripts'));
-    copyDir('src/components', path.join(distDir, 'components'));
     copyDir('public', distDir);          // favicons, logo, robots, sitemap, vendor/
     copyDir('vendor-dev', path.join(distDir, 'vendor-dev')); // dev-only engine
     console.log('=== Build Complete ===\n');
@@ -87,7 +86,6 @@ function setupWatchers() {
     watchDirectory('dev', '');         // dev pages -> dist root
     watchDirectory('src/styles', 'styles');
     watchDirectory('src/scripts', 'scripts');
-    watchDirectory('src/components', 'components');
     watchDirectory('public', '');      // public assets (incl. vendor) -> dist root
     watchDirectory('vendor-dev', 'vendor-dev');
     console.log('✓ Watching for changes... (Ctrl+C to stop)\n');

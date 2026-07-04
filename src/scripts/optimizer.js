@@ -4,8 +4,7 @@
  */
 
 /**
- * Embedded fallback language mappings to ensure mapping works in file:// contexts
- * These are overridden by fetched JSON if available at runtime.
+ * Language character mappings (embedded; no runtime fetch, works on file:// too).
  */
 const EMBEDDED_MAPPINGS = {
     'swiss-german': {
@@ -64,12 +63,120 @@ const EMBEDDED_MAPPINGS = {
         '×': 'x'
     }
 };
+
+/**
+ * Precompiled single-pass replacement tables. Building one regex per feature
+ * (instead of one full-text scan per mapping entry) keeps large inputs fast.
+ */
+
+// Diacritic removal. The base table maps every accented character to its plain
+// ASCII form; for German/Swiss German the umlauts use the ae/oe/ue digraph
+// convention instead. ß→ss and the æ/œ ligatures apply to every language.
+const DIACRITIC_BASE_MAP = {
+    'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a', 'ā': 'a', 'ă': 'a', 'ą': 'a',
+    'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Ā': 'A', 'Ă': 'A', 'Ą': 'A',
+    'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'ē': 'e', 'ĕ': 'e', 'ė': 'e', 'ę': 'e', 'ě': 'e',
+    'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ē': 'E', 'Ĕ': 'E', 'Ė': 'E', 'Ę': 'E', 'Ě': 'E',
+    'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i', 'ĩ': 'i', 'ī': 'i', 'ĭ': 'i', 'į': 'i',
+    'Ì': 'I', 'Í': 'I', 'Î': 'I', 'Ï': 'I', 'Ĩ': 'I', 'Ī': 'I', 'Ĭ': 'I', 'Į': 'I',
+    'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o', 'ø': 'o', 'ō': 'o', 'ŏ': 'o', 'ő': 'o',
+    'Ò': 'O', 'Ó': 'O', 'Ô': 'O', 'Õ': 'O', 'Ö': 'O', 'Ø': 'O', 'Ō': 'O', 'Ŏ': 'O', 'Ő': 'O',
+    'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u', 'ũ': 'u', 'ū': 'u', 'ŭ': 'u', 'ů': 'u', 'ű': 'u', 'ų': 'u',
+    'Ù': 'U', 'Ú': 'U', 'Û': 'U', 'Ü': 'U', 'Ũ': 'U', 'Ū': 'U', 'Ŭ': 'U', 'Ů': 'U', 'Ű': 'U', 'Ų': 'U',
+    'ý': 'y', 'ÿ': 'y', 'ŷ': 'y',
+    'Ý': 'Y', 'Ÿ': 'Y', 'Ŷ': 'Y',
+    'ñ': 'n', 'ń': 'n', 'ň': 'n', 'ņ': 'n',
+    'Ñ': 'N', 'Ń': 'N', 'Ň': 'N', 'Ņ': 'N',
+    'ç': 'c', 'ć': 'c', 'ĉ': 'c', 'ċ': 'c', 'č': 'c',
+    'Ç': 'C', 'Ć': 'C', 'Ĉ': 'C', 'Ċ': 'C', 'Č': 'C',
+    'ß': 'ss',
+    'æ': 'ae', 'Æ': 'Ae',
+    'œ': 'oe', 'Œ': 'Oe'
+};
+const DIACRITIC_GERMAN_MAP = {
+    ...DIACRITIC_BASE_MAP,
+    'ä': 'ae', 'Ä': 'Ae', 'ö': 'oe', 'Ö': 'Oe', 'ü': 'ue', 'Ü': 'Ue'
+};
+function compileCharMap(map) {
+    return { re: new RegExp(`[${Object.keys(map).join('')}]`, 'g'), map };
+}
+const DIACRITICS_PLAIN = compileCharMap(DIACRITIC_BASE_MAP);
+const DIACRITICS_GERMAN = compileCharMap(DIACRITIC_GERMAN_MAP);
+
+// CP-1252/Latin-1 mojibake repair (UTF-8 read with the wrong encoding).
+// Compiled once into a single alternation regex + lookup for a one-pass fix.
+const MOJIBAKE_PAIRS = [
+    ['\u00C3\u00A4', '\u00E4'],   // a-umlaut
+    ['\u00C3\u00B6', '\u00F6'],   // o-umlaut
+    ['\u00C3\u00BC', '\u00FC'],   // u-umlaut
+    ['\u00C3\u0084', '\u00C4'],   // A-umlaut
+    ['\u00C3\u0096', '\u00D6'],   // O-umlaut
+    ['\u00C3\u009C', '\u00DC'],   // U-umlaut
+    ['\u00C3\u00A9', '\u00E9'],   // e-acute
+    ['\u00C3\u00A8', '\u00E8'],   // e-grave
+    ['\u00C3\u00AA', '\u00EA'],   // e-circumflex
+    ['\u00C3\u00AB', '\u00EB'],   // e-diaeresis
+    ['\u00C3\u00A0', '\u00E0'],   // a-grave
+    ['\u00C3\u00A1', '\u00E1'],   // a-acute
+    ['\u00C3\u00A2', '\u00E2'],   // a-circumflex
+    ['\u00C3\u00A3', '\u00E3'],   // a-tilde
+    ['\u00C3\u00A5', '\u00E5'],   // a-ring
+    ['\u00C3\u00AD', '\u00ED'],   // i-acute
+    ['\u00C3\u00AC', '\u00EC'],   // i-grave
+    ['\u00C3\u00AE', '\u00EE'],   // i-circumflex
+    ['\u00C3\u00AF', '\u00EF'],   // i-diaeresis
+    ['\u00C3\u00B3', '\u00F3'],   // o-acute
+    ['\u00C3\u00B2', '\u00F2'],   // o-grave
+    ['\u00C3\u00B4', '\u00F4'],   // o-circumflex
+    ['\u00C3\u00B5', '\u00F5'],   // o-tilde
+    ['\u00C3\u00BA', '\u00FA'],   // u-acute
+    ['\u00C3\u00B9', '\u00F9'],   // u-grave
+    ['\u00C3\u00BB', '\u00FB'],   // u-circumflex
+    ['\u00C3\u00B1', '\u00F1'],   // n-tilde
+    ['\u00C3\u0091', '\u00D1'],   // N-tilde
+    ['\u00C3\u00A7', '\u00E7'],   // c-cedilla
+    ['\u00C3\u0087', '\u00C7'],   // C-cedilla
+    ['\u00C3\u009F', '\u00DF'],   // sharp s (Latin-1 interpretation)
+    ['\u00C3\u0178', '\u00DF'],   // sharp s (CP-1252 interpretation)
+    ['\u00C3\u00A6', '\u00E6'],   // ae ligature
+    ['\u00C3\u0086', '\u00C6'],   // AE ligature
+    ['\u00C2\u00AB', '\u00AB'],   // left guillemet
+    ['\u00C2\u00BB', '\u00BB'],   // right guillemet
+    ['\u00C2\u00B0', '\u00B0'],   // degree sign
+    ['\u00C2\u00A7', '\u00A7'],   // section sign
+    ['\u00C2\u00A9', '\u00A9'],   // copyright
+    ['\u00C2\u00AE', '\u00AE'],   // registered
+    ['\u00C2\u00B2', '\u00B2'],   // superscript two
+    ['\u00C2\u00B3', '\u00B3'],   // superscript three
+    ['\u00C2\u00BD', '\u00BD'],   // one half
+    ['\u00C2\u00BC', '\u00BC'],   // one quarter
+    ['\u00C2\u00BE', '\u00BE'],   // three quarters
+    ['\u00C2\u00AD', ''],          // soft hyphen mojibake (remove)
+    ['\u00C2\u00A0', ' '],         // non-breaking space mojibake
+    ['\u00E2\u0080\u0093', '\u2013'],  // en-dash
+    ['\u00E2\u0080\u0094', '\u2014'],  // em-dash
+    ['\u00E2\u0080\u009C', '\u201C'],  // left double quote
+    ['\u00E2\u0080\u009D', '\u201D'],  // right double quote
+    ['\u00E2\u0080\u0098', '\u2018'],  // left single quote
+    ['\u00E2\u0080\u0099', '\u2019'],  // right single quote
+    ['\u00E2\u0080\u00A6', '\u2026'],  // ellipsis
+    ['\u00E2\u0080\u00A2', '\u2022'],  // bullet
+];
+const MOJIBAKE_LOOKUP = new Map(MOJIBAKE_PAIRS);
+const MOJIBAKE_RE = new RegExp(
+    MOJIBAKE_PAIRS
+        .map(([garbled]) => garbled)
+        .sort((a, b) => b.length - a.length)
+        .map(seq => seq.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('|'),
+    'g'
+);
+
 class TextOptimizer {
     constructor() {
         this.settings = {
             applyLanguageMapping: false,  // New setting for language character replacement
             removeDiacritics: false,
-            reverseDiacritics: false,
             removeCitations: false,
             convertMarkdown: false,
             removeFancyFont: false,
@@ -79,52 +186,8 @@ class TextOptimizer {
             removeLineBreaks: false        // Remove all line breaks (default off)
         };
 
-        this.languageMappings = { ...EMBEDDED_MAPPINGS };
-        this.isInitialized = false;
-
-        // Initialize the optimizer
-        this.initialize();
-    }
-
-    async initialize() {
-        try {
-            await this.loadLanguageMappings();
-            this.isInitialized = true;
-            console.log('TextOptimizer initialized successfully');
-        } catch (error) {
-            console.error('Failed to initialize TextOptimizer:', error);
-        }
-    }
-
-    async loadLanguageMappings() {
-        const languages = [
-            'swiss-german',
-            'german',
-            'french',
-            'italian',
-            'english-international',
-            'english-us'
-        ];
-
-        // Start with embedded mappings so this works in file:// context
-        this.languageMappings = { ...EMBEDDED_MAPPINGS };
-
-        for (const lang of languages) {
-            try {
-                // Try relative path first (most common for local files)
-                const response = await fetch(`components/mappings/mappings/${lang}.json`);
-                if (response.ok) {
-                    this.languageMappings[lang] = await response.json();
-                    console.log(`✅ Loaded mapping for ${lang}:`, this.languageMappings[lang]);
-                } else {
-                    console.warn(`❌ Failed to load mapping for ${lang} - Status: ${response.status}`);
-                }
-            } catch (error) {
-                console.error(`❌ Error loading ${lang} mapping:`, error);
-            }
-        }
-        console.log('🔍 All language mappings loaded:', Object.keys(this.languageMappings));
-        console.log('📊 Total mappings loaded:', Object.keys(this.languageMappings).length);
+        // Mappings are embedded; no network fetch needed (works on file:// too).
+        this.languageMappings = EMBEDDED_MAPPINGS;
     }
 
     updateSettings(newSettings) {
@@ -138,54 +201,58 @@ class TextOptimizer {
      */
     processText(inputText) {
         if (!inputText || typeof inputText !== 'string') {
-            return { text: '', changed: false };
+            return { text: '', changed: false, applied: [] };
         }
 
-        let processedText = inputText;
         const originalText = inputText;
+        let processedText = inputText;
+        // Track which steps actually altered the text so the UI can report
+        // what happened instead of a generic "processed" message.
+        const applied = [];
+        const run = (label, fn) => {
+            const before = processedText;
+            processedText = fn(before);
+            if (processedText !== before) applied.push(label);
+        };
 
-        // Cross-platform normalization runs FIRST
-        processedText = this.normalizeForTargetSystem(processedText);
+        // Cross-platform normalization runs FIRST (always on)
+        run('encoding & whitespace normalization', t => this.normalizeForTargetSystem(t));
 
-        // Apply processing steps in order
         if (this.settings.removeDiacritics) {
-            processedText = this.removeDiacritics(processedText);
-        } else if (this.settings.reverseDiacritics) {
-            // When reverse diacritics is toggled on, convert digraph sequences back to umlauts
-            // e.g. ae -> ä, oe -> ö, ue -> ü (case-sensitive)
-            processedText = this.invertDiacritics(processedText);
+            run('diacritics', t => this.removeDiacritics(t));
         }
 
         if (this.settings.removeCitations) {
-            processedText = this.removeCitations(processedText);
+            run('citations', t => this.removeCitations(t));
         }
 
         if (this.settings.convertMarkdown) {
-            processedText = this.convertMarkdown(processedText);
+            run('Markdown', t => this.convertMarkdown(t));
         }
 
         if (this.settings.removeFancyFont) {
-            processedText = this.removeFancyFont(processedText);
+            run('fancy font', t => this.removeFancyFont(t));
         }
 
         // Apply em dash replacement BEFORE language mapping
         if (this.settings.replaceEmDash) {
-            processedText = this.replaceEmDash(processedText);
+            run('em dashes', t => this.replaceEmDash(t));
         }
 
         // Apply language mapping AFTER em dash replacement
         if (this.settings.applyLanguageMapping) {
-            processedText = this.applyLanguageCharacterMapping(processedText);
+            run('language mapping', t => this.applyLanguageCharacterMapping(t));
         }
 
         // Line break removal runs LAST
         if (this.settings.removeLineBreaks) {
-            processedText = this.removeAllLineBreaks(processedText);
+            run('line breaks', t => this.removeAllLineBreaks(t));
         }
 
         return {
             text: processedText,
-            changed: processedText !== originalText
+            changed: processedText !== originalText,
+            applied
         };
     }
 
@@ -195,165 +262,34 @@ class TextOptimizer {
      * @returns {string} - Text with language mappings applied
      */
     applyLanguageCharacterMapping(text) {
-        const lang = this.settings.languageMapping;
-        const mapping = this.languageMappings[lang] || EMBEDDED_MAPPINGS[lang] || {};
-        console.log(`🔧 Applying language mapping for: ${lang}`);
-        console.log(`📋 Available mappings:`, Object.keys(this.languageMappings));
+        const mapping = this.languageMappings[this.settings.languageMapping];
+        if (!mapping) return text;
 
-        if (!mapping || Object.keys(mapping).length === 0) {
-            console.warn(`❌ No mapping found for language: ${lang}`);
-            return text;
-        }
-
-        console.log(`✅ Found mapping with ${Object.keys(mapping).length} rules`);
         // Normalize to ensure composed characters match mapping keys
         let result = (text ?? '').normalize('NFC');
-        let changesCount = 0;
 
         // Use split/join to avoid any RegExp edge cases
         for (const [original, replacement] of Object.entries(mapping)) {
             if (!original) continue;
             if (replacement === undefined || original === replacement) continue;
-
-            const parts = result.split(original);
-            const replacements = parts.length - 1;
-            if (replacements > 0) {
-                result = parts.join(replacement);
-                changesCount += replacements;
-                console.log(`🔄 Replaced "${original}" → "${replacement}" (${replacements} times)`);
-            }
+            result = result.split(original).join(replacement);
         }
-
-        // Minimal safety net for Swiss German core characters if still unchanged
-        if (changesCount === 0 && lang === 'swiss-german') {
-            const coreMap = { '—': '-', '«': '"', '»': '"', 'ß': 'ss' };
-            for (const [orig, repl] of Object.entries(coreMap)) {
-                const parts = result.split(orig);
-                const n = parts.length - 1;
-                if (n > 0) {
-                    result = parts.join(repl);
-                    changesCount += n;
-                    console.log(`🛡️ Core fallback: "${orig}" → "${repl}" (${n} times)`);
-                }
-            }
-        }
-
-        console.log(`📈 Total character replacements made: ${changesCount}`);
-        return result;
-    }
-
-    /**
-     * Invert diacritics: convert digraph sequences back to umlauts when removeDiacritics is OFF.
-     * e.g. ae -> ä, Ae -> Ä, AE -> Ä, oe -> ö, Oe -> Ö, OE -> Ö, ue -> ü, Ue -> Ü, UE -> Ü
-     * Case-sensitive, preserves already-correct characters.
-     * @param {string} text - Input text
-     * @returns {string} - Text with digraphs replaced by umlauts
-     */
-    invertDiacritics(text) {
-        let result = text;
-
-        // --- Exceptions List ---
-        // Patterns and words that should NOT be converted.
-        // This list can be expanded as needed!
-        const exceptions = [
-            // 1. Specific letter patterns for 'ue'
-            /([qQ]ue)/g,               // catches Quelle, bequem, Konsequenz, etc.
-            /([aAeEiIoOuUäöüÄÖÜ]ue)/g, // catches vowels before 'ue': neue, Bauer, Abenteuer, Reue
-
-            // 2. Words with '-uell' / '-uel'
-            /\b([a-zA-Z]*(?:akt|act|man|event|individ|virt|vis|sex|spirit|text|rit|konzept|d|sam|eman)uell?[a-zA-Z]*)\b/gi,
-
-            // 3. Further specific exceptions with 'ue'
-            /\b(Statue[n]?)\b/gi,
-            /\b(Menuett[e]?)\b/gi,
-            /\b(Silhouette[n]?)\b/gi,
-            /\b(Pirouette[n]?)\b/gi,
-
-            // 4. Exceptions for 'oe'
-            /\b([Pp]oe[st][a-z]*)\b/gi,     // Poet, Poesie
-            /\b([Kk]oeffizient[a-z]*)\b/gi, // Koeffizient
-            /\b([Aa]loe)\b/gi,              // Aloe
-
-            // 5. Exceptions for 'ae'
-            /\b([Mm]ichael|[Rr]a[fp]hael|[Ii]srael)\b/gi, // Names
-            /\b([Aa]ero[a-z]*)\b/gi,                      // aerodynamisch, Aerosol
-            /\b(Paella)\b/gi                              // Paella
-        ];
-
-        // Protect these exceptions by temporarily replacing them with a placeholder
-        const protectedWords = [];
-        exceptions.forEach((regex) => {
-            result = result.replace(regex, (match) => {
-                const placeholder = `__PROTECTED_${protectedWords.length}__`;
-                protectedWords.push(match);
-                return placeholder;
-            });
-        });
-
-        const invertMap = [
-            // ue -> ü
-            ['UE', 'Ü'],
-            ['Ue', 'Ü'],
-            ['ue', 'ü'],
-            // oe -> ö
-            ['OE', 'Ö'],
-            ['Oe', 'Ö'],
-            ['oe', 'ö'],
-            // ae -> ä
-            ['AE', 'Ä'],
-            ['Ae', 'Ä'],
-            ['ae', 'ä']
-            // ss -> ß is intentionally ignored as it is highly context-dependent
-        ];
-
-        for (const [digraph, umlaut] of invertMap) {
-            result = result.split(digraph).join(umlaut);
-        }
-
-        // Restore protected words
-        protectedWords.forEach((word, index) => {
-            result = result.replace(`__PROTECTED_${index}__`, word);
-        });
 
         return result;
     }
 
     /**
-     * Remove diacritics and apply language-specific character mappings
+     * Remove diacritics, respecting the selected language convention:
+     * German/Swiss German turn umlauts into digraphs (ä→ae); every other
+     * language gets the plain letter (ä→a). Single regex pass.
      * @param {string} text - Input text
      * @returns {string} - Text with diacritics removed
      */
     removeDiacritics(text) {
-        let result = text;
-
-        // Comprehensive diacritic removal for common accented characters
-        const diacriticMap = {
-            'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'ae', 'å': 'a', 'ā': 'a', 'ă': 'a', 'ą': 'a',
-            'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'Ae', 'Å': 'A', 'Ā': 'A', 'Ă': 'A', 'Ą': 'A',
-            'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e', 'ē': 'e', 'ĕ': 'e', 'ė': 'e', 'ę': 'e', 'ě': 'e',
-            'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ē': 'E', 'Ĕ': 'E', 'Ė': 'E', 'Ę': 'E', 'Ě': 'E',
-            'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i', 'ĩ': 'i', 'ī': 'i', 'ĭ': 'i', 'į': 'i',
-            'Ì': 'I', 'Í': 'I', 'Î': 'I', 'Ï': 'I', 'Ĩ': 'I', 'Ī': 'I', 'Ĭ': 'I', 'Į': 'I',
-            'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'oe', 'ø': 'o', 'ō': 'o', 'ŏ': 'o', 'ő': 'o',
-            'Ò': 'O', 'Ó': 'O', 'Ô': 'O', 'Õ': 'O', 'Ö': 'Oe', 'Ø': 'O', 'Ō': 'O', 'Ŏ': 'O', 'Ő': 'O',
-            'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'ue', 'ũ': 'u', 'ū': 'u', 'ŭ': 'u', 'ů': 'u', 'ű': 'u', 'ų': 'u',
-            'Ù': 'U', 'Ú': 'U', 'Û': 'U', 'Ü': 'Ue', 'Ũ': 'U', 'Ū': 'U', 'Ŭ': 'U', 'Ů': 'U', 'Ű': 'U', 'Ų': 'U',
-            'ý': 'y', 'ÿ': 'y', 'ŷ': 'y',
-            'Ý': 'Y', 'Ÿ': 'Y', 'Ŷ': 'Y',
-            'ñ': 'n', 'ń': 'n', 'ň': 'n', 'ņ': 'n',
-            'Ñ': 'N', 'Ń': 'N', 'Ň': 'N', 'Ņ': 'N',
-            'ç': 'c', 'ć': 'c', 'ĉ': 'c', 'ċ': 'c', 'č': 'c',
-            'Ç': 'C', 'Ć': 'C', 'Ĉ': 'C', 'Ċ': 'C', 'Č': 'C',
-            'ß': 'ss',
-            'æ': 'ae', 'Æ': 'Ae',
-            'œ': 'oe', 'Œ': 'Oe'
-        };
-
-        for (const [accented, plain] of Object.entries(diacriticMap)) {
-            result = result.replace(new RegExp(this.escapeRegExp(accented), 'g'), plain);
-        }
-
-        return result;
+        const lang = this.settings.languageMapping;
+        const useGermanDigraphs = lang === 'swiss-german' || lang === 'german';
+        const { re, map } = useGermanDigraphs ? DIACRITICS_GERMAN : DIACRITICS_PLAIN;
+        return text.normalize('NFC').replace(re, ch => map[ch]);
     }
 
     /**
@@ -369,40 +305,38 @@ class TextOptimizer {
         const processedLines = lines.map(line => {
             let result = line;
 
-            // Remove full markdown-style citation links: [label](url) -> completely removed
-            // This handles cases like [business.uq.edu](https://business.uq.edu.au/...)
-            result = result.replace(/\[[^\]]*\]\(https?:\/\/[^)]*\)/g, '');
-
-            // Remove markdown-style links where URL is not http (e.g. [text](path))
-            // Only if it looks like a citation (label contains a dot or is short)
-            result = result.replace(/\[[^\]]*\]\([^)]*\)/g, '');
+            // Markdown links: remove citation-style ones entirely (label is a
+            // bare domain or a number); real links keep their visible text.
+            result = result.replace(/\[([^\]]*)\]\([^)]*\)/g, (match, label) => {
+                const trimmed = label.trim();
+                if (!trimmed) return '';
+                if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(trimmed)) return '';
+                if (/^\d+$/.test(trimmed)) return '';
+                return trimmed;
+            });
 
             // Remove standalone bracketed domains or sources: e.g. [business.uq.edu]
             result = result.replace(/\[[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\]/g, '');
 
             // Remove numbered citations: [1], [2], [123], etc.
+            // Parenthetical (1), (2) are left alone — they are usually enumerations.
             result = result.replace(/\[\d+\]/g, '');
 
-            // Remove parenthetical citations: (1), (2), (123), etc.
-            result = result.replace(/\(\d+\)/g, '');
-
             // Remove source citations: (Source: XYZ), (Quelle: ABC), etc.
-            result = result.replace(/\((Source|Quelle|Fonte|Fuente):\s*[^)]+\)/gi, '');
+            result = result.replace(/\((Source|Quelle|Fonte|Fuente|Ref\.?|Reference):\s*[^)]+\)/gi, '');
 
             // Remove URL citations in parentheses: (https://example.com)
             result = result.replace(/\(https?:\/\/[^)]+\)/g, '');
 
-            // Remove reference markers: ¹, ², ³, etc.
-            result = result.replace(/[¹²³⁴⁵⁶⁷⁸⁹⁰]/g, '');
+            // Remove superscript reference markers: ¹ ² ³ and U+2070–207F.
+            // Subscripts (U+2080 and up, e.g. H₂O, CO₂) stay untouched.
+            result = result.replace(/[¹²³]|[\u2070-\u207F]/g, '');
 
-            // Remove superscript numbers (Unicode superscripts)
-            result = result.replace(/[\u2070-\u209F]/g, '');
+            // Clean up extra spaces left by removed citations, preserving indentation
+            result = result.replace(/(\S)[ \t]{2,}/g, '$1 ');
+            result = result.replace(/[ \t]+([.!?])/g, '$1');
 
-            // Clean up extra spaces left by removed citations (within the line only)
-            result = result.replace(/\s{2,}/g, ' ');
-            result = result.replace(/\s+([.!?])/g, '$1');
-
-            return result.trim();
+            return result.replace(/[ \t]+$/, '');
         });
 
         return processedLines.join('\n');
@@ -467,48 +401,15 @@ class TextOptimizer {
     }
 
     /**
-     * Remove fancy Unicode text styles (bold, italic, monospace, etc.)
+     * Remove fancy Unicode text styles (bold, italic, script, double-struck,
+     * sans-serif, monospace, fullwidth, circled, ...).
+     * Unicode compatibility normalization (NFKC) folds every stylized alphabet
+     * back to plain characters in a single pass - no lookup table needed.
      * @param {string} text - Input text with fancy Unicode
      * @returns {string} - Plain text with normal characters
      */
     removeFancyFont(text) {
-        let result = text;
-
-        // Extended Unicode character mappings for fancy text styles
-        const fancyMappings = {
-            // Mathematical Bold
-            '𝐀': 'A', '𝐁': 'B', '𝐂': 'C', '𝐃': 'D', '𝐄': 'E', '𝐅': 'F', '𝐆': 'G', '𝐇': 'H', '𝐈': 'I', '𝐉': 'J',
-            '𝐊': 'K', '𝐋': 'L', '𝐌': 'M', '𝐍': 'N', '𝐎': 'O', '𝐏': 'P', '𝐐': 'Q', '𝐑': 'R', '𝐒': 'S', '𝐓': 'T',
-            '𝐔': 'U', '𝐕': 'V', '𝐖': 'W', '𝐗': 'X', '𝐘': 'Y', '𝐙': 'Z',
-            '𝐚': 'a', '𝐛': 'b', '𝐜': 'c', '𝐝': 'd', '𝐞': 'e', '𝐟': 'f', '𝐠': 'g', '𝐡': 'h', '𝐢': 'i', '𝐣': 'j',
-            '𝐤': 'k', '𝐥': 'l', '𝐦': 'm', '𝐧': 'n', '𝐨': 'o', '𝐩': 'p', '𝐪': 'q', '𝐫': 'r', '𝐬': 's', '𝐭': 't',
-            '𝐮': 'u', '𝐯': 'v', '𝐰': 'w', '𝐱': 'x', '𝐲': 'y', '𝐳': 'z',
-
-            // Mathematical Italic
-            '𝐴': 'A', '𝐵': 'B', '𝐶': 'C', '𝐷': 'D', '𝐸': 'E', '𝐹': 'F', '𝐺': 'G', '𝐻': 'H', '𝐼': 'I', '𝐽': 'J',
-            '𝐾': 'K', '𝐿': 'L', '𝑀': 'M', '𝑁': 'N', '𝑂': 'O', '𝑃': 'P', '𝑄': 'Q', '𝑅': 'R', '𝑆': 'S', '𝑇': 'T',
-            '𝑈': 'U', '𝑉': 'V', '𝑊': 'W', '𝑋': 'X', '𝑌': 'Y', '𝑍': 'Z',
-            '𝑎': 'a', '𝑏': 'b', '𝑐': 'c', '𝑑': 'd', '𝑒': 'e', '𝑓': 'f', '𝑔': 'g', 'ℎ': 'h', '𝑖': 'i', '𝑗': 'j', '𝑘': 'k',
-            '𝑙': 'l', '𝑚': 'm', '𝑛': 'n', '𝑜': 'o', '𝑝': 'p', '𝑞': 'q', '𝑟': 'r', '𝑠': 's', '𝑡': 't',
-            '𝑢': 'u', '𝑣': 'v', '𝑤': 'w', '𝑥': 'x', '𝑦': 'y', '𝑧': 'z',
-
-            // Mathematical Monospace
-            '𝙰': 'A', '𝙱': 'B', '𝙲': 'C', '𝙳': 'D', '𝙴': 'E', '𝙵': 'F', '𝙶': 'G', '𝙷': 'H', '𝙸': 'I', '𝙹': 'J',
-            '𝙺': 'K', '𝙻': 'L', '𝙼': 'M', '𝙽': 'N', '𝙾': 'O', '𝙿': 'P', '𝚀': 'Q', '𝚁': 'R', '𝚂': 'S', '𝚃': 'T',
-            '𝚄': 'U', '𝚅': 'V', '𝚆': 'W', '𝚇': 'X', '𝚈': 'Y', '𝚉': 'Z',
-            '𝚊': 'a', '𝚋': 'b', '𝚌': 'c', '𝚍': 'd', '𝚎': 'e', '𝚏': 'f', '𝚐': 'g', '𝚑': 'h', '𝚒': 'i', '𝚓': 'j',
-            '𝚔': 'k', '𝚕': 'l', '𝚖': 'm', '𝚗': 'n', '𝚘': 'o', '𝚙': 'p', '𝚚': 'q', '𝚛': 'r', '𝚜': 's', '𝚝': 't',
-            '𝚞': 'u', '𝚟': 'v', '𝚠': 'w', '𝚡': 'x', '𝚢': 'y', '𝚣': 'z',
-
-            // Additional special characters
-            'ℎ': 'h'  // Special mathematical h
-        };
-
-        for (const [fancy, normal] of Object.entries(fancyMappings)) {
-            result = result.replace(new RegExp(this.escapeRegExp(fancy), 'g'), normal);
-        }
-
-        return result;
+        return text.normalize('NFKC');
     }
 
     /**
@@ -522,24 +423,16 @@ class TextOptimizer {
         const lines = text.split('\n');
 
         const processedLines = lines.map(line => {
-            let result = line;
+            // Turn each em-dash break into a sentence break and capitalize ONLY
+            // the letter that directly follows it. Everything else on the line
+            // (ellipses, abbreviations like "z. B.", other periods) is untouched.
+            let result = line.replace(/\s*—\s*(\p{Ll})?/gu, (match, letter) =>
+                letter ? '. ' + letter.toUpperCase() : '. '
+            );
 
-            // Replace em dash with period (no space before the period)
-            result = result.replace(/\s*—\s*/g, '. ');
-
-            // Clean up any double spaces (but only within the line)
-            result = result.replace(/\s{2,}/g, ' ');
-
-            // Clean up double periods (except ellipsis)
-            result = result.replace(/\.{2}(?!\.)/g, '.');
-
-            // Capitalize first letter after periods (basic sentence case)
-            result = result.replace(/\.\s+([a-z])/g, (match, letter) => '. ' + letter.toUpperCase());
-
-            // Clean up any space before punctuation
-            result = result.replace(/\s+([.!?,;:])/g, '$1');
-
-            return result;
+            // Tidy doubled spaces introduced by the replacement and trailing ". "
+            result = result.replace(/(\S)[ \t]{2,}/g, '$1 ');
+            return result.replace(/[ \t]+$/, '');
         });
 
         return processedLines.join('\n');
@@ -558,73 +451,9 @@ class TextOptimizer {
         // 1. Remove BOM (Byte Order Mark) from start and mid-text
         result = result.replace(/\uFEFF/g, '');
 
-        // 2. Fix common CP-1252 to UTF-8 mojibake patterns
-        // These occur when text encoded as UTF-8 is misinterpreted as CP-1252
-        const mojibakeMap = [
-            ['\u00C3\u00A4', '\u00E4'],   // ä
-            ['\u00C3\u00B6', '\u00F6'],   // ö
-            ['\u00C3\u00BC', '\u00FC'],   // ü
-            ['\u00C3\u0084', '\u00C4'],   // Ä
-            ['\u00C3\u0096', '\u00D6'],   // Ö
-            ['\u00C3\u009C', '\u00DC'],   // Ü
-            ['\u00C3\u00A9', '\u00E9'],   // é
-            ['\u00C3\u00A8', '\u00E8'],   // è
-            ['\u00C3\u00AA', '\u00EA'],   // ê
-            ['\u00C3\u00AB', '\u00EB'],   // ë
-            ['\u00C3\u00A0', '\u00E0'],   // à
-            ['\u00C3\u00A1', '\u00E1'],   // á
-            ['\u00C3\u00A2', '\u00E2'],   // â
-            ['\u00C3\u00A3', '\u00E3'],   // ã
-            ['\u00C3\u00A5', '\u00E5'],   // å
-            ['\u00C3\u00AD', '\u00ED'],   // í
-            ['\u00C3\u00AC', '\u00EC'],   // ì
-            ['\u00C3\u00AE', '\u00EE'],   // î
-            ['\u00C3\u00AF', '\u00EF'],   // ï
-            ['\u00C3\u00B3', '\u00F3'],   // ó
-            ['\u00C3\u00B2', '\u00F2'],   // ò
-            ['\u00C3\u00B4', '\u00F4'],   // ô
-            ['\u00C3\u00B5', '\u00F5'],   // õ
-            ['\u00C3\u00BA', '\u00FA'],   // ú
-            ['\u00C3\u00B9', '\u00F9'],   // ù
-            ['\u00C3\u00BB', '\u00FB'],   // û
-            ['\u00C3\u00B1', '\u00F1'],   // ñ
-            ['\u00C3\u0091', '\u00D1'],   // Ñ
-            ['\u00C3\u00A7', '\u00E7'],   // ç
-            ['\u00C3\u0087', '\u00C7'],   // Ç
-            ['\u00C3\u009F', '\u00DF'],   // ß (Latin-1/ISO-8859-1 interpretation)
-            ['\u00C3\u0178', '\u00DF'],   // ß (CP-1252 interpretation where 0x9F → Ÿ)
-            ['\u00C3\u00A6', '\u00E6'],   // æ
-            ['\u00C3\u0086', '\u00C6'],   // Æ
-            ['\u00C2\u00AB', '\u00AB'],   // «
-            ['\u00C2\u00BB', '\u00BB'],   // »
-            ['\u00C2\u00B0', '\u00B0'],   // °
-            ['\u00C2\u00A7', '\u00A7'],   // §
-            ['\u00C2\u00A9', '\u00A9'],   // ©
-            ['\u00C2\u00AE', '\u00AE'],   // ®
-            ['\u00C2\u00B2', '\u00B2'],   // ²
-            ['\u00C2\u00B3', '\u00B3'],   // ³
-            ['\u00C2\u00BD', '\u00BD'],   // ½
-            ['\u00C2\u00BC', '\u00BC'],   // ¼
-            ['\u00C2\u00BE', '\u00BE'],   // ¾
-            ['\u00C2\u00AD', ''],          // soft hyphen mojibake (remove)
-            ['\u00C2\u00A0', ' '],         // non-breaking space mojibake
-            ['\u00E2\u0080\u0093', '\u2013'],  // en-dash
-            ['\u00E2\u0080\u0094', '\u2014'],  // em-dash
-            ['\u00E2\u0080\u009C', '\u201C'],  // left double quote
-            ['\u00E2\u0080\u009D', '\u201D'],  // right double quote
-            ['\u00E2\u0080\u0098', '\u2018'],  // left single quote
-            ['\u00E2\u0080\u0099', '\u2019'],  // right single quote
-            ['\u00E2\u0080\u00A6', '\u2026'],  // ellipsis
-            ['\u00E2\u0080\u00A2', '\u2022'],  // bullet
-        ];
-
-        for (const [garbled, correct] of mojibakeMap) {
-            if (!garbled) continue;
-            const parts = result.split(garbled);
-            if (parts.length > 1) {
-                result = parts.join(correct);
-            }
-        }
+        // 2. Fix common CP-1252 to UTF-8 mojibake patterns in one pass
+        // (see MOJIBAKE_PAIRS at module level)
+        result = result.replace(MOJIBAKE_RE, seq => MOJIBAKE_LOOKUP.get(seq));
 
         // 3. Remove invisible/zero-width characters
         result = result.replace(/[\u200B\u200C\u200D]/g, '');  // Zero-width space/joiner/non-joiner
@@ -692,6 +521,29 @@ class TextOptimizer {
 }
 
 /**
+ * Quick presets: each maps to a full set of processing toggles. Applying a
+ * preset first resets every toggle, so presets are deterministic.
+ */
+const OPTIMIZER_PRESETS = {
+    'chatgpt': {
+        label: 'ChatGPT / Claude output',
+        settings: { convertMarkdown: true, removeCitations: true, removeFancyFont: true }
+    },
+    'research': {
+        label: 'Perplexity / research output',
+        settings: { convertMarkdown: true, removeCitations: true }
+    },
+    'swiss': {
+        label: 'Swiss standardization',
+        settings: { applyLanguageMapping: true, removeDiacritics: true, languageMapping: 'swiss-german' }
+    },
+    'paragraph': {
+        label: 'Paragraph cleanup',
+        settings: { removeLineBreaks: true }
+    }
+};
+
+/**
  * UI Controller for the Optimizer page
  */
 class OptimizerUI {
@@ -703,6 +555,8 @@ class OptimizerUI {
         this.cleanButton = null;
         this.copyButton = null;
         this.clearButton = null;
+        this.undoButton = null;
+        this.undoSnapshot = null;
 
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
@@ -716,7 +570,6 @@ class OptimizerUI {
         this.setupElements();
         this.setupEventListeners();
         this.loadUserSettings();
-        console.log('OptimizerUI initialized');
     }
 
     setupElements() {
@@ -725,8 +578,10 @@ class OptimizerUI {
         this.cleanButton = document.getElementById('clean-text-btn');
         this.copyButton = document.getElementById('copy-text-btn');
         this.clearButton = document.getElementById('clear-text-btn');
+        this.undoButton = document.getElementById('undo-text-btn');
         this.languageSelect = document.getElementById('language-select');
         this.targetSystemButtons = document.querySelectorAll('#target-system-buttons button');
+        this.presetButtons = document.querySelectorAll('[data-preset]');
     }
 
     setupEventListeners() {
@@ -735,8 +590,9 @@ class OptimizerUI {
             return;
         }
 
-        // Character counter
-        this.textarea.addEventListener('input', () => this.updateCharCount());
+        // Typing updates the counter via the shared CharacterCounter
+        // (shared.js); this class refreshes it only after programmatic
+        // changes (process/undo/clear) that fire no input event.
 
         // Clean text button
         this.cleanButton.addEventListener('click', () => this.handleTextProcess());
@@ -749,6 +605,18 @@ class OptimizerUI {
         // Clear text button
         if (this.clearButton) {
             this.clearButton.addEventListener('click', () => this.handleClearText());
+        }
+
+        // Undo (restores the input as it was before the last clean)
+        if (this.undoButton) {
+            this.undoButton.addEventListener('click', () => this.handleUndo());
+        }
+
+        // Preset buttons
+        if (this.presetButtons) {
+            this.presetButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => this.applyPreset(e.currentTarget.dataset.preset));
+            });
         }
 
         // Language selection
@@ -772,6 +640,36 @@ class OptimizerUI {
         this.textarea.addEventListener('input', () => this.autoResizeTextarea());
     }
 
+    applyPreset(presetKey) {
+        const preset = OPTIMIZER_PRESETS[presetKey];
+        if (!preset) return;
+
+        // Reset all processing toggles, then apply the preset on top.
+        this.optimizer.updateSettings({
+            applyLanguageMapping: false,
+            removeDiacritics: false,
+            removeCitations: false,
+            convertMarkdown: false,
+            removeFancyFont: false,
+            replaceEmDash: false,
+            removeLineBreaks: false,
+            ...preset.settings
+        });
+        this.applySettingsToUI(this.optimizer.settings);
+        this.saveUserSettings();
+        this.showMessage(`Preset applied: ${preset.label}.`, 'info');
+    }
+
+    handleUndo() {
+        if (this.undoSnapshot === null || !this.textarea) return;
+        this.textarea.value = this.undoSnapshot;
+        this.undoSnapshot = null;
+        this.undoButton.disabled = true;
+        this.updateCharCount();
+        this.autoResizeTextarea();
+        this.showMessage('Original text restored.', 'info');
+    }
+
     updateCharCount() {
         if (this.textarea && this.charCount) {
             const count = this.textarea.value.length;
@@ -790,7 +688,6 @@ class OptimizerUI {
         const settingMap = {
             'apply-language-mapping': 'applyLanguageMapping',
             'remove-diacritics': 'removeDiacritics',
-            'reverse-diacritics': 'reverseDiacritics',
             'remove-citations': 'removeCitations',
             'convert-markdown': 'convertMarkdown',
             'remove-fancy-font': 'removeFancyFont',
@@ -829,7 +726,7 @@ class OptimizerUI {
         });
     }
 
-    async handleTextProcess() {
+    handleTextProcess() {
         if (!this.textarea) return;
 
         const inputText = this.textarea.value;
@@ -838,42 +735,27 @@ class OptimizerUI {
             return;
         }
 
-        // Show processing state
-        this.cleanButton.disabled = true;
-        this.cleanButton.textContent = 'Processing...';
-
         try {
-            // Wait for optimizer to be initialized
-            if (!this.optimizer.isInitialized) {
-                await new Promise(resolve => {
-                    const checkInit = () => {
-                        if (this.optimizer.isInitialized) {
-                            resolve();
-                        } else {
-                            setTimeout(checkInit, 100);
-                        }
-                    };
-                    checkInit();
-                });
-            }
-
             const result = this.optimizer.processText(inputText);
 
             if (result.changed) {
+                // Keep the pre-processing text so the user can undo.
+                this.undoSnapshot = inputText;
+                if (this.undoButton) this.undoButton.disabled = false;
+
                 this.textarea.value = result.text;
                 this.updateCharCount();
                 this.autoResizeTextarea();
-                this.showMessage('Text processed successfully!', 'success');
+                const summary = result.applied.length
+                    ? ` Applied: ${result.applied.join(', ')}.`
+                    : '';
+                this.showMessage(`Text processed.${summary}`, 'success');
             } else {
                 this.showMessage('No changes were made to the text.', 'info');
             }
         } catch (error) {
             console.error('Error processing text:', error);
             this.showMessage('An error occurred while processing the text.', 'error');
-        } finally {
-            // Reset button state
-            this.cleanButton.disabled = false;
-            this.cleanButton.textContent = 'Clean Text Now';
         }
     }
 
@@ -943,7 +825,7 @@ class OptimizerUI {
         setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(100%)';
-            setTimeout(() => document.body.removeChild(toast), 300);
+            setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
 
@@ -973,7 +855,6 @@ class OptimizerUI {
         const toggleMap = {
             'applyLanguageMapping': 'apply-language-mapping',
             'removeDiacritics': 'remove-diacritics',
-            'reverseDiacritics': 'reverse-diacritics',
             'removeCitations': 'remove-citations',
             'convertMarkdown': 'convert-markdown',
             'removeFancyFont': 'remove-fancy-font',
@@ -1010,7 +891,6 @@ class StorageManager {
             optimizer: {
                 applyLanguageMapping: false,
                 removeDiacritics: false,
-                reverseDiacritics: false,
                 removeCitations: false,
                 convertMarkdown: false,
                 removeFancyFont: false,

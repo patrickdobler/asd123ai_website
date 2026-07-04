@@ -27,7 +27,7 @@
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap"
         rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="vendor/tailwind-play-3.4.16.min.js"></script>
     <link href="styles/main.css" rel="stylesheet" />
     <link href="styles/components.css" rel="stylesheet" />
     <script src="scripts/shared.js"></script>
@@ -100,7 +100,7 @@
         <div class="relative z-10 flex flex-col min-h-screen">
             <header>
                 <nav role="navigation" aria-label="Main navigation">
-                    <a href="index.html" class="logo-link" aria-label="ASD123.ai Home">
+                    <a href="/" class="logo-link" aria-label="ASD123.ai Home">
                         <span class="logo-text">ASD123.ai</span>
                     </a>
 
@@ -113,34 +113,34 @@
                             </svg>
                         </button>
                         <div class="nav-tools-menu" role="menu" aria-label="Tools">
-                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                            <a href="/optimizer" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Optimizer</span>
                                 <span class="nav-tool-description">Clean and standardize generated text.</span>
                             </a>
-                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                            <a href="/anonymizer" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Anonymizer</span>
                                 <span class="nav-tool-description">Detect and anonymize PII locally.</span>
                             </a>
-                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                            <a href="/chat" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Local AI Chat</span>
                                 <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
                             </a>
-                            <a href="context.html" class="nav-tool-item" role="menuitem">
+                            <a href="/context" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Context Estimator</span>
                                 <span class="nav-tool-description">Estimate useful LLM context size.</span>
                             </a>
-                            <a href="converter.html" class="nav-tool-item" role="menuitem">
+                            <a href="/converter" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Markdown Converter</span>
                                 <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
                             </a>
-                            <a href="tts.html" class="nav-tool-item" role="menuitem">
+                            <a href="/tts" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Text to Speech</span>
                                 <span class="nav-tool-description">Generate speech locally from text.</span>
                             </a>
                         </div>
                     </div>
-                    <a href="documentation.html" class="nav-link">Documentation</a>
-                    <a href="about.html" class="nav-link">About</a>
+                    <a href="/documentation" class="nav-link">Documentation</a>
+                    <a href="/about" class="nav-link">About</a>
                 </div>
                 </nav>
             </header>
@@ -217,6 +217,15 @@ All processing happens entirely in your browser for complete privacy."></textare
                         </svg>
                         Copy to Clipboard
                     </button>
+                    <button class="btn btn-secondary" id="undo-text-btn" disabled>
+                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 7v6h6" />
+                            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+                        </svg>
+                        Undo
+                    </button>
                     <button class="btn btn-ghost" id="clear-text-btn">
                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -231,6 +240,20 @@ All processing happens entirely in your browser for complete privacy."></textare
                 <!-- Control Panel -->
                 <div class="card">
                     <h2 class="controls-header">Processing Options</h2>
+
+                    <!-- Quick Presets -->
+                    <div class="form-group">
+                        <label class="form-label">Quick Presets</label>
+                        <div class="button-group" id="preset-buttons" style="margin-top: var(--space-2); margin-bottom: 0; justify-content: flex-start; gap: var(--space-2); flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary" style="padding: 10px 20px;" data-preset="chatgpt">ChatGPT / Claude</button>
+                            <button type="button" class="btn btn-secondary" style="padding: 10px 20px;" data-preset="research">Perplexity / Research</button>
+                            <button type="button" class="btn btn-secondary" style="padding: 10px 20px;" data-preset="swiss">Swiss Standardization</button>
+                            <button type="button" class="btn btn-secondary" style="padding: 10px 20px;" data-preset="paragraph">Paragraph Cleanup</button>
+                        </div>
+                        <small style="display: block; margin-top: var(--space-2); color: var(--text-secondary);">A preset switches the toggles below to a proven combination — fine-tune afterwards if needed.</small>
+                    </div>
+
+                    <div class="section-divider"></div>
 
                     <!-- Target System -->
                     <div class="form-group">
@@ -299,29 +322,9 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             <path d="M12 16v-4" />
                                             <path d="M12 8h.01" />
                                         </svg>
-                                        <span class="tooltip-text">Converts accented characters to their basic
-                                            equivalents</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="toggle-item">
-                                <div class="toggle-content">
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" class="toggle-input" data-toggle="reverse-diacritics">
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                    <span class="toggle-label">Reverse Diacritics (ae &rarr; ä)</span>
-                                    <div class="tooltip">
-                                        <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <path d="M12 16v-4" />
-                                            <path d="M12 8h.01" />
-                                        </svg>
-                                        <span class="tooltip-text">Converts digraphs like ae, oe, ue back to ä, ö, ü
-                                            with exceptions for words that naturally contain them.</span>
+                                        <span class="tooltip-text">Converts accented characters to plain equivalents.
+                                            With German or Swiss German selected, ä/ö/ü become ae/oe/ue; for other
+                                            languages they become a/o/u.</span>
                                     </div>
                                 </div>
                             </div>
@@ -341,8 +344,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             <path d="M12 16v-4" />
                                             <path d="M12 8h.01" />
                                         </svg>
-                                        <span class="tooltip-text">Converts fancy Unicode text styles back to plain
-                                            characters</span>
+                                        <span class="tooltip-text">Converts all stylized Unicode alphabets (bold, italic,
+                                            script, double-struck, fullwidth, ...) back to plain characters</span>
                                     </div>
                                 </div>
                             </div>
@@ -370,8 +373,9 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             <path d="M12 16v-4" />
                                             <path d="M12 8h.01" />
                                         </svg>
-                                        <span class="tooltip-text">Removes source and citation references commonly found
-                                            in AI outputs</span>
+                                        <span class="tooltip-text">Removes citation markers such as [1], superscript
+                                            references, (Source: ...) notes and citation links. Normal links keep their
+                                            visible text.</span>
                                     </div>
                                 </div>
                             </div>
@@ -459,9 +463,9 @@ All processing happens entirely in your browser for complete privacy."></textare
                 </div>
 
                 <div class="footer-links">
-                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
-                    <a href="terms.html" class="footer-link">Terms of Service</a>
-                    <a href="contact.html" class="footer-link">Contact</a>
+                    <a href="/privacy" class="footer-link">Privacy Policy</a>
+                    <a href="/terms" class="footer-link">Terms of Service</a>
+                    <a href="/contact" class="footer-link">Contact</a>
 
                     <div class="social-links">
                         <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">
@@ -486,12 +490,6 @@ All processing happens entirely in your browser for complete privacy."></textare
         </footer>
         </div>
     </div>
-
-    <script>
-        // Optimizer functionality is handled by scripts/optimizer.js
-        // The OptimizerUI class is automatically initialized when the page loads
-        console.log('Optimizer page loaded - functionality ready');
-    </script>
 
 </body>
 

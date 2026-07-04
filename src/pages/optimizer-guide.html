@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="vendor/tailwind-play-3.4.16.min.js"></script>
     <link href="styles/main.css" rel="stylesheet">
     <link href="styles/components.css" rel="stylesheet">
     <script src="scripts/shared.js"></script>
@@ -108,7 +108,7 @@
         <div class="relative z-10 flex flex-col min-h-screen">
             <header>
                 <nav role="navigation" aria-label="Main navigation">
-                    <a href="index.html" class="logo-link" aria-label="ASD123.ai Home">
+                    <a href="/" class="logo-link" aria-label="ASD123.ai Home">
                         <span class="logo-text">ASD123.ai</span>
                     </a>
 
@@ -121,34 +121,34 @@
                             </svg>
                         </button>
                         <div class="nav-tools-menu" role="menu" aria-label="Tools">
-                            <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                            <a href="/optimizer" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Optimizer</span>
                                 <span class="nav-tool-description">Clean and standardize generated text.</span>
                             </a>
-                            <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                            <a href="/anonymizer" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Anonymizer</span>
                                 <span class="nav-tool-description">Detect and anonymize PII locally.</span>
                             </a>
-                            <a href="chat.html" class="nav-tool-item" role="menuitem">
+                            <a href="/chat" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Local AI Chat</span>
                                 <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
                             </a>
-                            <a href="context.html" class="nav-tool-item" role="menuitem">
+                            <a href="/context" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Context Estimator</span>
                                 <span class="nav-tool-description">Estimate useful LLM context size.</span>
                             </a>
-                            <a href="converter.html" class="nav-tool-item" role="menuitem">
+                            <a href="/converter" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Markdown Converter</span>
                                 <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
                             </a>
-                            <a href="tts.html" class="nav-tool-item" role="menuitem">
+                            <a href="/tts" class="nav-tool-item" role="menuitem">
                                 <span class="nav-tool-title">Text to Speech</span>
                                 <span class="nav-tool-description">Generate speech locally from text.</span>
                             </a>
                         </div>
                     </div>
-                    <a href="documentation.html" class="nav-link">Documentation</a>
-                    <a href="about.html" class="nav-link">About</a>
+                    <a href="/documentation" class="nav-link">Documentation</a>
+                    <a href="/about" class="nav-link">About</a>
                 </div>
                 </nav>
             </header>
@@ -235,6 +235,10 @@
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Windows / Linux / macOS</h4>
                                     <p class="text-sm">Use these when line endings matter. Windows outputs CRLF; Linux and macOS use LF.</p>
                                 </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Always-on base normalization</h4>
+                                    <p class="text-sm">This step runs on every clean, even with all toggles off: it repairs broken encoding (mojibake such as <code>&Atilde;&curren;</code> &rarr; <code>&auml;</code>), removes the BOM, zero-width and other invisible characters, converts non-breaking and unusual spaces to normal spaces, and unifies line endings. If the result changes with no options enabled, this is why.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -274,19 +278,15 @@
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Diacritics</h4>
-                                    <p class="text-sm">Converts accented characters to plain or language-compatible forms, for example ä to ae in Swiss-style output.</p>
-                                </div>
-                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Reverse Diacritics</h4>
-                                    <p class="text-sm">Converts digraphs such as ae, oe, ue back to ä, ö, ü with common exceptions. This does not run when Remove Diacritics is enabled.</p>
+                                    <p class="text-sm">Converts accented characters to plain forms, following the selected language: with German or Swiss German, &auml;/&ouml;/&uuml; become ae/oe/ue; for all other languages they become a/o/u. &szlig; always becomes ss.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Fancy Text Font</h4>
-                                    <p class="text-sm">Normalizes stylized Unicode letters such as mathematical bold, italic, script, or monospace characters.</p>
+                                    <p class="text-sm">Normalizes every stylized Unicode alphabet back to plain characters &mdash; mathematical bold, italic, script, double-struck, sans-serif, monospace, fullwidth and more (Unicode NFKC compatibility normalization).</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Citation References</h4>
-                                    <p class="text-sm">Removes common citation formats such as numbered brackets, source notes, URL citations, and superscript references.</p>
+                                    <p class="text-sm">Removes numbered brackets like [1], superscript references, (Source: ...) notes, bare URL citations, and citation-style links whose label is just a domain or number. Normal links keep their visible text; parenthetical enumerations like (1) and subscripts (H&#8322;O) are left untouched.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Convert MD to Normal Text</h4>
@@ -294,7 +294,7 @@
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Replace em dash with new sentence</h4>
-                                    <p class="text-sm">Experimental option that turns em-dash sentence breaks into full-stop sentence breaks. Review output carefully.</p>
+                                    <p class="text-sm">Experimental option that turns each em-dash break into a full stop and capitalizes only the word right after it. Ellipses, abbreviations, and other periods are not affected. Review output carefully; the Undo button restores the previous text.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Line Breaks</h4>
@@ -307,6 +307,7 @@
                             <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <span class="text-[var(--primary-color)]">6.</span> Common Presets
                             </h3>
+                            <p class="text-sm text-[var(--text-secondary)] mb-4">These combinations are available as one-click <strong class="text-[var(--text-primary)]">Quick Preset</strong> buttons at the top of the Processing Options panel.</p>
                             <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Clean ChatGPT / Claude Output</h4>
@@ -354,7 +355,7 @@
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Review experimental changes</h4>
-                                    <p class="text-sm">The em-dash sentence option can change meaning in edge cases. Use it carefully.</p>
+                                    <p class="text-sm">The em-dash sentence option can change meaning in edge cases. Use it carefully &mdash; the Undo button brings back the text as it was before the last clean.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Mind line breaks</h4>
@@ -368,7 +369,7 @@
                         </div>
 
                         <div class="mt-12 text-center">
-                            <a href="optimizer.html" class="inline-block px-8 py-4 text-lg font-semibold text-[var(--text-primary)] bg-[rgba(60,60,60,0.15)] border-2 border-[var(--border-color)] rounded-lg hover:bg-[rgba(60,60,60,0.25)] transition-all duration-300">
+                            <a href="/optimizer" class="inline-block px-8 py-4 text-lg font-semibold text-[var(--text-primary)] bg-[rgba(60,60,60,0.15)] border-2 border-[var(--border-color)] rounded-lg hover:bg-[rgba(60,60,60,0.25)] transition-all duration-300">
                                 Try the Optimizer Now →
                             </a>
                         </div>
@@ -389,9 +390,9 @@
                 </div>
 
                 <div class="footer-links">
-                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
-                    <a href="terms.html" class="footer-link">Terms of Service</a>
-                    <a href="contact.html" class="footer-link">Contact</a>
+                    <a href="/privacy" class="footer-link">Privacy Policy</a>
+                    <a href="/terms" class="footer-link">Terms of Service</a>
+                    <a href="/contact" class="footer-link">Contact</a>
 
                     <div class="social-links">
                         <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">

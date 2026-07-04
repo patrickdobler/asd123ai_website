@@ -53,8 +53,7 @@ the same (e.g. `src/pages/index.html` → `dist/index.html`, served at `/`).
 │   ├── index.js                 # Cloudflare Workers entry (routing + Apple-Silicon engine proxy) — wrangler `main`
 │   ├── pages/                   # Production HTML pages          → dist/*.html
 │   ├── scripts/                 # JavaScript modules             → dist/scripts/
-│   ├── styles/                  # main.css + components.css      → dist/styles/
-│   └── components/              # Shared HTML partials/mappings  → dist/components/
+│   └── styles/                  # main.css + components.css      → dist/styles/
 ├── public/                      # Static assets served as-is     → dist/ (root)
 │   ├── vendor/                  # Self-hosted third-party libs (onnxruntime-web, pdf.js, mammoth, lamejs, …)
 │   └── favicon.ico, logo.png, robots.txt, sitemap.xml, …
@@ -87,8 +86,7 @@ Example routes:
 ### Client-Side Architecture
 
 #### Optimizer (`scripts/optimizer.js`)
-- **Language Mappings**: JSON-based character replacement mappings stored in `components/mappings/`
-- **Embedded Fallbacks**: Hard-coded mappings in the script for offline/file:// protocol usage
+- **Language Mappings**: character replacement tables embedded directly in the script (`EMBEDDED_MAPPINGS`); no runtime fetch, works on file://
 - **Processing Options**:
   - Language-specific character mapping (Swiss German, German, French, Italian, English variants)
   - Diacritics removal
@@ -147,17 +145,16 @@ The build script:
 2. Minifies all HTML files (removes comments, whitespace, minifies inline CSS/JS)
 3. Minifies and copies CSS files from `styles/` (excludes `anonymizer.css` which is merged)
 4. Minifies and uglifies all JavaScript files from `scripts/`
-5. Copies static assets (sitemap.xml, robots.txt, components/)
+5. Copies static assets (sitemap.xml, robots.txt, public/vendor/)
 6. Console logging for each processed file
 
 **Important**: The build process drops console logs and debugger statements from JavaScript.
 
 ### Language Mapping System
-The Optimizer loads language-specific character mappings:
-- JSON files attempted to load from `components/mappings/{language}.json`
-- Falls back to embedded mappings if fetch fails
+The Optimizer's language mappings live in `EMBEDDED_MAPPINGS` in `src/scripts/optimizer.js` (no JSON files, no fetch — this also keeps file:// usage working):
 - Supports: swiss-german, german, french, italian, english-international, english-us
 - Mappings replace special characters (quotes, dashes, spaces, ligatures, etc.)
+- Diacritic removal is language-aware: German/Swiss German → ae/oe/ue digraphs, all other languages → plain a/o/u
 
 ### Entity Detection Patterns
 The Anonymizer uses prioritized regex patterns (lower priority = checked first):
@@ -183,10 +180,8 @@ The Anonymizer uses prioritized regex patterns (lower priority = checked first):
    See **Mobile Responsiveness** below for the recurring gotchas.
 
 ### Adding a New Language Mapping
-1. Create JSON file in `components/mappings/{language}.json`
-2. Add embedded fallback to `EMBEDDED_MAPPINGS` in `scripts/optimizer.js`
-3. Add language option to the dropdown in `optimizer.html`
-4. Update `loadLanguageMappings()` to include the new language
+1. Add the mapping table to `EMBEDDED_MAPPINGS` in `src/scripts/optimizer.js`
+2. Add the language option to the dropdown in `src/pages/optimizer.html`
 
 ### Modifying Entity Detection
 1. Edit `entityPatterns` object in `scripts/anonymizer-core.js`

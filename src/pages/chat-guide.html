@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="vendor/tailwind-play-3.4.16.min.js"></script>
     <link href="styles/main.css" rel="stylesheet">
     <link href="styles/components.css" rel="stylesheet">
     <script src="scripts/shared.js"></script>
@@ -110,7 +110,7 @@
         <div class="relative z-10 flex flex-col min-h-screen">
             <header>
                 <nav role="navigation" aria-label="Main navigation">
-                    <a href="index.html" class="logo-link" aria-label="ASD123.ai Home">
+                    <a href="/" class="logo-link" aria-label="ASD123.ai Home">
                         <span class="logo-text">ASD123.ai</span>
                     </a>
 
@@ -123,34 +123,34 @@
                                 </svg>
                             </button>
                             <div class="nav-tools-menu" role="menu" aria-label="Tools">
-                                <a href="optimizer.html" class="nav-tool-item" role="menuitem">
+                                <a href="/optimizer" class="nav-tool-item" role="menuitem">
                                     <span class="nav-tool-title">Optimizer</span>
                                     <span class="nav-tool-description">Clean and standardize generated text.</span>
                                 </a>
-                                <a href="anonymizer.html" class="nav-tool-item" role="menuitem">
+                                <a href="/anonymizer" class="nav-tool-item" role="menuitem">
                                     <span class="nav-tool-title">Anonymizer</span>
                                     <span class="nav-tool-description">Detect and anonymize PII locally.</span>
                                 </a>
-                                <a href="chat.html" class="nav-tool-item" role="menuitem">
+                                <a href="/chat" class="nav-tool-item" role="menuitem">
                                     <span class="nav-tool-title">Local AI Chat</span>
                                     <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
                                 </a>
-                                <a href="context.html" class="nav-tool-item" role="menuitem">
+                                <a href="/context" class="nav-tool-item" role="menuitem">
                                     <span class="nav-tool-title">Context Estimator</span>
                                     <span class="nav-tool-description">Estimate useful LLM context size.</span>
                                 </a>
-                                <a href="converter.html" class="nav-tool-item" role="menuitem">
+                                <a href="/converter" class="nav-tool-item" role="menuitem">
                                     <span class="nav-tool-title">Markdown Converter</span>
                                     <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
                                 </a>
-                                <a href="tts.html" class="nav-tool-item" role="menuitem">
+                                <a href="/tts" class="nav-tool-item" role="menuitem">
                                     <span class="nav-tool-title">Text to Speech</span>
                                     <span class="nav-tool-description">Generate speech locally from text.</span>
                                 </a>
                             </div>
                         </div>
-                        <a href="documentation.html" class="nav-link">Documentation</a>
-                        <a href="about.html" class="nav-link">About</a>
+                        <a href="/documentation" class="nav-link">Documentation</a>
+                        <a href="/about" class="nav-link">About</a>
                     </div>
                 </nav>
             </header>
@@ -373,8 +373,8 @@
                         </section>
 
                         <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                            <a href="chat.html" class="btn btn--primary text-center no-underline">Open Local AI Chat</a>
-                            <a href="documentation.html" class="btn text-center no-underline">Back to Documentation</a>
+                            <a href="/chat" class="btn btn--primary text-center no-underline">Open Local AI Chat</a>
+                            <a href="/documentation" class="btn text-center no-underline">Back to Documentation</a>
                         </div>
                     </div>
                 </div>
@@ -394,9 +394,9 @@
                     </div>
 
                     <div class="footer-links">
-                        <a href="privacy.html" class="footer-link">Privacy Policy</a>
-                        <a href="terms.html" class="footer-link">Terms of Service</a>
-                        <a href="contact.html" class="footer-link">Contact</a>
+                        <a href="/privacy" class="footer-link">Privacy Policy</a>
+                        <a href="/terms" class="footer-link">Terms of Service</a>
+                        <a href="/contact" class="footer-link">Contact</a>
 
                         <div class="social-links">
                             <a href="https://github.com/patrickdobler/asd123.ai" class="social-link" target="_blank" rel="noopener" aria-label="GitHub">

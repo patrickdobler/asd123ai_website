@@ -89,11 +89,6 @@ async function build() {
         await minifyFile(path.join(scriptsDir, file), path.join(distDir, 'scripts', file), 'js');
     }
 
-    // Shared HTML components copied as-is.
-    if (fs.existsSync(path.join(SRC, 'components'))) {
-        copyDir(path.join(SRC, 'components'), path.join(distDir, 'components'));
-        console.log('Copied: components');
-    }
 
     // Static public assets (favicons, logo, robots.txt, sitemap.xml, vendor/) -> dist root.
     if (fs.existsSync(PUBLIC)) {
