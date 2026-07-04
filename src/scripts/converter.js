@@ -166,12 +166,17 @@ function escapeHtml(text) {
 }
 
 function collapseWhitespace(markdown) {
-    return markdown
+    // Fenced code blocks are exempt: collapsing runs of spaces would destroy
+    // code indentation.
+    return String(markdown)
         .replace(/\r\n/g, '\n')
-        .replace(/ /g, ' ')
-        .replace(/[ \t]+\n/g, '\n')
-        .replace(/[ \t]{2,}/g, ' ')
-        .replace(/\n{3,}/g, '\n\n')
+        .split(/(```[\s\S]*?```)/)
+        .map((part, index) => index % 2 === 1 ? part : part
+            .replace(/\u00a0/g, ' ')
+            .replace(/[ \t]+\n/g, '\n')
+            .replace(/(^|[^\\])[ \t]{2,}/g, '$1 ')
+            .replace(/\n{3,}/g, '\n\n'))
+        .join('')
         .trim();
 }
 
@@ -183,9 +188,16 @@ class HtmlToMarkdown {
     }
 
     convert(html) {
-        const container = document.createElement('div');
-        container.innerHTML = html;
-        const markdown = this.renderChildren(container, { listDepth: 0 }).trim();
+        // Parse with DOMParser: the resulting document is inert, so <img src>
+        // in the input NEVER triggers network requests (setting innerHTML on a
+        // live element did — a privacy leak for HTML files with tracking pixels).
+        const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+        return this.convertElement(doc.body || doc.documentElement);
+    }
+
+    convertElement(root) {
+        if (!root) return '';
+        const markdown = this.renderChildren(root, { listDepth: 0 }).trim();
         return markdown.replace(/\n{3,}/g, '\n\n');
     }
 
@@ -225,7 +237,9 @@ class HtmlToMarkdown {
                 return inner ? `\n\n${inner}\n\n` : '';
             }
             case 'br':
-                return '  \n';
+                // Backslash hard break — survives whitespace collapsing,
+                // unlike the two-trailing-spaces form.
+                return '\\\n';
             case 'strong':
             case 'b': {
                 if (!this.preserveFormatting) return this.renderChildren(node, ctx);
@@ -859,12 +873,11 @@ class HtmlFileToMarkdown {
         const doc = new DOMParser().parseFromString(text, 'text/html');
         doc.querySelectorAll('script, style, noscript, template, svg, iframe, head').forEach(el => el.remove());
         const root = doc.querySelector('main') || doc.querySelector('article') || doc.body || doc.documentElement;
-        const html = root ? root.innerHTML : text;
         const markdown = new HtmlToMarkdown({
             preserveFormatting: this.options.preserveFormatting,
             keepTables: this.options.keepTables,
             keepLinks: this.options.keepLinks
-        }).convert(html);
+        }).convertElement(root);
         if (!markdown.trim()) {
             throw new Error('No readable content was found in this HTML file.');
         }
@@ -891,7 +904,10 @@ class XlsxToMarkdown {
         const multiSheet = workbook.SheetNames.length > 1;
         const parts = [];
         for (const name of workbook.SheetNames) {
-            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[name], { header: 1, blankrows: false, defval: '' });
+            // raw:false returns the formatted cell text, so dates appear as
+            // dates (not Excel serial numbers like 46188) and numbers keep
+            // their cell formatting.
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[name], { header: 1, blankrows: false, defval: '', raw: false });
             const table = aoaToMarkdownTable(rows);
             if (!table) continue;
             parts.push(multiSheet ? `## ${name}\n\n${table}` : table);
@@ -930,10 +946,53 @@ class PptxToMarkdown {
         for (let i = 0; i < slidePaths.length; i++) {
             const xml = await zip.files[slidePaths[i]].async('string');
             const body = this.slideToMarkdown(xml);
-            parts.push(`## Slide ${i + 1}${body ? `\n\n${body}` : ''}`);
+            const notes = await this.extractNotes(zip, slidePaths[i]);
+            const section = [`## Slide ${i + 1}`];
+            if (body) section.push(body);
+            if (notes) section.push(`> **Speaker notes:** ${notes}`);
+            parts.push(section.join('\n\n'));
         }
         const markdown = parts.join('\n\n');
         return this.options.collapseWhitespace ? collapseWhitespace(markdown) : markdown.trim();
+    }
+
+    // Speaker notes live in ppt/notesSlides/, linked from each slide's .rels
+    // file. Falls back to the index-matched notesSlideN when rels are missing.
+    async extractNotes(zip, slidePath) {
+        try {
+            let notesPath = null;
+            const slideFile = slidePath.split('/').pop();
+            const relsPath = `ppt/slides/_rels/${slideFile}.rels`;
+            if (zip.files[relsPath]) {
+                const rels = await zip.files[relsPath].async('string');
+                const match = rels.match(/Target="\.\.\/notesSlides\/(notesSlide\d+\.xml)"/);
+                if (match) notesPath = `ppt/notesSlides/${match[1]}`;
+            }
+            if (!notesPath) {
+                const fallback = slideFile.replace('slide', 'notesSlide');
+                if (zip.files[`ppt/notesSlides/${fallback}`]) {
+                    notesPath = `ppt/notesSlides/${fallback}`;
+                }
+            }
+            if (!notesPath || !zip.files[notesPath]) return '';
+
+            const xml = await zip.files[notesPath].async('string');
+            const doc = new DOMParser().parseFromString(xml, 'application/xml');
+            const lines = [];
+            for (const paragraph of Array.from(doc.getElementsByTagName('a:p'))) {
+                const text = Array.from(paragraph.getElementsByTagName('a:t'))
+                    .map(node => node.textContent)
+                    .join('')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                // Skip the slide-number placeholder (a lone digit).
+                if (text && !/^\d+$/.test(text)) lines.push(text);
+            }
+            return lines.join(' ');
+        } catch (error) {
+            // Notes are a bonus; a malformed notes part must not fail the slide.
+            return '';
+        }
     }
 
     slideToMarkdown(xml) {
@@ -976,7 +1035,9 @@ class PlainTextToMarkdown {
         if (!text.trim()) {
             throw new Error(`${file.name} appears to be empty.`);
         }
-        return this.options.collapseWhitespace ? collapseWhitespace(text) : text.replace(/\s+$/, '');
+        // True pass-through: indentation in code/config files carries meaning,
+        // so the collapse-whitespace option is intentionally NOT applied here.
+        return text.replace(/\r\n/g, '\n').replace(/\s+$/, '');
     }
 }
 
@@ -1176,14 +1237,38 @@ class MarkdownPreviewRenderer {
         return `<table>${thead}${tbody}</table>`;
     }
 
+    // Only render URLs with safe protocols; javascript:/data:text etc. in a
+    // converted document must not become clickable in the preview.
+    sanitizeUrl(url, { allowDataImage = false } = {}) {
+        const trimmed = String(url || '').trim();
+        if (allowDataImage && /^data:image\//i.test(trimmed)) {
+            return trimmed;
+        }
+        try {
+            const parsed = new URL(trimmed, window.location.origin);
+            if (['http:', 'https:', 'mailto:'].includes(parsed.protocol)) {
+                return trimmed;
+            }
+        } catch (error) {
+            // Unparseable URL -> treat as unsafe.
+        }
+        return null;
+    }
+
     inlineFormat(text) {
         let output = text;
         output = output.replace(/\\([\\`*_{}\[\]<>])/g, '$1');
         output = output.replace(/`([^`]+)`/g, '<code>$1</code>');
         output = output.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
         output = output.replace(/(^|[\s(])\*(\S(?:[^*]*\S)?)\*(?=[\s).,!?:;]|$)/g, '$1<em>$2</em>');
-        output = output.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">');
-        output = output.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+        output = output.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+            const safe = this.sanitizeUrl(src, { allowDataImage: true });
+            return safe ? `<img alt="${alt}" src="${safe}">` : alt;
+        });
+        output = output.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, href) => {
+            const safe = this.sanitizeUrl(href);
+            return safe ? `<a href="${safe}" target="_blank" rel="noopener noreferrer">${label}</a>` : label;
+        });
         return output;
     }
 }
@@ -1296,9 +1381,65 @@ class ConverterApp {
     }
 
     async handleFiles(fileList) {
-        const file = fileList?.[0];
-        if (!file) return;
-        await this.convertFile(file);
+        const files = [...(fileList || [])];
+        if (!files.length) return;
+        if (files.length === 1) {
+            await this.convertFile(files[0]);
+            return;
+        }
+        await this.convertBatch(files);
+    }
+
+    // Multiple files: convert each one and combine them into a single Markdown
+    // document with one "# filename" section per file. A failing file becomes
+    // an error note instead of aborting the whole batch.
+    async convertBatch(files) {
+        this.elements.chooseFileBtn.disabled = true;
+        const sections = [];
+        let converted = 0;
+
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                this.setStatus(`Converting ${i + 1} of ${files.length}: ${file.name}...`, 'working');
+                try {
+                    const ext = this.validate(file);
+                    this.updateEngineAvailability(ext);
+                    const { markdown } = await this.runConversion(file, ext, this.collectOptions());
+                    sections.push(`# ${file.name}\n\n${markdown}`);
+                    converted++;
+                } catch (error) {
+                    sections.push(`# ${file.name}\n\n> Conversion failed: ${error.message || 'unknown error'}`);
+                }
+            }
+
+            const markdown = sections.join('\n\n---\n\n');
+            this.lastFile = null;
+            this.currentFileName = 'converted-files.md';
+            this.currentMarkdown = markdown;
+            this.renderOutput(markdown);
+            this.updateEngineAvailability(null);
+            const wordCount = markdown.split(/\s+/).filter(Boolean).length;
+            this.elements.meta.textContent = `${converted} of ${files.length} files converted locally. ${markdown.length.toLocaleString('en-US')} characters · ${wordCount.toLocaleString('en-US')} words.`;
+            this.setStatus(`${converted} of ${files.length} files converted locally. No upload happened.`, converted ? 'good' : 'danger');
+            this.elements.copyBtn.disabled = !markdown;
+            this.elements.downloadBtn.disabled = !markdown;
+            if (this.elements.toTtsBtn) this.elements.toTtsBtn.disabled = !markdown;
+        } finally {
+            this.elements.chooseFileBtn.disabled = false;
+            this.elements.fileInput.value = '';
+        }
+    }
+
+    collectOptions() {
+        return {
+            engine: this.currentEngine(),
+            headingMode: this.elements.headingMode.value,
+            preserveFormatting: this.elements.preserveFormatting.checked,
+            keepTables: this.elements.keepTables.checked,
+            keepLinks: this.elements.keepLinks.checked,
+            collapseWhitespace: this.elements.collapseWhitespace.checked
+        };
     }
 
     validate(file) {
@@ -1334,62 +1475,8 @@ class ConverterApp {
             this.lastFile = file;
             this.currentFileName = file.name;
 
-            const options = {
-                engine: this.currentEngine(),
-                headingMode: this.elements.headingMode.value,
-                preserveFormatting: this.elements.preserveFormatting.checked,
-                keepTables: this.elements.keepTables.checked,
-                keepLinks: this.elements.keepLinks.checked,
-                collapseWhitespace: this.elements.collapseWhitespace.checked
-            };
-
-            let markdown = '';
-            let engineNote = '';
-            if (ext === 'image') {
-                markdown = await this.runOcrOnImage(file, options.collapseWhitespace);
-                engineNote = ` · OCR (PP-OCRv6 Tiny)`;
-            } else if (ext === 'pdf') {
-                const pdfOptions = {
-                    headingMode: options.headingMode,
-                    collapseWhitespace: options.collapseWhitespace
-                };
-                const runStandard = () => new PdfToMarkdown(pdfOptions).convert(file, message => this.setStatus(message, 'working'));
-
-                if (options.engine === 'ocr') {
-                    markdown = await this.runOcrOnPdf(file, options.collapseWhitespace);
-                    engineNote = ` · OCR (PP-OCRv6 Tiny)`;
-                } else if (options.engine === 'liteparse' || options.engine === 'edgeparse') {
-                    const engineLabel = options.engine === 'edgeparse' ? 'EdgeParse' : 'LiteParse';
-                    const Engine = options.engine === 'edgeparse' ? EdgeParsePdfToMarkdown : LiteParsePdfToMarkdown;
-                    try {
-                        const converter = new Engine(pdfOptions);
-                        markdown = await converter.convert(file, message => this.setStatus(message, 'working'));
-                        engineNote = ` · ${engineLabel} engine`;
-                    } catch (engineError) {
-                        // Fall back to pdf.js so a WASM hiccup never blocks the user.
-                        this.setStatus(`${engineLabel} failed (${engineError.message}). Falling back to the standard engine...`, 'warning');
-                        markdown = await runStandard();
-                        engineNote = ` · standard engine (${engineLabel} fallback)`;
-                    }
-                } else {
-                    markdown = await runStandard();
-                }
-            } else if (ext === 'docx') {
-                const docxConverter = new DocxToMarkdown(options);
-                markdown = await docxConverter.convert(file, message => this.setStatus(message, 'working'));
-            } else if (ext === 'html' || ext === 'htm') {
-                markdown = await new HtmlFileToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
-                engineNote = ' · HTML';
-            } else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
-                markdown = await new XlsxToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
-                engineNote = ` · ${ext.toUpperCase()}`;
-            } else if (ext === 'pptx') {
-                markdown = await new PptxToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
-                engineNote = ' · PPTX';
-            } else if (ext === 'text') {
-                markdown = await new PlainTextToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
-                engineNote = ' · plain text';
-            }
+            const options = this.collectOptions();
+            const { markdown, engineNote } = await this.runConversion(file, ext, options);
             this.engineNote = engineNote;
 
             this.currentMarkdown = markdown;
@@ -1411,6 +1498,58 @@ class ConverterApp {
             this.elements.chooseFileBtn.disabled = false;
             this.elements.fileInput.value = '';
         }
+    }
+
+    // Single-file conversion dispatch, shared by convertFile and convertBatch.
+    async runConversion(file, ext, options) {
+        let markdown = '';
+        let engineNote = '';
+        if (ext === 'image') {
+            markdown = await this.runOcrOnImage(file, options.collapseWhitespace);
+            engineNote = ` · OCR (PP-OCRv6 Tiny)`;
+        } else if (ext === 'pdf') {
+            const pdfOptions = {
+                headingMode: options.headingMode,
+                collapseWhitespace: options.collapseWhitespace
+            };
+            const runStandard = () => new PdfToMarkdown(pdfOptions).convert(file, message => this.setStatus(message, 'working'));
+
+            if (options.engine === 'ocr') {
+                markdown = await this.runOcrOnPdf(file, options.collapseWhitespace);
+                engineNote = ` · OCR (PP-OCRv6 Tiny)`;
+            } else if (options.engine === 'liteparse' || options.engine === 'edgeparse') {
+                const engineLabel = options.engine === 'edgeparse' ? 'EdgeParse' : 'LiteParse';
+                const Engine = options.engine === 'edgeparse' ? EdgeParsePdfToMarkdown : LiteParsePdfToMarkdown;
+                try {
+                    const converter = new Engine(pdfOptions);
+                    markdown = await converter.convert(file, message => this.setStatus(message, 'working'));
+                    engineNote = ` · ${engineLabel} engine`;
+                } catch (engineError) {
+                    // Fall back to pdf.js so a WASM hiccup never blocks the user.
+                    this.setStatus(`${engineLabel} failed (${engineError.message}). Falling back to the standard engine...`, 'warning');
+                    markdown = await runStandard();
+                    engineNote = ` · standard engine (${engineLabel} fallback)`;
+                }
+            } else {
+                markdown = await runStandard();
+            }
+        } else if (ext === 'docx') {
+            const docxConverter = new DocxToMarkdown(options);
+            markdown = await docxConverter.convert(file, message => this.setStatus(message, 'working'));
+        } else if (ext === 'html' || ext === 'htm') {
+            markdown = await new HtmlFileToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
+            engineNote = ' · HTML';
+        } else if (ext === 'xlsx' || ext === 'xls' || ext === 'csv') {
+            markdown = await new XlsxToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
+            engineNote = ` · ${ext.toUpperCase()}`;
+        } else if (ext === 'pptx') {
+            markdown = await new PptxToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
+            engineNote = ' · PPTX';
+        } else if (ext === 'text') {
+            markdown = await new PlainTextToMarkdown(options).convert(file, message => this.setStatus(message, 'working'));
+            engineNote = ' · plain text';
+        }
+        return { markdown, engineNote };
     }
 
     async runOcrOnImage(file, shouldCollapse) {
@@ -1501,7 +1640,7 @@ class ConverterApp {
             this.setStatus('Could not hand the text to the Speech tool in this browser.', 'warning');
             return;
         }
-        window.location.href = 'tts.html';
+        window.location.href = '/tts';
     }
 
     downloadMarkdown() {
