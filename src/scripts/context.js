@@ -8,6 +8,7 @@ const MODEL_PROFILES = {
         charsPerToken: 4.0,
         wordsPerTokenFactor: 1.32,
         cjkCharsPerToken: 1.55,
+        otherScriptCharsPerToken: 2.6,
         multiplier: 1
     },
     llama: {
@@ -15,6 +16,7 @@ const MODEL_PROFILES = {
         charsPerToken: 3.8,
         wordsPerTokenFactor: 1.36,
         cjkCharsPerToken: 1.45,
+        otherScriptCharsPerToken: 2.4,
         multiplier: 1.05
     },
     qwen: {
@@ -22,6 +24,7 @@ const MODEL_PROFILES = {
         charsPerToken: 3.6,
         wordsPerTokenFactor: 1.42,
         cjkCharsPerToken: 1.25,
+        otherScriptCharsPerToken: 2.7,
         multiplier: 1.08
     },
     gemma: {
@@ -29,6 +32,7 @@ const MODEL_PROFILES = {
         charsPerToken: 4.2,
         wordsPerTokenFactor: 1.28,
         cjkCharsPerToken: 1.65,
+        otherScriptCharsPerToken: 2.9,
         multiplier: 1
     },
     gpt: {
@@ -36,8 +40,19 @@ const MODEL_PROFILES = {
         charsPerToken: 4.0,
         wordsPerTokenFactor: 1.33,
         cjkCharsPerToken: 1.45,
+        otherScriptCharsPerToken: 2.5,
         multiplier: 1
     }
+};
+
+// Exact counting (opt-in): tokenizer-only downloads, no model weights.
+const TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';
+const TOKENIZER_REPOS = {
+    generic: 'Xenova/gpt-4o',
+    gpt: 'Xenova/gpt-4o',
+    llama: 'onnx-community/Llama-3.2-1B-Instruct',
+    qwen: 'onnx-community/Qwen3.5-0.8B-ONNX',
+    gemma: 'onnx-community/gemma-4-E2B-it-ONNX'
 };
 
 const STATUS_COPY = {
@@ -102,17 +117,29 @@ function estimateTokens(text, profileId) {
 
     const profile = MODEL_PROFILES[profileId] || MODEL_PROFILES.generic;
     const nonWhitespace = normalized.replace(/\s/g, '');
-    const cjkMatches = normalized.match(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/gu) || [];
-    const cjkChars = cjkMatches.length;
-    const latinText = normalized.replace(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/gu, ' ');
-    const wordMatches = latinText.match(/[A-Za-zÀ-ÖØ-öø-ÿ0-9]+(?:[-'][A-Za-zÀ-ÖØ-öø-ÿ0-9]+)*/g) || [];
-    const words = wordMatches.length;
-    const latinChars = Math.max(0, nonWhitespace.length - cjkChars);
+    const cjkRe = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/gu;
+    const cjkChars = (normalized.match(cjkRe) || []).length;
+    const noCjkText = normalized.replace(cjkRe, ' ');
 
-    const latinByWords = words * profile.wordsPerTokenFactor;
+    // Words across ALL scripts (Cyrillic, Greek, Arabic, ... included) — the
+    // old Latin-only regex reported "0 words" for e.g. Russian text.
+    const wordMatches = noCjkText.match(/[\p{L}\p{N}]+(?:['\u2019-][\p{L}\p{N}]+)*/gu) || [];
+    const words = wordMatches.length;
+
+    // Non-Latin letters outside CJK (Cyrillic, Greek, Arabic, Hebrew, Thai,
+    // Devanagari, ...) tokenize far denser than Latin text in common BPE
+    // vocabularies — give them their own divisor instead of the Latin one.
+    const totalLetters = (noCjkText.match(/\p{L}/gu) || []).length;
+    const latinLetters = (noCjkText.match(/\p{Script=Latin}/gu) || []).length;
+    const otherScriptChars = Math.max(0, totalLetters - latinLetters);
+    const latinWords = wordMatches.filter(word => /^[\p{Script=Latin}\p{N}'\u2019-]+$/u.test(word)).length;
+    const latinChars = Math.max(0, nonWhitespace.length - cjkChars - otherScriptChars);
+
+    const latinByWords = latinWords * profile.wordsPerTokenFactor;
     const latinByChars = latinChars / profile.charsPerToken;
     const cjkTokens = cjkChars / profile.cjkCharsPerToken;
-    const contentTokens = Math.ceil((Math.max(latinByWords, latinByChars) + cjkTokens) * profile.multiplier);
+    const otherTokens = otherScriptChars / (profile.otherScriptCharsPerToken || 2.6);
+    const contentTokens = Math.ceil((Math.max(latinByWords, latinByChars) + cjkTokens + otherTokens) * profile.multiplier);
 
     return {
         normalized,
@@ -297,6 +324,7 @@ class ContextEstimatorApp {
             reserveInput: document.getElementById('contextReserveInput'),
             reserveValue: document.getElementById('contextReserveValue'),
             estimateBtn: document.getElementById('contextEstimateBtn'),
+            exactBtn: document.getElementById('contextExactBtn'),
             clearBtn: document.getElementById('contextClearBtn'),
             inputTokens: document.getElementById('contextInputTokens'),
             reserveTokens: document.getElementById('contextReserveTokens'),
@@ -307,12 +335,13 @@ class ContextEstimatorApp {
         this.fileName = '';
         this.processor = new ContextFileProcessor(message => this.setFileStatus(message, 'working'));
         this.lastResult = null;
+        this.exactResult = null;
+        this._estimateCache = null;
         this.debouncedEstimate = this.debounce(() => this.updateEstimate(), 120);
         this.bindEvents();
         this.populateTable();
         this.updateReserveLabel();
         this.updateEstimate();
-        setTimeout(() => this.updateEstimate(), 0);
     }
 
     bindEvents() {
@@ -328,6 +357,16 @@ class ContextEstimatorApp {
             this.updateEstimate();
         });
         this.elements.estimateBtn.addEventListener('click', () => this.updateEstimate({ announce: true }));
+        if (this.elements.exactBtn) {
+            this.elements.exactBtn.addEventListener('click', () => this.runExactCount());
+        }
+        document.querySelectorAll('[data-reserve-preset]').forEach(button => {
+            button.addEventListener('click', () => {
+                this.elements.reserveInput.value = button.dataset.reservePreset;
+                this.updateReserveLabel();
+                this.updateEstimate();
+            });
+        });
         this.elements.clearBtn.addEventListener('click', () => this.clear());
         this.elements.chooseFileBtn.addEventListener('click', () => this.elements.fileInput.click());
         this.elements.fileInput.addEventListener('change', event => this.handleFiles(event.target.files));
@@ -380,13 +419,22 @@ class ContextEstimatorApp {
         const profileId = this.elements.profileSelect.value;
         const profile = MODEL_PROFILES[profileId] || MODEL_PROFILES.generic;
         const reservePercent = Number(this.elements.reserveInput.value) || 35;
-        const estimate = estimateTokens(text, profileId);
-        const windows = CONTEXT_WINDOWS.map(size => classifyWindow(estimate.estimatedInputTokens, size, reservePercent));
-        const recommendation = windows.find(row => row.status !== 'tooSmall') || windows[windows.length - 1];
-        const exceedsMax = estimate.estimatedInputTokens > windows[windows.length - 1].usableBudget;
+        const estimate = this.getCachedEstimate(text, profileId);
+        const exactActive = this.isExactResultValid(text, profileId);
+        const inputTokens = exactActive ? this.exactResult.tokens : estimate.estimatedInputTokens;
+        const windows = CONTEXT_WINDOWS.map(size => classifyWindow(inputTokens, size, reservePercent));
+        // Recommend the first window with real headroom ("Good"); a "Tight"
+        // window is only recommended when nothing better exists — the guide
+        // itself says to take the next larger window when the fit is tight.
+        const recommendation = windows.find(row => row.status === 'good' || row.status === 'overkill') ||
+            windows.find(row => row.status !== 'tooSmall') ||
+            windows[windows.length - 1];
+        const exceedsMax = inputTokens > windows[windows.length - 1].usableBudget;
 
         this.lastResult = {
             estimate,
+            inputTokens,
+            exactActive,
             reservePercent,
             windows,
             recommendation,
@@ -396,16 +444,83 @@ class ContextEstimatorApp {
         this.renderResult(announce);
     }
 
+    // Normalization + several unicode regex passes over the full text are the
+    // expensive part; profile/reserve changes reuse the cached result.
+    getCachedEstimate(text, profileId) {
+        if (this._estimateCache &&
+            this._estimateCache.text === text &&
+            this._estimateCache.profileId === profileId) {
+            return this._estimateCache.estimate;
+        }
+        const estimate = estimateTokens(text, profileId);
+        this._estimateCache = { text, profileId, estimate };
+        return estimate;
+    }
+
+    isExactResultValid(text, profileId) {
+        return Boolean(this.exactResult &&
+            this.exactResult.text === text &&
+            this.exactResult.profileId === profileId);
+    }
+
+    async runExactCount() {
+        const text = this.elements.input.value;
+        const profileId = this.elements.profileSelect.value;
+        const normalized = normalizeText(text);
+
+        if (!normalized) {
+            this.setFileStatus('Paste text first, then count exactly.', 'neutral');
+            return;
+        }
+
+        const repo = TOKENIZER_REPOS[profileId] || TOKENIZER_REPOS.generic;
+        this.elements.exactBtn.disabled = true;
+
+        try {
+            this.setFileStatus('Loading tokenizer (one-time, a few MB — only on this click)...', 'working');
+            if (!this._transformersPromise) {
+                this._transformersPromise = import(TRANSFORMERS_CDN).catch(error => {
+                    this._transformersPromise = null;
+                    throw new Error('Could not load the tokenizer library (offline or CDN blocked). The heuristic estimate still works.');
+                });
+            }
+            const { AutoTokenizer } = await this._transformersPromise;
+
+            this._tokenizers = this._tokenizers || new Map();
+            let tokenizer = this._tokenizers.get(repo);
+            if (!tokenizer) {
+                tokenizer = await AutoTokenizer.from_pretrained(repo);
+                this._tokenizers.set(repo, tokenizer);
+            }
+
+            this.setFileStatus('Counting tokens exactly...', 'working');
+            await new Promise(resolve => setTimeout(resolve, 0));
+            const encoded = tokenizer.encode(normalized);
+            const tokens = (encoded?.length || 0) + FIXED_PROMPT_OVERHEAD;
+
+            this.exactResult = { text, profileId, tokens, repo };
+            this.updateEstimate();
+            this.setFileStatus(`Exact count with the ${MODEL_PROFILES[profileId]?.label || profileId} tokenizer: ${formatTokens(tokens)} tokens incl. overhead.`, 'good');
+        } catch (error) {
+            this.setFileStatus(error.message || 'Exact counting failed. The heuristic estimate still works.', 'danger');
+        } finally {
+            this.elements.exactBtn.disabled = false;
+        }
+    }
+
     renderResult(announce) {
-        const { estimate, reservePercent, windows, recommendation, exceedsMax } = this.lastResult;
-        this.elements.inputTokens.textContent = estimate.estimatedInputTokens ? formatTokens(estimate.estimatedInputTokens) : '0';
+        const { estimate, inputTokens, exactActive, reservePercent, windows, recommendation, exceedsMax } = this.lastResult;
+        this.elements.inputTokens.textContent = inputTokens ? formatTokens(inputTokens) : '0';
         this.elements.reserveTokens.textContent = recommendation ? `${reservePercent}% (${formatTokens(recommendation.reservedTokens)})` : `${reservePercent}%`;
 
-        this.elements.meta.textContent = estimate.estimatedInputTokens
-            ? `${formatTokens(estimate.characters)} characters · ${formatTokens(estimate.words)} words`
-            : 'No text loaded yet.';
+        const parts = [];
+        if (inputTokens) {
+            parts.push(`${formatTokens(estimate.characters)} characters · ${formatTokens(estimate.words)} words`);
+            parts.push(exactActive ? 'exact tokenizer count' : 'heuristic estimate');
+        }
+        this.elements.meta.textContent = parts.length ? parts.join(' · ') : 'No text loaded yet.';
 
-        this.renderTable(windows, recommendation, exceedsMax);
+        this.renderTable(windows, recommendation, exceedsMax, inputTokens);
 
         if (announce) {
             this.setFileStatus('Estimate updated locally.', 'good');
@@ -424,15 +539,24 @@ class ContextEstimatorApp {
             .join('');
     }
 
-    renderTable(windows, recommendation, exceedsMax) {
+    renderTable(windows, recommendation, exceedsMax, inputTokens = 0) {
         const hasInput = windows.some(row => row.status !== 'empty');
         this.elements.tableBody.innerHTML = windows.map(row => {
             const status = STATUS_COPY[row.status] || STATUS_COPY.empty;
             const isRecommended = hasInput && !exceedsMax && recommendation.contextWindow === row.contextWindow;
+            // Concrete headroom beats an abstract label: show what is left of
+            // the usable input budget (or how far it overflows).
+            let detail = '';
+            if (hasInput && inputTokens > 0) {
+                const leftover = row.usableBudget - inputTokens;
+                detail = leftover >= 0
+                    ? `<small class="context-row-detail">${formatTokens(leftover)} left</small>`
+                    : `<small class="context-row-detail">${formatTokens(-leftover)} over</small>`;
+            }
             return `
                 <tr class="${isRecommended ? 'context-table-row--recommended' : ''}">
                     <td>${formatContext(row.contextWindow)}${isRecommended ? ' · recommended' : ''}</td>
-                    <td>${formatTokens(row.usableBudget)}</td>
+                    <td>${formatTokens(row.usableBudget)} ${detail}</td>
                     <td><span class="context-status-pill" data-tone="${status.tone}">${status.label}</span></td>
                 </tr>
             `;
@@ -442,6 +566,7 @@ class ContextEstimatorApp {
     clear() {
         this.elements.input.value = '';
         this.fileName = '';
+        this.exactResult = null;
         this.setFileStatus('Cleared. No text is stored by this tool.', 'neutral');
         this.updateEstimate();
         this.elements.input.focus();

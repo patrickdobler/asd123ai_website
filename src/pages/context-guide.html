@@ -188,8 +188,7 @@
                             </p>
                             <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
                                 <p class="text-sm text-[var(--text-secondary)]">
-                                    <strong class="text-[var(--text-primary)]">Estimate, not exact count:</strong> Different models tokenize text differently. The tool gives a practical planning estimate without downloading tokenizers.
-                                </p>
+                                    <strong class="text-[var(--text-primary)]">Estimate, not exact count:</strong> Different models tokenize text differently. The default estimate is a fast local heuristic. For precise numbers, use the <strong>Exact count</strong> button — it downloads the real tokenizer of the selected profile (a few MB, only when clicked) and counts your text with it. </p>
                             </div>
                         </div>
                     </div>
@@ -203,7 +202,7 @@
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">1</div>
                                 <div>
                                     <h4 class="font-bold text-[var(--text-primary)] mb-1">Paste or upload</h4>
-                                    <p class="text-sm">Paste text into the input area or choose a local TXT, DOCX, or PDF file.</p>
+                                    <p class="text-sm">Paste text into the input area or choose a local TXT, Markdown, DOCX, or PDF file (up to 25&nbsp;MB). Scanned PDFs have no text layer — run them through the <a href="/converter" class="text-[var(--primary-color)] hover:underline">Markdown Converter</a> (OCR engine) first.</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
@@ -217,7 +216,7 @@
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">3</div>
                                 <div>
                                     <h4 class="font-bold text-[var(--text-primary)] mb-1">Read the comparison table</h4>
-                                    <p class="text-sm">Use the row marked recommended as the minimum practical context window. If the fit is tight, choose the next larger window.</p>
+                                    <p class="text-sm">Use the row marked recommended: it is the smallest window with real headroom (a &ldquo;Tight&rdquo; window is only recommended when nothing larger fits). Every row also shows how many tokens would be left for the answer.</p>
                                 </div>
                             </div>
                         </div>
@@ -248,8 +247,7 @@
                                 A context window must hold the source text, your instruction, system prompt, and generated answer. The reserve slider keeps part of the window free before making a recommendation.
                             </p>
                             <p class="leading-relaxed">
-                                The default 35% is a practical starting point. Increase it for detailed answers or reasoning. Lower it only when you expect a short answer.
-                            </p>
+                                The default 35% is a practical starting point. Increase it for detailed answers or reasoning. Lower it only when you expect a short answer. The Short answer / Standard / Detailed buttons set the slider to matching presets (20% / 35% / 50%). </p>
                         </div>
                     </div>
 
@@ -275,7 +273,7 @@
                         </h3>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
-                                Text extraction and estimation run locally in your browser. Pasted text and uploaded files are not sent to ASD123.ai for processing, and document contents are not saved in localStorage or IndexedDB.
+                                Text extraction and the heuristic estimation run locally in your browser with self-hosted libraries — no external requests. Pasted text and uploaded files are not sent to ASD123.ai for processing, and document contents are not saved in localStorage or IndexedDB. The optional <strong>Exact count</strong> downloads tokenizer files from CDN/Hugging Face when you click it; your text itself is never transmitted. Estimates include a fixed allowance of about 300 tokens for system prompt and formatting overhead. Heuristics for non-Latin scripts (Cyrillic, Arabic, Thai, ...) are coarser than for English — use Exact count when precision matters there.
                             </p>
                             <p class="leading-relaxed">
                                 PDF extraction depends on readable embedded text. Scanned, image-only, password-protected, or unusual PDFs may need OCR or manual cleanup before estimation.

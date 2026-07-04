@@ -153,7 +153,7 @@
                     <div class="context-panel-header">
                         <div>
                             <h2>Input</h2>
-                            <p>Paste text or load a local TXT, DOCX, or PDF file.</p>
+                            <p>Paste text or load a local TXT, Markdown, DOCX, or PDF file (up to 25 MB).</p>
                         </div>
                         <div class="context-actions">
                             <button id="contextEstimateBtn" type="button" class="btn btn-primary btn-small">
@@ -162,6 +162,13 @@
                                     <path d="m19 9-5 5-4-4-3 3"/>
                                 </svg>
                                 Estimate
+                            </button>
+                            <button id="contextExactBtn" type="button" class="btn btn-secondary btn-small" title="Counts with the real tokenizer of the selected profile. Downloads a few MB of tokenizer files on first use (only when clicked).">
+                                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m9 11 3 3L22 4"/>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                </svg>
+                                Exact count
                             </button>
                             <button id="contextClearBtn" type="button" class="btn btn-secondary btn-small">
                                 <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -189,7 +196,7 @@
                         </div>
                         <div>
                             <strong>Drop a document here</strong>
-                            <span>or choose a TXT, DOCX, or PDF file. Extraction happens locally in this browser.</span>
+                            <span>or choose a TXT, Markdown, DOCX, or PDF file. Extraction happens locally in this browser.</span>
                         </div>
                         <button id="chooseContextFileBtn" type="button" class="btn btn-secondary btn-small">Choose file</button>
                         <input id="contextFileInput" type="file" accept=".txt,.md,.markdown,.docx,.pdf" hidden>
@@ -215,13 +222,18 @@
                             <span>Reserve for answer and reasoning <strong id="contextReserveValue">35%</strong></span>
                             <input id="contextReserveInput" type="range" min="15" max="60" step="5" value="35">
                         </label>
+                        <div class="context-reserve-presets" role="group" aria-label="Answer length presets">
+                            <button type="button" class="btn btn-secondary btn-small" data-reserve-preset="20" title="Short answers (20% reserve)">Short answer</button>
+                            <button type="button" class="btn btn-secondary btn-small" data-reserve-preset="35" title="Normal answers (35% reserve)">Standard</button>
+                            <button type="button" class="btn btn-secondary btn-small" data-reserve-preset="50" title="Long answers or reasoning (50% reserve)">Detailed</button>
+                        </div>
                     </div>
 
                     <div class="context-metrics-grid">
                         <div class="context-metric">
                             <span>Estimated input</span>
                             <strong id="contextInputTokens">0</strong>
-                            <small>tokens incl. overhead</small>
+                            <small>tokens incl. ~300 prompt overhead</small>
                         </div>
                         <div class="context-metric">
                             <span>Reserve</span>

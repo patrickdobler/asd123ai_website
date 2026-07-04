@@ -5839,3 +5839,16 @@ main#main.chat-main {
     text-decoration: underline dotted;
     text-underline-offset: 3px;
 }
+
+/* Context estimator: reserve presets + per-row headroom */
+.context-reserve-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.context-row-detail {
+    color: var(--text-secondary);
+    font-size: 11px;
+    white-space: nowrap;
+}
