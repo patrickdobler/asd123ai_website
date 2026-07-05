@@ -7,21 +7,21 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <title>Count LLM Tokens Offline - GPT, Llama, Qwen, Gemma | ASD123.ai</title>
-    <meta name="description" content="Count AI tokens and estimate context-window needs for GPT, Llama, Qwen, and Gemma models - instantly in your browser, with an optional exact tokenizer count. No upload.">
-    <meta name="keywords" content="count tokens offline, llm token counter, gpt token counter, context window calculator, how many tokens, tokenizer online private">
+    <title>Photo-Shot - Self-Hosted AI Image Editing PWA | ASD123.ai</title>
+    <meta name="description" content="Photo-Shot is a free, open-source, mobile-first PWA for AI image editing across Gemini, WaveSpeed and OpenRouter (14+ models), plus an EXIF metadata copier. Self-hosted: your API keys stay on your server. GPLv3.">
+    <meta name="keywords" content="ai image editing self-hosted, nano banana app, gemini image editing, openrouter image models, exif copier, self-hosted pwa, photo-shot">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Count LLM Tokens Offline - GPT, Llama, Qwen, Gemma | ASD123.ai">
-    <meta property="og:description" content="Count AI tokens and estimate context-window needs for GPT, Llama, Qwen, and Gemma models - instantly in your browser, with an optional exact tokenizer count. No upload.">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://asd123.ai/count-tokens-offline">
+    <meta property="og:title" content="Photo-Shot - Self-Hosted AI Image Editing PWA | ASD123.ai">
+    <meta property="og:description" content="Photo-Shot is a free, open-source, mobile-first PWA for AI image editing across Gemini, WaveSpeed and OpenRouter (14+ models), plus an EXIF metadata copier. Self-hosted: your API keys stay on your server. GPLv3.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://asd123.ai/photo-shot">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Count LLM Tokens Offline - GPT, Llama, Qwen, Gemma | ASD123.ai">
-    <meta name="twitter:description" content="Count AI tokens and estimate context-window needs for GPT, Llama, Qwen, and Gemma models - instantly in your browser, with an optional exact tokenizer count. No upload.">
-    <link rel="canonical" href="https://asd123.ai/count-tokens-offline">
+    <meta name="twitter:title" content="Photo-Shot - Self-Hosted AI Image Editing PWA | ASD123.ai">
+    <meta name="twitter:description" content="Photo-Shot is a free, open-source, mobile-first PWA for AI image editing across Gemini, WaveSpeed and OpenRouter (14+ models), plus an EXIF metadata copier. Self-hosted: your API keys stay on your server. GPLv3.">
+    <link rel="canonical" href="https://asd123.ai/photo-shot">
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/components.css">
@@ -61,10 +61,10 @@
         },
         {
           "@type": "WebPage",
-          "@id": "https://asd123.ai/count-tokens-offline#webpage",
-          "name": "Count LLM Tokens Offline - GPT, Llama, Qwen, Gemma | ASD123.ai",
-          "description": "Count AI tokens and estimate context-window needs for GPT, Llama, Qwen, and Gemma models - instantly in your browser, with an optional exact tokenizer count. No upload.",
-          "url": "https://asd123.ai/count-tokens-offline",
+          "@id": "https://asd123.ai/photo-shot#webpage",
+          "name": "Photo-Shot - Self-Hosted AI Image Editing PWA | ASD123.ai",
+          "description": "Photo-Shot is a free, open-source, mobile-first PWA for AI image editing across Gemini, WaveSpeed and OpenRouter (14+ models), plus an EXIF metadata copier. Self-hosted: your API keys stay on your server. GPLv3.",
+          "url": "https://asd123.ai/photo-shot",
           "inLanguage": "en",
           "isPartOf": {
             "@id": "https://asd123.ai/#website"
@@ -81,49 +81,40 @@
               {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "Count AI Tokens Without Sending Text Anywhere",
-                "item": "https://asd123.ai/count-tokens-offline"
+                "name": "Apps",
+                "item": "https://asd123.ai/apps"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Photo-Shot",
+                "item": "https://asd123.ai/photo-shot"
               }
             ]
           }
         },
         {
-          "@type": "FAQPage",
-          "@id": "https://asd123.ai/count-tokens-offline#faq",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "How accurate is the instant estimate?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Typically within a few percent for natural language. When it matters, the exact mode runs the model family\u2019s actual tokenizer locally and is precise."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Which model families are supported?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "GPT-style (o200k), Llama, Qwen, and Gemma profiles. Counts differ between families because each uses its own tokenizer vocabulary."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Why do different models report different token counts?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Tokenizers split text differently - the same word can be one token in one vocabulary and three in another. Pick the model family to get the right count."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Does it work offline?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "The instant estimate works fully offline once the page is loaded. The exact mode needs a one-time tokenizer download, which is then cached."
-              }
-            }
-          ]
+          "@type": "SoftwareApplication",
+          "@id": "https://asd123.ai/photo-shot#app",
+          "name": "Photo-Shot",
+          "description": "Mobile-first, self-hosted PWA for AI image editing across Gemini, WaveSpeed and OpenRouter, plus an EXIF metadata copier.",
+          "url": "https://asd123.ai/photo-shot",
+          "applicationCategory": "MultimediaApplication",
+          "operatingSystem": "Any (self-hosted via Docker; installable PWA)",
+          "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "screenshot": [
+            "https://asd123.ai/apps/photo-shot-editor.png",
+            "https://asd123.ai/apps/photo-shot-metadata.png"
+          ],
+          "downloadUrl": "https://github.com/asd123ch/photo-shot",
+          "author": {
+            "@id": "https://asd123.ai/#organization"
+          }
         }
       ]
     }
@@ -185,59 +176,54 @@
 
         <main id="main" role="main">
             <div class="page-header">
-                <h1 class="page-title">Count AI Tokens Without Sending Text Anywhere</h1>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: var(--space-4);">
+                    <img src="/apps/photo-shot-logo.png" alt="" width="56" height="55" style="width: 56px; height: 55px; border-radius: 12px;">
+                    <h1 class="page-title" style="margin-bottom: 0;">Photo-Shot</h1>
+                </div>
                 <p class="page-subtitle">
-                    Instant token estimates for your text or documents - plus an exact count using the model family’s real tokenizer.
+                    A mobile-first, installable (PWA) AI image studio: edit photos across many image models, or copy EXIF metadata between images - all from one small self-hosted app. Free and open source (GPLv3).
                 </p>
             </div>
 
             <div style="max-width: 900px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: var(--space-8);">
                 <div class="liquid-glass" style="padding: var(--space-8);">
-                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Why token counts matter</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Every LLM measures text in tokens, and every model has a context window - the maximum number of tokens it can consider at once. If your document plus your question plus the model’s answer do not fit, the model silently loses the beginning of the conversation or refuses the input. Knowing the token count before you start saves you from truncated answers, and for API users it is what the bill is based on.</p>
-                    <p style="color: var(--text-secondary); line-height: 1.6;">Most online token counters send your text to a server to count it - which is ironic, given that people often check tokens precisely for confidential documents. The <a href="/context" style="color: var(--text-primary); font-weight: 600;">ASD123.ai Context Estimator</a> counts in your browser instead.</p>
+                    <div style="display: flex; gap: var(--space-6); justify-content: center; flex-wrap: wrap;">
+                        <img src="/apps/photo-shot-editor.png" alt="Editor tab: multi-provider AI image editing with model-aware controls" width="780" height="2072" loading="lazy" style="width: min(290px, 100%); height: auto; border-radius: 12px; border: 2px solid var(--border-color);">
+                        <img src="/apps/photo-shot-metadata.png" alt="Metadata tab: EXIF metadata copier" width="780" height="2238" loading="lazy" style="width: min(290px, 100%); height: auto; border-radius: 12px; border: 2px solid var(--border-color);">
+                    </div>
                 </div>
 
                 <div class="liquid-glass" style="padding: var(--space-8);">
-                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Two counting modes</h2>
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">One studio, many models</h2>
                     <ul style="list-style-type: disc; padding-left: 24px; color: var(--text-secondary); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
-                        <li><strong style="color: var(--text-primary);">Instant estimate</strong> - a model-family-aware heuristic (GPT-style, Llama, Qwen, Gemma) that accounts for words, punctuation, and non-Latin scripts. It responds as you type, with no downloads at all.</li>
-                        <li><strong style="color: var(--text-primary);">Exact count</strong> - one click downloads the model family’s real tokenizer (a few megabytes, cached afterwards) and tokenizes your text locally. The number you see is mathematically exact for that tokenizer.</li>
+                        <li><strong style="color: var(--text-primary);">Multi-provider editing:</strong> one UI in front of Gemini (direct), WaveSpeed, and OpenRouter, with 14+ image models (Nano Banana 2 / Pro, Seedream, GPT Image, Grok, …).</li>
+                        <li><strong style="color: var(--text-primary);">Model-aware controls:</strong> each model exposes only its real aspect ratios, resolutions (2K/4K), multi-image limits and extras - with a live per-image price estimate.</li>
+                        <li><strong style="color: var(--text-primary);">Text-to-image, image-to-image and re-edit:</strong> up to 5 reference images, prompt templates, and a one-tap "edit this result again" loop.</li>
+                        <li><strong style="color: var(--text-primary);">Cost tracking:</strong> lifetime, monthly and daily spend with a per-provider and per-model breakdown.</li>
+                        <li><strong style="color: var(--text-primary);">History across devices:</strong> generated images are kept on your server for 90 days, with per-image delete.</li>
                     </ul>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-top: var(--space-4);">You can paste text or drop TXT, DOCX, and PDF files - extraction also happens in the browser. A reserve setting keeps room for the model’s answer and reasoning, and the tool recommends the smallest context window (4K to 128K+) that comfortably fits.</p>
                 </div>
+
                 <div class="liquid-glass" style="padding: var(--space-8);">
-                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Frequently asked questions</h2>
-                    <div style="margin-bottom: var(--space-6);">
-                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">How accurate is the instant estimate?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Typically within a few percent of the real count for natural language, because the heuristic is tuned per model family and handles non-Latin scripts separately. When it matters, use the exact mode - it runs the model family’s actual tokenizer.</p>
-                    </div>
-                    <div style="margin-bottom: var(--space-6);">
-                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Which model families are supported?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">GPT-style models (o200k tokenizer), Llama, Qwen, and Gemma profiles - covering the most common cloud and local models. Counts differ between families because each uses its own vocabulary.</p>
-                    </div>
-                    <div style="margin-bottom: var(--space-6);">
-                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Why do different models report different token counts?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">Tokenizers split text differently: a word that is one token in GPT’s vocabulary may be two or three tokens for Llama. That is why the estimator lets you pick the model family first.</p>
-                    </div>
-                    <div style="">
-                        <h3 style="font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Does it work offline?</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6;">The instant estimate works fully offline once the page is loaded. The exact mode needs a one-time tokenizer download; after that it is cached by your browser.</p>
-                    </div>
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">EXIF metadata copier</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Copy full EXIF, GPS only, GPS + time, or a custom field set from a source JPEG onto a target image - with optional pre-clear and PNG-to-JPEG conversion. Useful when an edited or AI-generated image should keep the original photo's location and timestamp.</p>
+                </div>
+
+                <div class="liquid-glass" style="padding: var(--space-8);">
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Private by architecture</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">The browser never calls the AI providers directly. A small server-side reverse proxy (nginx) injects the provider API keys, so the keys live <strong style="color: var(--text-primary);">only on your server</strong> and never reach the browser. Every API request must carry the unlock password, which nginx verifies - without it, neither the models nor the keys are reachable.</p>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Deployment is a single <code>docker compose up</code>: nginx serves the static PWA bundle and the API proxy, with an optional Cloudflare tunnel. Built with React 19, TypeScript, Tailwind CSS v4 (local build, no CDN), and vite-plugin-pwa for the installable, offline-capable app shell.</p>
                 </div>
 
                 <div class="liquid-glass" style="padding: var(--space-8); text-align: center;">
-                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Check your document before you paste it</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Instant estimates, exact counts on demand, and no text ever leaves your browser.</p>
+                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Get Photo-Shot</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Free software under the GPLv3 - self-host it with Docker in minutes.</p>
                     <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                        <a href="/context" class="btn btn--primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Open Context Estimator</a>
-                        <a href="/context-guide" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Read the User Guide</a>
+                        <a href="https://github.com/asd123ch/photo-shot" target="_blank" rel="noopener" class="btn btn--primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View on GitHub</a>
+                        <a href="https://photo-shot.ch" target="_blank" rel="noopener" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">photo-shot.ch</a>
+                        <a href="/apps" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">All Apps</a>
                     </div>
                 </div>
-
-                <p style="color: var(--text-secondary); text-align: center; font-size: var(--text-sm);">
-                    Related: <a href="/convert-pdf-to-markdown" style="color: var(--text-primary); font-weight: 600;">Convert PDF to Markdown</a>  ·  <a href="/run-ai-chat-locally" style="color: var(--text-primary); font-weight: 600;">Run AI chat locally</a>
-                </p>
             </div>
         </main>
         <footer role="contentinfo">

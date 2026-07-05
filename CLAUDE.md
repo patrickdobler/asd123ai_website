@@ -262,8 +262,10 @@ Recurring gotchas that have bitten this codebase (check these first when a page 
 - **Wrap wide tables in a `overflow-x-auto` container** so they scroll inside their box
   instead of pushing the page wide. (This only works once the wrapper has a definite
   width — see the `main#main` point above.)
-- **Shared header:** the logo + three nav links are tight at ≤375px; `.logo-text` and
-  `.nav-links` gap are shrunk in the `@media (max-width: 768px)` block, with a further
+- **Shared header:** the logo + four nav links (Tools, Apps, Documentation, About) are
+  tight at ≤375px; `.logo-text` and `.nav-links` gap are shrunk in the
+  `@media (max-width: 768px)` block (where "Documentation" also switches to the short
+  "Docs" label via `.nav-label-full`/`.nav-label-short` spans), with a further
   `@media (max-width: 345px)` step for very small phones. Adding nav links risks
   re-breaking this — re-verify the header at 375px and 320px.
 

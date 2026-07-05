@@ -535,6 +535,10 @@ nav {
     align-items: center;
 }
 
+.nav-link .nav-label-short {
+    display: none;
+}
+
 .nav-tools {
     position: relative;
 }
@@ -1538,6 +1542,16 @@ footer {
 
     .nav-links {
         gap: var(--space-2);
+    }
+
+    /* Four nav items no longer fit at 375px with the full "Documentation"
+       label - show the short label on mobile instead. */
+    .nav-link .nav-label-full {
+        display: none;
+    }
+
+    .nav-link .nav-label-short {
+        display: inline;
     }
 
     /* Anchor the dropdown to the nav (full header width) instead of the Tools
