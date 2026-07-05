@@ -8,19 +8,19 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>Apps - Open-Source Software by ASD123 | ASD123.ai</title>
-    <meta name="description" content="Open-source apps from ASD123: RDP123, a minimal native RDP client for macOS written in Rust, and Photo-Shot, a self-hosted PWA for AI image editing. Free, GPLv3.">
-    <meta name="keywords" content="asd123 apps, open source apps, rdp client macos, ai image editing self-hosted, rust macos app, photo-shot, rdp123">
+    <meta name="description" content="Open-source apps from ASD123: RDP123 (native macOS RDP client in Rust), RustQuit (auto-quit macOS apps when the last window closes), and Photo-Shot (self-hosted PWA for AI image editing). Free, GPLv3.">
+    <meta name="keywords" content="asd123 apps, open source apps, rdp client macos, ai image editing self-hosted, rust macos app, photo-shot, rdp123, rustquit, auto quit macos apps">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Apps - Open-Source Software by ASD123 | ASD123.ai">
-    <meta property="og:description" content="Open-source apps from ASD123: RDP123, a minimal native RDP client for macOS written in Rust, and Photo-Shot, a self-hosted PWA for AI image editing. Free, GPLv3.">
+    <meta property="og:description" content="Open-source apps from ASD123: RDP123 (native macOS RDP client in Rust), RustQuit (auto-quit macOS apps when the last window closes), and Photo-Shot (self-hosted PWA for AI image editing). Free, GPLv3.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/apps">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Apps - Open-Source Software by ASD123 | ASD123.ai">
-    <meta name="twitter:description" content="Open-source apps from ASD123: RDP123, a minimal native RDP client for macOS written in Rust, and Photo-Shot, a self-hosted PWA for AI image editing. Free, GPLv3.">
+    <meta name="twitter:description" content="Open-source apps from ASD123: RDP123 (native macOS RDP client in Rust), RustQuit (auto-quit macOS apps when the last window closes), and Photo-Shot (self-hosted PWA for AI image editing). Free, GPLv3.">
     <link rel="canonical" href="https://asd123.ai/apps">
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles/main.css">
@@ -63,7 +63,7 @@
           "@type": "CollectionPage",
           "@id": "https://asd123.ai/apps#webpage",
           "name": "Apps - Open-Source Software by ASD123 | ASD123.ai",
-          "description": "Open-source apps from ASD123: RDP123, a minimal native RDP client for macOS written in Rust, and Photo-Shot, a self-hosted PWA for AI image editing. Free, GPLv3.",
+          "description": "Open-source apps from ASD123: RDP123 (native macOS RDP client in Rust), RustQuit (auto-quit macOS apps when the last window closes), and Photo-Shot (self-hosted PWA for AI image editing). Free, GPLv3.",
           "url": "https://asd123.ai/apps",
           "inLanguage": "en",
           "isPartOf": {
@@ -98,6 +98,11 @@
                 "@type": "ListItem",
                 "position": 2,
                 "url": "https://asd123.ai/photo-shot"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "url": "https://asd123.ai/rustquit"
               }
             ]
           }
@@ -190,6 +195,18 @@
                     </div>
                     <p class="feature-description">
                         A mobile-first, self-hosted PWA for AI image editing across Gemini, WaveSpeed and OpenRouter (14+ models), plus an EXIF metadata copier. Your API keys stay on your own server.
+                    </p>
+                </a>
+
+                <a href="/rustquit" class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-title-group">
+                            <img src="/apps/rustquit-logo.png" alt="" width="28" height="28" style="width: 28px; height: 28px; border-radius: 6px;">
+                            <h2 class="feature-title">RustQuit</h2>
+                        </div>
+                    </div>
+                    <p class="feature-description">
+                        Automatically quits macOS apps when their last window closes - the red ✕ finally means quit. A tiny, defensive menu bar utility in Rust: graceful ⌘Q only, protected system apps, no telemetry.
                     </p>
                 </a>
             </div>
