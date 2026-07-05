@@ -1862,6 +1862,14 @@ footer {
  }
 
 /* Buttons - Mockup Version */
+/* As an <a>, .btn would fall back to the browser's default link blue on pages
+   without the Tailwind preflight. :where() keeps specificity at zero so variant
+   classes like .btn--primary (defined in main.css) still win. */
+:where(.btn) {
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
 .btn {
     padding: 10px 20px;
     border-radius: 6px;
