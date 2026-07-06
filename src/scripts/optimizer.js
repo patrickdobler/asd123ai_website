@@ -536,7 +536,7 @@ const OPTIMIZER_PRESETS = {
     },
     'swiss': {
         label: 'Swiss standardization',
-        settings: { applyLanguageMapping: true, removeDiacritics: true, removeFancyFont: true, removeCitations: true, replaceEmDash: true, languageMapping: 'swiss-german' }
+        settings: { applyLanguageMapping: true, removeFancyFont: true, removeCitations: true, replaceEmDash: true, languageMapping: 'swiss-german' }
     },
     'paragraph': {
         label: 'Paragraph cleanup',
