@@ -318,9 +318,10 @@ class TextOptimizer {
             // Remove standalone bracketed domains or sources: e.g. [business.uq.edu]
             result = result.replace(/\[[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\]/g, '');
 
-            // Remove numbered citations: [1], [2], [123], etc.
-            // Parenthetical (1), (2) are left alone — they are usually enumerations.
-            result = result.replace(/\[\d+\]/g, '');
+            // Remove numbered citations: [1], [2], [123], also with superscript
+            // digits like [¹]. Parenthetical (1), (2) are left alone — they are
+            // usually enumerations.
+            result = result.replace(/\[[\d¹²³\u2070-\u207F]+\]/g, '');
 
             // Remove source citations: (Source: XYZ), (Quelle: ABC), etc.
             result = result.replace(/\((Source|Quelle|Fonte|Fuente|Ref\.?|Reference):\s*[^)]+\)/gi, '');
@@ -535,7 +536,7 @@ const OPTIMIZER_PRESETS = {
     },
     'swiss': {
         label: 'Swiss standardization',
-        settings: { applyLanguageMapping: true, removeDiacritics: true, languageMapping: 'swiss-german' }
+        settings: { applyLanguageMapping: true, removeDiacritics: true, removeFancyFont: true, removeCitations: true, replaceEmDash: true, languageMapping: 'swiss-german' }
     },
     'paragraph': {
         label: 'Paragraph cleanup',
