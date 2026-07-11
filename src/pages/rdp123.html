@@ -8,19 +8,19 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>RDP123 - Minimal, Fast RDP Client for macOS | ASD123.ai</title>
-    <meta name="description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. GPLv3.">
+    <meta name="description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.">
     <meta name="keywords" content="rdp client macos, remote desktop mac, rust rdp client, lightweight rdp client, microsoft remote desktop alternative mac, rdp123">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="RDP123 - Minimal, Fast RDP Client for macOS | ASD123.ai">
-    <meta property="og:description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. GPLv3.">
+    <meta property="og:description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/rdp123">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="RDP123 - Minimal, Fast RDP Client for macOS | ASD123.ai">
-    <meta name="twitter:description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. GPLv3.">
+    <meta name="twitter:description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.">
     <link rel="canonical" href="https://asd123.ai/rdp123">
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles/main.css">
@@ -63,7 +63,7 @@
           "@type": "WebPage",
           "@id": "https://asd123.ai/rdp123#webpage",
           "name": "RDP123 - Minimal, Fast RDP Client for macOS | ASD123.ai",
-          "description": "RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. GPLv3.",
+          "description": "RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.",
           "url": "https://asd123.ai/rdp123",
           "inLanguage": "en",
           "isPartOf": {
@@ -101,7 +101,7 @@
           "url": "https://asd123.ai/rdp123",
           "applicationCategory": "UtilitiesApplication",
           "operatingSystem": "macOS 11 or newer",
-          "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+          "license": "https://www.gnu.org/licenses/agpl-3.0.html",
           "offers": {
             "@type": "Offer",
             "price": "0",
@@ -181,7 +181,7 @@
                     <h1 class="page-title" style="margin-bottom: 0;">RDP123</h1>
                 </div>
                 <p class="page-subtitle">
-                    A minimal, fast, and responsive RDP client for macOS - a real native AppKit app, written in Rust. Free and open source (GPLv3).
+                    A minimal, fast, and responsive RDP client for macOS - a real native AppKit app, written in Rust. Free and open source (AGPLv3).
                 </p>
             </div>
 
@@ -213,7 +213,10 @@
                     <ul style="list-style-type: disc; padding-left: 24px; color: var(--text-secondary); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
                         <li>Lives in the menu bar - click, pick a connection, connect</li>
                         <li>Remote resolution follows the window, including Retina/HiDPI, or pin a fixed size</li>
-                        <li>Shared clipboard in both directions and remote sound on your Mac</li>
+                        <li>Shared clipboard in both directions - including files: paste Finder files into the remote Explorer and back, streamed on demand with no size limit</li>
+                        <li>Remote sound on your Mac, per connection</li>
+                        <li><strong style="color: var(--text-primary);">Wake on LAN</strong> - optionally store the host's MAC address and RDP123 wakes the machine before connecting</li>
+                        <li><strong style="color: var(--text-primary);">Keep session awake</strong> - an optional invisible key tap while you are idle, so an idle-timeout policy does not disconnect you</li>
                         <li>Physical-scancode keyboard mapping for non-US layouts (e.g. Swiss German) - modifiers never get stuck</li>
                         <li>Simple native Settings window: connections, colour depth, scaling, full screen, auto-reconnect</li>
                         <li>SSH shortcuts alongside RDP, opened in your terminal of choice</li>
@@ -241,7 +244,7 @@
 
                 <div class="liquid-glass" style="padding: var(--space-8); text-align: center;">
                     <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Get RDP123</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Free software under the GPLv3.</p>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Free software under the AGPLv3.</p>
                     <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                         <a href="https://github.com/asd123ch/rdp123" target="_blank" rel="noopener" class="btn btn--primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View on GitHub</a>
                         <a href="/apps" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">All Apps</a>
