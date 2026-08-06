@@ -184,14 +184,14 @@
                                 </span>
                                 <label class="sr-only" for="converterEngine">PDF parsing engine</label>
                                 <select id="converterEngine" class="select-field select-field--compact">
-                                    <option value="edgeparse" selected>EdgeParse</option>
+                                    <option value="pdfinspector" selected>Firecrawl - pdf-inspector</option>
+                                    <option value="edgeparse">EdgeParse</option>
                                     <option value="liteparse">LlamaIndex - LiteParse</option>
-                                    <option value="pdfinspector">Firecrawl - pdf-inspector</option>
                                     <option value="standard">Mozilla - PDF.js</option>
                                     <option value="ocr">OCR (scanned PDFs)</option>
                                 </select>
                             </div>
-                            <small id="converterEngineHint" class="converter-engine-hint">EdgeParse WebAssembly engine. Rust parser with XY-cut reading order and native Markdown tables. Loads a one-time ~2.7 MB module locally on first use.</small>
+                            <small id="converterEngineHint" class="converter-engine-hint">pdf-inspector WebAssembly engine (Firecrawl). Rust parser tuned for tables and multi-column reading order; also detects scanned pages and tells you when OCR is needed. Loads a one-time ~4.6 MB module locally on first use.</small>
                         </div>
                     </div>
 

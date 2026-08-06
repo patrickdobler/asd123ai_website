@@ -1531,7 +1531,7 @@ class ConverterApp {
     }
 
     currentEngine() {
-        return this.elements.engine ? this.elements.engine.value : 'edgeparse';
+        return this.elements.engine ? this.elements.engine.value : 'pdfinspector';
     }
 
     async convertFile(file) {
