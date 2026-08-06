@@ -11,6 +11,7 @@ const ENGINE_HINTS = {
     standard: 'Fast, lightweight pdf.js reader. Good for most single-column PDFs. PDF only; DOCX always uses mammoth.js.',
     liteparse: 'LiteParse WebAssembly engine. Reconstructs reading order across columns. Loads a one-time ~4 MB module locally on first use.',
     edgeparse: 'EdgeParse WebAssembly engine. Rust parser with XY-cut reading order and native Markdown tables. Loads a one-time ~2.7 MB module locally on first use.',
+    pdfinspector: 'pdf-inspector WebAssembly engine (Firecrawl). Rust parser tuned for tables and multi-column reading order; also detects scanned pages and tells you when OCR is needed. Loads a one-time ~4.6 MB module locally on first use.',
     ocr: 'PP-OCRv6 Tiny optical character recognition for scanned PDFs and images (PNG, JPG, WebP). Reads text from pixels locally. Loads a one-time ~6 MB model on first use.'
 };
 
@@ -132,6 +133,27 @@ async function loadEdgeParse() {
         });
     }
     return edgeParseModulePromise;
+}
+
+// Lazy-loaded pdf-inspector (Firecrawl, Rust) WebAssembly engine.
+// Like the other WASM parsers it is only fetched when its mode is selected, so
+// the ~4.6 MB module never affects users who stay on the default path. Its
+// processPdf() returns the Markdown *and* a classification (TextBased/Scanned/
+// ImageBased/Mixed) in one pass, which we use for a precise "this needs OCR"
+// message instead of a bare empty result.
+let pdfInspectorModulePromise = null;
+async function loadPdfInspector() {
+    if (!pdfInspectorModulePromise) {
+        pdfInspectorModulePromise = (async () => {
+            const mod = await import('../vendor/pdfinspector/pdf_inspector_wasm.js');
+            await mod.default({ module_or_path: 'vendor/pdfinspector/pdf_inspector_wasm_bg.wasm' });
+            return mod;
+        })().catch(error => {
+            pdfInspectorModulePromise = null;
+            throw error;
+        });
+    }
+    return pdfInspectorModulePromise;
 }
 
 // Lazy-loaded PP-OCRv6 pipeline (onnxruntime-web). Only fetched when the OCR
@@ -793,6 +815,53 @@ class EdgeParsePdfToMarkdown {
 
         if (!markdown || !markdown.trim()) {
             throw new Error('EdgeParse found no readable text. Scanned or image-only PDFs need OCR first.');
+        }
+
+        return this.collapseWhitespace ? collapseWhitespace(markdown) : markdown.trim();
+    }
+}
+
+// High-accuracy PDF path backed by pdf-inspector (Firecrawl, Rust WASM).
+// It emits GitHub-flavoured Markdown directly and, in the same pass, classifies
+// the document — so when a PDF has no text layer we can say exactly that and
+// point at OCR, instead of returning an empty document.
+class PdfInspectorToMarkdown {
+    constructor({ headingMode = 'auto', collapseWhitespace: shouldCollapse = true } = {}) {
+        this.headingMode = headingMode;
+        this.collapseWhitespace = shouldCollapse;
+    }
+
+    async convert(file, statusCallback) {
+        const setStatus = statusCallback || (() => {});
+        setStatus('Loading pdf-inspector engine (one-time ~4.6 MB)...');
+        const mod = await loadPdfInspector();
+        setStatus('Parsing PDF locally with pdf-inspector...');
+
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        // 'fidelity' keeps the source structure; 'compact' would drop blank lines
+        // and is aimed at token budgets rather than readable Markdown.
+        const result = mod.processPdf(bytes, { profile: 'fidelity' });
+        const markdown = result && result.markdown;
+
+        if (!markdown || !markdown.trim()) {
+            const type = result ? result.pdfType : null;
+            if (type === 'Scanned' || type === 'ImageBased') {
+                // A classification result is a fact about the document, not an
+                // engine hiccup: falling back to pdf.js would only produce the
+                // same empty output with a vaguer message.
+                const err = new Error(`This is a ${type === 'Scanned' ? 'scanned' : 'image-only'} PDF with no text layer (detected with ${Math.round((result.confidence || 0) * 100)}% confidence). Switch the engine to OCR to read it.`);
+                err.skipFallback = true;
+                throw err;
+            }
+            throw new Error('pdf-inspector found no readable text. Scanned or image-only PDFs need OCR first.');
+        }
+
+        // A text PDF can still have unreadable pages (broken font encodings or
+        // embedded scans); surfacing that beats silently returning partial text.
+        if (result.hasEncodingIssues) {
+            setStatus('Converted, but some fonts use broken encodings — check the output, or try OCR.');
+        } else if (Array.isArray(result.pagesNeedingOcr) && result.pagesNeedingOcr.length) {
+            setStatus(`Converted. Pages ${result.pagesNeedingOcr.join(', ')} look scanned — run OCR for those.`);
         }
 
         return this.collapseWhitespace ? collapseWhitespace(markdown) : markdown.trim();
@@ -1517,14 +1586,21 @@ class ConverterApp {
             if (options.engine === 'ocr') {
                 markdown = await this.runOcrOnPdf(file, options.collapseWhitespace);
                 engineNote = ` · OCR (PP-OCRv6 Tiny)`;
-            } else if (options.engine === 'liteparse' || options.engine === 'edgeparse') {
-                const engineLabel = options.engine === 'edgeparse' ? 'EdgeParse' : 'LiteParse';
-                const Engine = options.engine === 'edgeparse' ? EdgeParsePdfToMarkdown : LiteParsePdfToMarkdown;
+            } else if (options.engine === 'liteparse' || options.engine === 'edgeparse' || options.engine === 'pdfinspector') {
+                const ENGINES = {
+                    edgeparse: ['EdgeParse', EdgeParsePdfToMarkdown],
+                    liteparse: ['LiteParse', LiteParsePdfToMarkdown],
+                    pdfinspector: ['pdf-inspector', PdfInspectorToMarkdown]
+                };
+                const [engineLabel, Engine] = ENGINES[options.engine];
                 try {
                     const converter = new Engine(pdfOptions);
                     markdown = await converter.convert(file, message => this.setStatus(message, 'working'));
                     engineNote = ` · ${engineLabel} engine`;
                 } catch (engineError) {
+                    // A document-level verdict (e.g. "this PDF has no text layer")
+                    // must reach the user as-is; only real engine failures fall back.
+                    if (engineError.skipFallback) throw engineError;
                     // Fall back to pdf.js so a WASM hiccup never blocks the user.
                     this.setStatus(`${engineLabel} failed (${engineError.message}). Falling back to the standard engine...`, 'warning');
                     markdown = await runStandard();

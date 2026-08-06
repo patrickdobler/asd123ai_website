@@ -137,7 +137,7 @@ Use this skill when an agent needs to help a user convert PDF, DOCX, PPTX, Excel
 ## Capabilities
 
 - Convert PDF files to Markdown using pdf.js text extraction with font-size heading detection
-- Optional high-accuracy PDF engines (LiteParse and EdgeParse, both WebAssembly) for multi-column and table-heavy layouts
+- Optional high-accuracy PDF engines (EdgeParse, LiteParse, and pdf-inspector, all WebAssembly) for multi-column and table-heavy layouts; pdf-inspector also detects scanned pages and reports when OCR is needed
 - OCR engine (PP-OCRv6 Tiny on onnxruntime-web) for scanned PDFs and image files (PNG, JPG, WebP, BMP) with no text layer
 - Convert DOCX files to Markdown via mammoth.js style mapping
 - Convert PPTX slides (including speaker notes), Excel/CSV tables, HTML pages, and plain text

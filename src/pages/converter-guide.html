@@ -273,7 +273,7 @@
                         </h3>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
-                                The <strong class="text-[var(--text-primary)]">PDF parsing engine</strong> selector applies to PDFs only — for every other format the conversion path is fixed, so the selector is disabled. It offers four choices. The default <strong class="text-[var(--text-primary)]">EdgeParse</strong> is a Rust engine compiled to WebAssembly that handles multi-column pages and tables well and emits Markdown directly. <strong class="text-[var(--text-primary)]">LiteParse</strong> is a second high-accuracy WebAssembly engine, <strong class="text-[var(--text-primary)]">Standard (pdf.js)</strong> is the lightest option with no extra download, and <strong class="text-[var(--text-primary)]">OCR</strong> reads scanned PDFs that have no text layer (standalone images are sent to OCR automatically). Every engine loads locally the first time you pick it; everything runs entirely in your browser.
+                                The <strong class="text-[var(--text-primary)]">PDF parsing engine</strong> selector applies to PDFs only — for every other format the conversion path is fixed, so the selector is disabled. It offers five choices. The default <strong class="text-[var(--text-primary)]">EdgeParse</strong> is a Rust engine compiled to WebAssembly that handles multi-column pages and tables well and emits Markdown directly. <strong class="text-[var(--text-primary)]">LiteParse</strong> and <strong class="text-[var(--text-primary)]">pdf-inspector</strong> are two further high-accuracy WebAssembly engines, <strong class="text-[var(--text-primary)]">Standard (pdf.js)</strong> is the lightest option with no extra download, and <strong class="text-[var(--text-primary)]">OCR</strong> reads scanned PDFs that have no text layer (standalone images are sent to OCR automatically). Every engine loads locally the first time you pick it; everything runs entirely in your browser.
                             </p>
                             <div class="grid md:grid-cols-2 gap-4">
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
@@ -285,6 +285,10 @@
                                     <p class="text-sm">Exposes the exact position and font size of every line. The converter groups text into columns by real x-coordinates, so a left column is read fully before the right one. One-time ~4&nbsp;MB module.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">High accuracy · <a href="https://github.com/firecrawl/pdf-inspector" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">pdf-inspector</a></h4>
+                                    <p class="text-sm">A Rust engine tuned for tables and multi-column reading order, with the most reliable heading levels of the four (it distinguishes H1 from H2 rather than flattening them). It also classifies the document while parsing, so if a PDF has no text layer it says so with a confidence score and points you to OCR instead of returning an empty result. One-time ~4.6&nbsp;MB module.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Standard · pdf.js</h4>
                                     <p class="text-sm">The built-in reader. The fastest option with no extra download, fine for simple single-column PDFs. Headings are detected from font sizes.</p>
                                 </div>
@@ -294,7 +298,7 @@
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Which one to pick</h4>
-                                    <p class="text-sm">EdgeParse is the default and best for table-heavy documents; try LiteParse for multi-column text or if a specific PDF renders better there; Standard is the quickest for plain text; choose OCR for scans and images. If a high-accuracy engine ever fails to load or parse, the converter quietly falls back to pdf.js so you always get a result.</p>
+                                    <p class="text-sm">EdgeParse is the default and best for table-heavy documents; try pdf-inspector when heading levels matter or when you are unsure whether a PDF is scanned at all; try LiteParse for multi-column text or if a specific PDF renders better there; Standard is the quickest for plain text; choose OCR for scans and images. If a high-accuracy engine ever fails to load or parse, the converter quietly falls back to pdf.js so you always get a result.</p>
                                 </div>
                             </div>
                             <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
@@ -325,19 +329,25 @@
                                             <tr>
                                                 <td class="p-3 border-b border-[var(--border-color)]">LiteParse</td>
                                                 <td class="p-3 border-b border-[var(--border-color)]">PDF — high accuracy</td>
-                                                <td class="p-3 border-b border-[var(--border-color)]">2.0.8</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">2.11.1</td>
                                                 <td class="p-3 border-b border-[var(--border-color)]"><a href="https://github.com/run-llama/liteparse" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="p-3 border-b border-[var(--border-color)]">pdf-inspector</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">PDF — high accuracy</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">0.1.3</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]"><a href="https://github.com/firecrawl/pdf-inspector" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
                                             </tr>
                                             <tr>
                                                 <td class="p-3 border-b border-[var(--border-color)]">pdf.js</td>
                                                 <td class="p-3 border-b border-[var(--border-color)]">PDF — standard</td>
-                                                <td class="p-3 border-b border-[var(--border-color)]">6.0.227</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">6.2.108</td>
                                                 <td class="p-3 border-b border-[var(--border-color)]"><a href="https://github.com/mozilla/pdf.js" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
                                             </tr>
                                             <tr>
                                                 <td class="p-3 border-b border-[var(--border-color)]">PP-OCRv6 Tiny</td>
                                                 <td class="p-3 border-b border-[var(--border-color)]">Scanned PDFs &amp; images — OCR</td>
-                                                <td class="p-3 border-b border-[var(--border-color)]">v6 (onnxruntime-web 1.26)</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">v6 (onnxruntime-web 1.27)</td>
                                                 <td class="p-3 border-b border-[var(--border-color)]"><a href="https://github.com/PaddlePaddle/PaddleOCR" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
                                             </tr>
                                             <tr>
