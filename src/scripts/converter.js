@@ -1458,6 +1458,11 @@ class ConverterApp {
             engineHint: document.getElementById('converterEngineHint'),
             docEngine: document.getElementById('converterDocEngine'),
             docEngineHint: document.getElementById('converterDocEngineHint'),
+            pdfEngineRow: document.getElementById('converterPdfEngineRow'),
+            docEngineRow: document.getElementById('converterDocEngineRow'),
+            headingRow: document.getElementById('converterHeadingRow'),
+            engineBadge: document.getElementById('converterEngineBadge'),
+            outputHint: document.getElementById('converterOutputHint'),
             headingMode: document.getElementById('converterHeadingMode'),
             preserveFormatting: document.getElementById('converterPreserveFormatting'),
             keepTables: document.getElementById('converterKeepTables'),
@@ -1480,13 +1485,15 @@ class ConverterApp {
         this.bindEvents();
         this.updateEngineHint();
         if (this.elements.docEngine) {
-            this.elements.docEngine.addEventListener('change', () => {
-                if (this.elements.docEngineHint) {
-                    this.elements.docEngineHint.textContent =
-                        DOC_ENGINE_HINTS[this.elements.docEngine.value] || DOC_ENGINE_HINTS.standard;
-                }
-            });
+            // Switching to anydoc changes which output options have an effect,
+            // so re-evaluate the whole panel, not just this hint.
+            this.elements.docEngine.addEventListener('change', () => this.updateEngineAvailability(this.currentType));
         }
+        if (this.elements.engine) {
+            this.elements.engine.addEventListener('change', () => this.updateEngineHint());
+        }
+        this.currentType = null;
+        this.updateEngineAvailability(null);
     }
 
     updateEngineHint() {
@@ -1501,36 +1508,88 @@ class ConverterApp {
 
     // The engine selector is meaningful only for PDFs. Enable it for PDFs (and the
     // no-file default); gray it out for everything else and explain what runs.
+    // Every control is shown in a fixed place, but the ones that cannot affect
+    // the selected file are dimmed and disabled — so nothing moves, and nothing
+    // silently does nothing.
     updateEngineAvailability(type) {
-        const sel = this.elements.engine;
-        if (sel) {
-            const card = sel.closest('.converter-engine-card');
-            const appliesToFile = type == null || type === 'pdf';
-            sel.disabled = !appliesToFile;
-            if (card) card.classList.toggle('converter-engine-card--disabled', !appliesToFile);
-            if (appliesToFile) {
-                this.updateEngineHint();
-            } else if (this.elements.engineHint) {
-                this.elements.engineHint.textContent = ENGINE_DISABLED_HINTS[type] || ENGINE_DISABLED_HINTS.default;
-            }
-        }
+        // Remembered so a later engine switch can re-evaluate against the same file.
+        this.currentType = type;
+        const RICH_TEXT_TYPES = ['docx', 'html', 'htm'];
+        const usingAnydoc = this.elements.docEngine && this.elements.docEngine.value === 'anydoc';
+        const unknown = type == null;
 
-        // The document engine is only a choice for the Office formats that have
-        // both a lightweight parser and an anydoc path.
-        const docSel = this.elements.docEngine;
-        if (!docSel) return;
-        const docCard = docSel.closest('.converter-engine-card');
-        const isChoice = type == null || OFFICE_CHOICE_EXTENSIONS.includes(type);
-        docSel.disabled = !isChoice;
-        if (docCard) docCard.classList.toggle('converter-engine-card--disabled', !isChoice);
+        const setRow = (row, control, enabled) => {
+            if (control) control.disabled = !enabled;
+            if (row) row.classList.toggle('converter-option-row--muted', !enabled);
+        };
+
+        // --- Group 1: reading engine -------------------------------------
+        const pdfActive = unknown || type === 'pdf';
+        const docActive = unknown || OFFICE_CHOICE_EXTENSIONS.includes(type);
+        setRow(this.elements.pdfEngineRow, this.elements.engine, pdfActive);
+        setRow(this.elements.docEngineRow, this.elements.docEngine, docActive);
+
+        if (this.elements.engineHint) {
+            this.elements.engineHint.textContent = pdfActive
+                ? (ENGINE_HINTS[this.elements.engine.value] || ENGINE_HINTS.standard)
+                : (ENGINE_DISABLED_HINTS[type] || ENGINE_DISABLED_HINTS.default);
+        }
         if (this.elements.docEngineHint) {
-            if (isChoice) {
-                this.elements.docEngineHint.textContent = DOC_ENGINE_HINTS[docSel.value] || DOC_ENGINE_HINTS.standard;
+            if (docActive) {
+                this.elements.docEngineHint.textContent = DOC_ENGINE_HINTS[this.elements.docEngine.value] || DOC_ENGINE_HINTS.standard;
             } else if (ANYDOC_ONLY_EXTENSIONS.includes(type)) {
                 this.elements.docEngineHint.textContent = DOC_ENGINE_DISABLED_HINTS.anydocOnly;
             } else {
                 this.elements.docEngineHint.textContent = DOC_ENGINE_DISABLED_HINTS[type] || DOC_ENGINE_DISABLED_HINTS.default;
             }
+        }
+
+        // Badge naming the path this file actually takes.
+        const badge = this.elements.engineBadge;
+        if (badge) {
+            let label = '';
+            if (type === 'pdf') label = 'PDF engine active';
+            else if (OFFICE_CHOICE_EXTENSIONS.includes(type)) label = 'Document engine active';
+            else if (ANYDOC_ONLY_EXTENSIONS.includes(type)) label = 'anydoc (only option)';
+            else if (type === 'image') label = 'OCR';
+            else if (type === 'html' || type === 'htm') label = 'Built-in HTML reader';
+            else if (type === 'text') label = 'Passed through';
+            badge.textContent = label;
+            badge.hidden = !label;
+            badge.setAttribute('data-tone', label ? 'active' : '');
+        }
+
+        // --- Group 2: Markdown output ------------------------------------
+        // Heading detection is a PDF-only control.
+        setRow(this.elements.headingRow, this.elements.headingMode, pdfActive);
+
+        // Bold/italic, tables and links come from the shared HTML renderer, which
+        // only runs for Word and HTML — and never when anydoc does the parsing.
+        const richActive = (unknown || RICH_TEXT_TYPES.includes(type)) && !(usingAnydoc && type !== 'html' && type !== 'htm');
+        [this.elements.preserveFormatting, this.elements.keepTables, this.elements.keepLinks].forEach(el => {
+            if (!el) return;
+            el.disabled = !richActive;
+            const label = el.closest('.converter-toggle');
+            if (label) label.classList.toggle('converter-toggle--muted', !richActive);
+        });
+
+        // Whitespace collapsing applies everywhere except the plain-text
+        // pass-through, where indentation is preserved on purpose.
+        const collapseActive = type !== 'text';
+        if (this.elements.collapseWhitespace) {
+            this.elements.collapseWhitespace.disabled = !collapseActive;
+            const label = this.elements.collapseWhitespace.closest('.converter-toggle');
+            if (label) label.classList.toggle('converter-toggle--muted', !collapseActive);
+        }
+
+        if (this.elements.outputHint) {
+            let note = '';
+            if (usingAnydoc && (unknown || OFFICE_CHOICE_EXTENSIONS.includes(type))) {
+                note = 'anydoc handles formatting, tables and links itself, so those three options do not apply to it.';
+            } else if (type === 'text') {
+                note = 'Plain text is passed through unchanged, so no output options apply.';
+            }
+            this.elements.outputHint.textContent = note;
         }
     }
 

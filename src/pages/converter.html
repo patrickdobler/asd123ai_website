@@ -177,80 +177,84 @@
                             <input id="converterFileInput" type="file" multiple hidden>
                         </div>
 
-                        <div class="converter-engine-card">
-                            <div class="converter-engine-head">
-                                <span class="converter-engine-title">
-                                    PDF parsing engine
-                                </span>
-                                <label class="sr-only" for="converterEngine">PDF parsing engine</label>
-                                <select id="converterEngine" class="select-field select-field--compact">
-                                    <option value="pdfinspector" selected>Firecrawl - pdf-inspector</option>
-                                    <option value="edgeparse">EdgeParse</option>
-                                    <option value="liteparse">LlamaIndex - LiteParse</option>
-                                    <option value="standard">Mozilla - PDF.js</option>
-                                    <option value="ocr">OCR (scanned PDFs)</option>
-                                </select>
-                            </div>
-                            <small id="converterEngineHint" class="converter-engine-hint">pdf-inspector WebAssembly engine (Firecrawl). Rust parser tuned for tables and multi-column reading order; also detects scanned pages and tells you when OCR is needed. Loads a one-time ~4.6 MB module locally on first use.</small>
-                        </div>
+                        <div class="converter-settings-col">
+                            <div id="converterEngineGroup" class="converter-option-group">
+                                <h3 class="converter-option-group-title">
+                                    <span class="converter-option-group-step">1</span> Reading engine
+                                    <span id="converterEngineBadge" class="converter-option-badge" hidden></span>
+                                </h3>
 
-                        <div class="converter-engine-card">
-                            <div class="converter-engine-head">
-                                <span class="converter-engine-title">
-                                    Document engine
-                                </span>
-                                <label class="sr-only" for="converterDocEngine">Document engine for Office, OpenDocument, RTF and EPUB files</label>
-                                <select id="converterDocEngine" class="select-field select-field--compact">
-                                    <option value="standard" selected>Standard (mammoth &amp; SheetJS)</option>
-                                    <option value="anydoc">Firecrawl - anydoc</option>
-                                </select>
+                                <div id="converterPdfEngineRow" class="converter-option-row">
+                                    <label class="converter-option-label" for="converterEngine">PDF</label>
+                                    <select id="converterEngine" class="select-field select-field--compact">
+                                        <option value="pdfinspector" selected>Firecrawl - pdf-inspector</option>
+                                        <option value="edgeparse">EdgeParse</option>
+                                        <option value="liteparse">LlamaIndex - LiteParse</option>
+                                        <option value="standard">Mozilla - PDF.js</option>
+                                        <option value="ocr">OCR (scanned PDFs)</option>
+                                    </select>
+                                </div>
+                                <small id="converterEngineHint" class="converter-engine-hint">pdf-inspector WebAssembly engine (Firecrawl). Rust parser tuned for tables and multi-column reading order; also detects scanned pages and tells you when OCR is needed. Loads a one-time ~4.6 MB module locally on first use.</small>
+
+                                <div id="converterDocEngineRow" class="converter-option-row">
+                                    <label class="converter-option-label" for="converterDocEngine">Documents</label>
+                                    <select id="converterDocEngine" class="select-field select-field--compact">
+                                        <option value="standard" selected>Standard (mammoth &amp; SheetJS)</option>
+                                        <option value="anydoc">Firecrawl - anydoc</option>
+                                    </select>
+                                </div>
+                                <small id="converterDocEngineHint" class="converter-engine-hint">Lightweight specialists: mammoth.js for Word, SheetJS for Excel/CSV, and a built-in reader for PowerPoint. Small downloads (0.1-0.9 MB) and the proven default.</small>
                             </div>
-                            <small id="converterDocEngineHint" class="converter-engine-hint">Lightweight specialists: mammoth.js for Word, SheetJS for Excel/CSV, and a built-in reader for PowerPoint. Small downloads (0.1-0.9 MB) and the proven default.</small>
+
+                            <div id="converterOutputGroup" class="converter-option-group">
+                                <h3 class="converter-option-group-title">
+                                    <span class="converter-option-group-step">2</span> Markdown output
+                                </h3>
+
+                                <div id="converterHeadingRow" class="converter-option-row">
+                                    <label class="converter-option-label" for="converterHeadingMode">PDF headings</label>
+                                    <select id="converterHeadingMode" class="select-field select-field--compact">
+                                        <option value="auto" selected>Auto (font size)</option>
+                                        <option value="off">Off (plain paragraphs)</option>
+                                    </select>
+                                </div>
+
+                                <div class="converter-toggle-grid">
+                                    <label class="converter-toggle" data-toggle="collapse">
+                                        <input type="checkbox" id="converterCollapseWhitespace" checked>
+                                        <span class="converter-toggle-label">
+                                            <strong>Collapse extra whitespace</strong>
+                                            <small>Remove repeated blank lines and stray spaces.</small>
+                                        </span>
+                                    </label>
+                                    <label class="converter-toggle" data-toggle="rich">
+                                        <input type="checkbox" id="converterPreserveFormatting" checked>
+                                        <span class="converter-toggle-label">
+                                            <strong>Preserve bold &amp; italic</strong>
+                                            <small>Word &amp; HTML only. Mirrors inline styles as Markdown.</small>
+                                        </span>
+                                    </label>
+                                    <label class="converter-toggle" data-toggle="rich">
+                                        <input type="checkbox" id="converterKeepTables" checked>
+                                        <span class="converter-toggle-label">
+                                            <strong>Convert tables</strong>
+                                            <small>Word &amp; HTML only. Renders tables as Markdown tables.</small>
+                                        </span>
+                                    </label>
+                                    <label class="converter-toggle" data-toggle="rich">
+                                        <input type="checkbox" id="converterKeepLinks" checked>
+                                        <span class="converter-toggle-label">
+                                            <strong>Keep hyperlinks</strong>
+                                            <small>Word &amp; HTML only. Uses the Markdown link syntax.</small>
+                                        </span>
+                                    </label>
+                                </div>
+                                <small id="converterOutputHint" class="converter-engine-hint"></small>
+                            </div>
                         </div>
                     </div>
-
                     <p id="converterFileStatus" class="converter-file-status" data-tone="neutral" role="status" aria-live="polite">No file selected. Documents stay on this device.</p>
 
-                    <div class="converter-settings">
-                        <div class="converter-setting converter-setting--inline">
-                            <span>PDF heading detection</span>
-                            <select id="converterHeadingMode" class="select-field select-field--compact">
-                                <option value="auto" selected>Auto (font size)</option>
-                                <option value="off">Off (plain paragraphs)</option>
-                            </select>
-                        </div>
-
-                        <div class="converter-toggle-grid">
-                            <label class="converter-toggle">
-                                <input type="checkbox" id="converterPreserveFormatting" checked>
-                                <span class="converter-toggle-label">
-                                    <strong>Preserve bold &amp; italic</strong>
-                                    <small>DOCX only. Mirrors inline styles as Markdown.</small>
-                                </span>
-                            </label>
-                            <label class="converter-toggle">
-                                <input type="checkbox" id="converterKeepTables" checked>
-                                <span class="converter-toggle-label">
-                                    <strong>Convert tables</strong>
-                                    <small>Render DOCX tables as Markdown tables.</small>
-                                </span>
-                            </label>
-                            <label class="converter-toggle">
-                                <input type="checkbox" id="converterKeepLinks" checked>
-                                <span class="converter-toggle-label">
-                                    <strong>Keep hyperlinks</strong>
-                                    <small>Use the Markdown link syntax for URLs.</small>
-                                </span>
-                            </label>
-                            <label class="converter-toggle">
-                                <input type="checkbox" id="converterCollapseWhitespace" checked>
-                                <span class="converter-toggle-label">
-                                    <strong>Collapse extra whitespace</strong>
-                                    <small>Remove repeated blank lines and stray spaces.</small>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
                 </div>
 
                 <aside class="converter-output-panel" aria-label="Markdown output">
