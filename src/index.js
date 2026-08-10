@@ -132,7 +132,7 @@ Pasted text and uploaded file contents remain in the user's browser. The tool do
 `,
   'converter': `# ASD123.ai Markdown Converter
 
-Use this skill when an agent needs to help a user convert PDF, DOCX, PPTX, Excel, CSV, HTML, or image files to Markdown with the ASD123.ai browser converter.
+Use this skill when an agent needs to help a user convert PDF, Word, PowerPoint, Excel, CSV, OpenDocument, RTF, EPUB, HTML, or image files to Markdown with the ASD123.ai browser converter.
 
 ## Capabilities
 
@@ -141,6 +141,7 @@ Use this skill when an agent needs to help a user convert PDF, DOCX, PPTX, Excel
 - OCR engine (PP-OCRv6 Tiny on onnxruntime-web) for scanned PDFs and image files (PNG, JPG, WebP, BMP) with no text layer
 - Convert DOCX files to Markdown via mammoth.js style mapping
 - Convert PPTX slides (including speaker notes), Excel/CSV tables, HTML pages, and plain text
+- Optional anydoc engine (WebAssembly) for Office files, and the only path for OpenDocument (.odt/.ods/.odp), RTF, EPUB and legacy binary Office formats (.doc/.ppt/.xls variants). Never used for PDFs.
 - Preserve bold, italic, links, lists, and tables for DOCX and HTML sources
 - Convert several files at once into one combined Markdown document
 - Toggle heading detection and whitespace collapsing

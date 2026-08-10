@@ -8,12 +8,12 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>Document to Markdown Converter - No Upload | ASD123.ai</title>
-    <meta name="description" content="Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
-    <meta name="keywords" content="pdf to markdown, docx to markdown, pptx to markdown, excel to markdown, xlsx to markdown, csv to markdown, html to markdown, document converter, local converter, privacy-first">
+    <meta name="description" content="Convert PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
+    <meta name="keywords" content="pdf to markdown, docx to markdown, pptx to markdown, excel to markdown, xlsx to markdown, csv to markdown, html to markdown, document converter, local converter, privacy-first, odt to markdown, rtf to markdown, epub to markdown, doc to markdown">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="ASD123.ai Document to Markdown Converter">
-    <meta property="og:description" content="Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
+    <meta property="og:description" content="Convert PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/converter">
     <meta property="og:site_name" content="ASD123.ai">
@@ -29,7 +29,7 @@
     <meta property="og:image:alt" content="ASD123.ai - private AI text tools, 100% in your browser">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Document to Markdown Converter | ASD123.ai">
-    <meta name="twitter:description" content="Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
+    <meta name="twitter:description" content="Convert PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.">
     <meta name="twitter:image" content="https://asd123.ai/og-image.png">
     <script type="application/ld+json">
     {
@@ -64,7 +64,7 @@
           "@id": "https://asd123.ai/converter#app",
           "name": "Document to Markdown Converter — ASD123.ai",
           "url": "https://asd123.ai/converter",
-          "description": "Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.",
+          "description": "Convert PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, HTML, and image files to clean Markdown locally in your browser, including OCR for scanned documents. Files never leave your device.",
           "applicationCategory": "UtilitiesApplication",
           "operatingSystem": "Web browser",
           "browserRequirements": "Requires JavaScript; on-device AI features require WebGPU",
@@ -146,7 +146,7 @@
                     <h1 id="converter-title" class="page-title">Markdown Converter</h1>
                 </div>
                 <p class="page-subtitle">
-                    Convert PDF, DOCX, PPTX, Excel, CSV, HTML, and image files to clean Markdown directly in your browser, with optional OCR for scanned documents. Files are parsed locally and never uploaded.
+                    Convert PDF, Word, PowerPoint, Excel/CSV, OpenDocument, RTF, EPUB, HTML, and image files to clean Markdown directly in your browser, with optional OCR for scanned documents. Files are parsed locally and never uploaded.
                 </p>
             </section>
 
@@ -155,7 +155,7 @@
                     <div class="converter-panel-header">
                         <div>
                             <h2>Source document</h2>
-                            <p>Drop a PDF, DOCX, PPTX, Excel/CSV, HTML, or image file. The extraction and Markdown conversion run on this device.</p>
+                            <p>Drop a PDF, Word, PowerPoint, Excel/CSV, OpenDocument, RTF, EPUB, HTML, or image file. The extraction and Markdown conversion run on this device.</p>
                         </div>
                     </div>
 
@@ -171,7 +171,7 @@
                             </div>
                             <div>
                                 <strong>Drop a document here</strong>
-                                <span>or choose one or more files — PDF, DOCX, PPTX, Excel/CSV, HTML, images (auto-OCR), or plain text. Multiple files are combined into one Markdown document. Conversion happens locally.</span>
+                                <span>or choose one or more files — PDF, Word, PowerPoint, Excel/CSV, OpenDocument, RTF, EPUB, HTML, images (auto-OCR), or plain text. Multiple files are combined into one Markdown document. Conversion happens locally.</span>
                             </div>
                             <button id="chooseConverterFileBtn" type="button" class="btn btn-secondary btn-small">Choose file</button>
                             <input id="converterFileInput" type="file" multiple hidden>
@@ -192,6 +192,20 @@
                                 </select>
                             </div>
                             <small id="converterEngineHint" class="converter-engine-hint">pdf-inspector WebAssembly engine (Firecrawl). Rust parser tuned for tables and multi-column reading order; also detects scanned pages and tells you when OCR is needed. Loads a one-time ~4.6 MB module locally on first use.</small>
+                        </div>
+
+                        <div class="converter-engine-card">
+                            <div class="converter-engine-head">
+                                <span class="converter-engine-title">
+                                    Document engine
+                                </span>
+                                <label class="sr-only" for="converterDocEngine">Document engine for Office, OpenDocument, RTF and EPUB files</label>
+                                <select id="converterDocEngine" class="select-field select-field--compact">
+                                    <option value="standard" selected>Standard (mammoth &amp; SheetJS)</option>
+                                    <option value="anydoc">Firecrawl - anydoc</option>
+                                </select>
+                            </div>
+                            <small id="converterDocEngineHint" class="converter-engine-hint">Lightweight specialists: mammoth.js for Word, SheetJS for Excel/CSV, and a built-in reader for PowerPoint. Small downloads (0.1-0.9 MB) and the proven default.</small>
                         </div>
                     </div>
 

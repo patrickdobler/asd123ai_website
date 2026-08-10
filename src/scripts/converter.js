@@ -17,20 +17,51 @@ const ENGINE_HINTS = {
 
 const OCR_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'bmp'];
 
+// Office formats where the user can pick the parser: the lightweight
+// specialists (mammoth / SheetJS / JSZip) or anydoc.
+const OFFICE_CHOICE_EXTENSIONS = ['docx', 'pptx', 'xlsx', 'xls', 'csv'];
+
+// Formats only anydoc can read. Legacy binary Office, OpenDocument, RTF and
+// EPUB have no lightweight in-browser parser here, so they always route to it.
+const ANYDOC_ONLY_EXTENSIONS = [
+    'doc', 'docm',
+    'ppt', 'pps', 'pot', 'pptm', 'ppsx', 'ppsm',
+    'xlsm', 'xlsb',
+    'odt', 'ods', 'odp',
+    'rtf', 'epub'
+];
+
 // The engine selector only applies to PDFs. For every other input there is a
 // single fixed conversion path (or forced OCR for images), so the selector is
 // disabled and one of these hints explains what runs instead.
 const ENGINE_DISABLED_HINTS = {
     image: "Images are read with OCR automatically. The PDF engine selector only applies to PDFs.",
-    docx: "Word (DOCX) is converted automatically with mammoth.js. The PDF engine selector only applies to PDFs.",
-    pptx: "PowerPoint (PPTX) is converted automatically. The PDF engine selector only applies to PDFs.",
-    xlsx: "Excel (XLSX) is converted automatically with SheetJS. The PDF engine selector only applies to PDFs.",
-    xls: "Excel (XLS) is converted automatically with SheetJS. The PDF engine selector only applies to PDFs.",
-    csv: "CSV is converted automatically with SheetJS. The PDF engine selector only applies to PDFs.",
+    docx: "Word (DOCX) uses the document engine below. The PDF engine selector only applies to PDFs.",
+    pptx: "PowerPoint (PPTX) uses the document engine below. The PDF engine selector only applies to PDFs.",
+    xlsx: "Excel (XLSX) uses the document engine below. The PDF engine selector only applies to PDFs.",
+    xls: "Excel (XLS) uses the document engine below. The PDF engine selector only applies to PDFs.",
+    csv: "CSV uses the document engine below. The PDF engine selector only applies to PDFs.",
     html: "HTML is converted automatically. The PDF engine selector only applies to PDFs.",
     htm: "HTML is converted automatically. The PDF engine selector only applies to PDFs.",
     text: "Plain text is passed through automatically. The PDF engine selector only applies to PDFs.",
     default: "This file is converted automatically. The PDF engine selector only applies to PDFs."
+};
+
+// Hints for the document (non-PDF) engine selector.
+const DOC_ENGINE_HINTS = {
+    standard: 'Lightweight specialists: mammoth.js for Word, SheetJS for Excel/CSV, and a built-in reader for PowerPoint. Small downloads (0.1-0.9 MB) and the proven default.',
+    anydoc: 'anydoc WebAssembly engine (Firecrawl). One Rust parser for Word, PowerPoint, Excel, OpenDocument, RTF and EPUB, with stronger structure and table handling. Loads a one-time ~6 MB module locally on first use.'
+};
+
+// Shown when the document engine selector cannot be changed for the chosen file.
+const DOC_ENGINE_DISABLED_HINTS = {
+    pdf: 'PDFs are handled by the PDF parsing engine above; anydoc is never used for PDFs.',
+    image: 'Images are read with OCR. The document engine applies to Word, PowerPoint, Excel, OpenDocument, RTF and EPUB files.',
+    html: 'HTML is converted with the built-in reader. The document engine applies to Office, OpenDocument, RTF and EPUB files.',
+    htm: 'HTML is converted with the built-in reader. The document engine applies to Office, OpenDocument, RTF and EPUB files.',
+    text: 'Plain text is passed through unchanged. The document engine applies to Office, OpenDocument, RTF and EPUB files.',
+    anydocOnly: 'This format is read by anydoc, the only engine here that supports it.',
+    default: 'The document engine applies to Word, PowerPoint, Excel, OpenDocument, RTF and EPUB files.'
 };
 
 function loadExternalScript(src) {
@@ -154,6 +185,26 @@ async function loadPdfInspector() {
         });
     }
     return pdfInspectorModulePromise;
+}
+
+// Lazy-loaded anydoc (Firecrawl, Rust) WebAssembly engine. One parser for
+// Word, PowerPoint, Excel, OpenDocument, RTF and EPUB — including the legacy
+// binary formats the lightweight parsers cannot read. ~6 MB, so it is only
+// fetched when anydoc is actually selected or a format requires it; the
+// default DOCX/XLSX/PPTX paths keep using their much smaller specialists.
+let anydocModulePromise = null;
+async function loadAnydoc() {
+    if (!anydocModulePromise) {
+        anydocModulePromise = (async () => {
+            const mod = await import('../vendor/anydoc/anydoc_wasm.js');
+            await mod.default({ module_or_path: 'vendor/anydoc/anydoc_wasm_bg.wasm' });
+            return mod;
+        })().catch(error => {
+            anydocModulePromise = null;
+            throw error;
+        });
+    }
+    return anydocModulePromise;
 }
 
 // Lazy-loaded PP-OCRv6 pipeline (onnxruntime-web). Only fetched when the OCR
@@ -868,6 +919,60 @@ class PdfInspectorToMarkdown {
     }
 }
 
+// Document path backed by anydoc (Firecrawl, Rust WASM). Handles Word,
+// PowerPoint, Excel, OpenDocument, RTF and EPUB through one parser and emits
+// GitHub-flavoured Markdown directly.
+class AnydocToMarkdown {
+    constructor({ collapseWhitespace: shouldCollapse = true, ext = '' } = {}) {
+        this.collapseWhitespace = shouldCollapse;
+        this.ext = ext;
+    }
+
+    async convert(file, statusCallback) {
+        const setStatus = statusCallback || (() => {});
+        setStatus('Loading anydoc engine (one-time ~6 MB)...');
+        const mod = await loadAnydoc();
+        setStatus('Converting document locally with anydoc...');
+
+        const bytes = new Uint8Array(await file.arrayBuffer());
+
+        // anydoc detects the format from the bytes, which is more reliable than
+        // trusting a file extension — except for CSV, which has no signature and
+        // must be named explicitly.
+        const format = this.ext === 'csv' ? 'csv' : null;
+
+        // PDFs have their own dedicated engines here; anydoc must never take
+        // that path, even if a file arrives with a misleading extension.
+        if (format === null && typeof mod.formatFromBytes === 'function') {
+            if (mod.formatFromBytes(bytes) === 'pdf') {
+                throw new Error('This file is a PDF. Use the PDF parsing engine selector instead.');
+            }
+        }
+
+        let markdown;
+        try {
+            markdown = mod.toMarkdownBytes(bytes, format);
+        } catch (error) {
+            // anydoc reports a machine-readable reason; turn the common ones
+            // into something the user can act on.
+            const reasons = {
+                unsupported: 'anydoc does not support this file type.',
+                malformed: 'This file is structurally damaged and could not be read.',
+                encrypted: 'This file is password-protected. Remove the protection and try again.',
+                resourceLimit: 'This file exceeds anydoc\'s safety limits (deeply nested or heavily compressed).',
+                missingPart: 'This file is missing a part required to read it.'
+            };
+            throw new Error(reasons[error && error.code] || `anydoc could not convert this file (${error.message || 'unknown error'}).`);
+        }
+
+        if (!markdown || !markdown.trim()) {
+            throw new Error('anydoc found no readable text in this file.');
+        }
+
+        return this.collapseWhitespace ? collapseWhitespace(markdown) : markdown.trim();
+    }
+}
+
 class DocxToMarkdown {
     constructor(options = {}) {
         this.options = {
@@ -1351,6 +1456,8 @@ class ConverterApp {
             fileStatus: document.getElementById('converterFileStatus'),
             engine: document.getElementById('converterEngine'),
             engineHint: document.getElementById('converterEngineHint'),
+            docEngine: document.getElementById('converterDocEngine'),
+            docEngineHint: document.getElementById('converterDocEngineHint'),
             headingMode: document.getElementById('converterHeadingMode'),
             preserveFormatting: document.getElementById('converterPreserveFormatting'),
             keepTables: document.getElementById('converterKeepTables'),
@@ -1372,6 +1479,14 @@ class ConverterApp {
         this.lastFile = null;
         this.bindEvents();
         this.updateEngineHint();
+        if (this.elements.docEngine) {
+            this.elements.docEngine.addEventListener('change', () => {
+                if (this.elements.docEngineHint) {
+                    this.elements.docEngineHint.textContent =
+                        DOC_ENGINE_HINTS[this.elements.docEngine.value] || DOC_ENGINE_HINTS.standard;
+                }
+            });
+        }
     }
 
     updateEngineHint() {
@@ -1388,15 +1503,34 @@ class ConverterApp {
     // no-file default); gray it out for everything else and explain what runs.
     updateEngineAvailability(type) {
         const sel = this.elements.engine;
-        if (!sel) return;
-        const card = sel.closest('.converter-engine-card');
-        const appliesToFile = type == null || type === 'pdf';
-        sel.disabled = !appliesToFile;
-        if (card) card.classList.toggle('converter-engine-card--disabled', !appliesToFile);
-        if (appliesToFile) {
-            this.updateEngineHint();
-        } else if (this.elements.engineHint) {
-            this.elements.engineHint.textContent = ENGINE_DISABLED_HINTS[type] || ENGINE_DISABLED_HINTS.default;
+        if (sel) {
+            const card = sel.closest('.converter-engine-card');
+            const appliesToFile = type == null || type === 'pdf';
+            sel.disabled = !appliesToFile;
+            if (card) card.classList.toggle('converter-engine-card--disabled', !appliesToFile);
+            if (appliesToFile) {
+                this.updateEngineHint();
+            } else if (this.elements.engineHint) {
+                this.elements.engineHint.textContent = ENGINE_DISABLED_HINTS[type] || ENGINE_DISABLED_HINTS.default;
+            }
+        }
+
+        // The document engine is only a choice for the Office formats that have
+        // both a lightweight parser and an anydoc path.
+        const docSel = this.elements.docEngine;
+        if (!docSel) return;
+        const docCard = docSel.closest('.converter-engine-card');
+        const isChoice = type == null || OFFICE_CHOICE_EXTENSIONS.includes(type);
+        docSel.disabled = !isChoice;
+        if (docCard) docCard.classList.toggle('converter-engine-card--disabled', !isChoice);
+        if (this.elements.docEngineHint) {
+            if (isChoice) {
+                this.elements.docEngineHint.textContent = DOC_ENGINE_HINTS[docSel.value] || DOC_ENGINE_HINTS.standard;
+            } else if (ANYDOC_ONLY_EXTENSIONS.includes(type)) {
+                this.elements.docEngineHint.textContent = DOC_ENGINE_DISABLED_HINTS.anydocOnly;
+            } else {
+                this.elements.docEngineHint.textContent = DOC_ENGINE_DISABLED_HINTS[type] || DOC_ENGINE_DISABLED_HINTS.default;
+            }
         }
     }
 
@@ -1503,6 +1637,7 @@ class ConverterApp {
     collectOptions() {
         return {
             engine: this.currentEngine(),
+            docEngine: this.elements.docEngine ? this.elements.docEngine.value : 'standard',
             headingMode: this.elements.headingMode.value,
             preserveFormatting: this.elements.preserveFormatting.checked,
             keepTables: this.elements.keepTables.checked,
@@ -1514,7 +1649,7 @@ class ConverterApp {
     validate(file) {
         const ext = fileExtension(file.name);
         const isImage = OCR_IMAGE_EXTENSIONS.includes(ext);
-        const supported = ['pdf', 'docx', 'pptx', 'xlsx', 'xls', 'csv', 'html', 'htm'];
+        const supported = ['pdf', 'html', 'htm'].concat(OFFICE_CHOICE_EXTENSIONS, ANYDOC_ONLY_EXTENSIONS);
 
         // PDFs/images are processed in full; everything else only has its text
         // extracted, so it gets the larger MAX_TEXT_FILE_SIZE allowance.
@@ -1609,6 +1744,13 @@ class ConverterApp {
             } else {
                 markdown = await runStandard();
             }
+        } else if (ANYDOC_ONLY_EXTENSIONS.includes(ext)) {
+            // No lightweight parser exists for these, so anydoc is the only path.
+            markdown = await new AnydocToMarkdown({ ...options, ext }).convert(file, message => this.setStatus(message, 'working'));
+            engineNote = ` · ${ext.toUpperCase()} (anydoc)`;
+        } else if (OFFICE_CHOICE_EXTENSIONS.includes(ext) && options.docEngine === 'anydoc') {
+            markdown = await new AnydocToMarkdown({ ...options, ext }).convert(file, message => this.setStatus(message, 'working'));
+            engineNote = ` · ${ext.toUpperCase()} (anydoc)`;
         } else if (ext === 'docx') {
             const docxConverter = new DocxToMarkdown(options);
             markdown = await docxConverter.convert(file, message => this.setStatus(message, 'working'));

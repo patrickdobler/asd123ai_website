@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>Markdown Converter Guide - ASD123.ai Documentation</title>
-    <meta name="description" content="Learn how to convert PDF, DOCX, PPTX, Excel, CSV, and HTML files to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.">
+    <meta name="description" content="Learn how to convert PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, and HTML files to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.">
     <meta name="keywords" content="markdown converter guide, pdf to markdown, docx to markdown, local document converter, browser markdown tool">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
@@ -30,7 +30,7 @@
     <meta property="og:image:alt" content="ASD123.ai - private AI text tools, 100% in your browser">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Markdown Converter Guide - ASD123.ai Documentation">
-    <meta name="twitter:description" content="Learn how to convert PDF, DOCX, PPTX, Excel, CSV, and HTML files to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.">
+    <meta name="twitter:description" content="Learn how to convert PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, and HTML files to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.">
     <meta name="twitter:image" content="https://asd123.ai/og-image.png">
     <script type="application/ld+json">
     {
@@ -64,7 +64,7 @@
           "@type": "TechArticle",
           "@id": "https://asd123.ai/converter-guide#article",
           "headline": "Markdown Converter Guide - ASD123.ai Documentation",
-          "description": "Learn how to convert PDF, DOCX, PPTX, Excel, CSV, and HTML files to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.",
+          "description": "Learn how to convert PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, and HTML files to clean Markdown locally with the ASD123.ai Markdown Converter. Files never leave your device.",
           "url": "https://asd123.ai/converter-guide",
           "image": "https://asd123.ai/logo.png",
           "inLanguage": "en",
@@ -162,7 +162,7 @@
             <div class="page-header">
                 <h1 class="page-title">Markdown Converter Guide</h1>
                 <p class="page-subtitle">
-                    Turn PDF, DOCX, PPTX, Excel, CSV, and HTML documents into clean Markdown without ever uploading them. Everything runs in your browser.
+                    Turn PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, and HTML documents into clean Markdown without ever uploading them. Everything runs in your browser.
                 </p>
             </div>
 
@@ -189,7 +189,7 @@
                         </h3>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
-                                Markdown Converter reads PDF, DOCX, PPTX, Excel (XLSX/XLS), CSV, and HTML files directly in your browser and turns them into clean Markdown. PDF uses pdf.js (or the high-accuracy engines), DOCX uses mammoth.js, spreadsheets use SheetJS, PPTX is read with JSZip, and HTML is converted with a built-in renderer — all translated into Markdown headings, lists, links, and tables.
+                                Markdown Converter reads PDF, Word, PowerPoint, Excel (XLSX/XLS), CSV, OpenDocument, RTF, EPUB, and HTML files directly in your browser and turns them into clean Markdown. PDF uses pdf.js (or the high-accuracy engines), DOCX uses mammoth.js, spreadsheets use SheetJS, PPTX is read with JSZip, and HTML is converted with a built-in renderer — all translated into Markdown headings, lists, links, and tables.
                             </p>
                             <p class="leading-relaxed">
                                 The tool is built for the same workflows the rest of ASD123.ai targets: feeding documents into local AI chats, preparing snippets for the Optimizer or Anonymizer, or simply archiving content in a portable text format.
@@ -253,6 +253,10 @@
                                 <p class="text-sm">Parsed with SheetJS. Each worksheet becomes a Markdown table; multi-sheet workbooks get a <code>## Sheet name</code> heading per sheet. Cells use their formatted value, so dates appear as dates (not Excel serial numbers). CSV is read as UTF-8.</p>
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                <h4 class="font-bold text-[var(--text-primary)] mb-2">OpenDocument, RTF, EPUB &amp; legacy Office <span class="text-xs font-normal text-[var(--text-secondary)]">(anydoc only)</span></h4>
+                                <p class="text-sm">LibreOffice/OpenOffice files (<code>.odt</code>, <code>.ods</code>, <code>.odp</code>), Rich Text (<code>.rtf</code>), e-books (<code>.epub</code>) and the older binary Office formats (<code>.doc</code>, <code>.ppt</code>, <code>.xls</code> variants such as <code>.docm</code>, <code>.pptm</code>, <code>.xlsb</code>) are read by the anydoc engine, the only parser here that supports them. The document engine selector switches to anydoc automatically for these files.</p>
+                            </div>
+                            <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                 <h4 class="font-bold text-[var(--text-primary)] mb-2">HTML</h4>
                                 <p class="text-sm">Converted with a built-in renderer. Scripts, styles, and page chrome are stripped; headings, lists, links, and tables become clean Markdown. Prefers <code>&lt;main&gt;</code>/<code>&lt;article&gt;</code> content when present. The file is parsed in an inert document — remote images or tracking pixels inside the HTML are never fetched.</p>
                             </div>
@@ -299,6 +303,10 @@
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Which one to pick</h4>
                                     <p class="text-sm">pdf-inspector is the default: it keeps heading levels distinct and tells you when a PDF has no text layer. Try EdgeParse for table-heavy documents, or LiteParse for multi-column text, if a specific PDF renders better there; Standard is the quickest for plain text; choose OCR for scans and images. If a high-accuracy engine ever fails to load or parse, the converter quietly falls back to pdf.js so you always get a result.</p>
+                                </div>
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Document engine <span class="text-xs font-normal text-[var(--text-secondary)]">(everything except PDF)</span></h4>
+                                    <p class="text-sm">A second selector chooses how Word, PowerPoint, Excel and CSV files are read. <strong class="text-[var(--text-primary)]">Standard</strong> (the default) uses the lightweight specialists — mammoth.js, SheetJS and a built-in PowerPoint reader — which download only 0.1–0.9&nbsp;MB. <strong class="text-[var(--text-primary)]"><a href="https://github.com/firecrawl/anydoc" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">anydoc</a></strong> is a single Rust engine covering all of them plus OpenDocument, RTF and EPUB, with stronger structure and table handling; it loads a one-time ~6&nbsp;MB module. For OpenDocument, RTF, EPUB and legacy binary Office files anydoc is used automatically, since nothing else here reads them. <strong class="text-[var(--text-primary)]">PDFs are never sent to anydoc</strong> — they always use the PDF parsing engine above.</p>
                                 </div>
                             </div>
                             <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
@@ -349,6 +357,12 @@
                                                 <td class="p-3 border-b border-[var(--border-color)]">Scanned PDFs &amp; images — OCR</td>
                                                 <td class="p-3 border-b border-[var(--border-color)]">v6 (onnxruntime-web 1.27)</td>
                                                 <td class="p-3 border-b border-[var(--border-color)]"><a href="https://github.com/PaddlePaddle/PaddleOCR" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="p-3 border-b border-[var(--border-color)]">anydoc</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">Word, PowerPoint, Excel, OpenDocument, RTF, EPUB</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]">0.1.7</td>
+                                                <td class="p-3 border-b border-[var(--border-color)]"><a href="https://github.com/firecrawl/anydoc" target="_blank" rel="noopener noreferrer" class="text-[var(--primary-color)] hover:underline">GitHub</a></td>
                                             </tr>
                                             <tr>
                                                 <td class="p-3 border-b border-[var(--border-color)]">mammoth.js</td>
