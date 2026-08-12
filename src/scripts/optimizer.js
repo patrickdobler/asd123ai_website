@@ -5,64 +5,309 @@
 
 /**
  * Language character mappings (embedded; no runtime fetch, works on file:// too).
+ *
+ * These tables only handle VISIBLE typography - quotes, dashes, ligatures and
+ * the few letters a language spells out differently in plain ASCII. Invisible
+ * and zero-width characters used to be buried in here as well; they now live in
+ * the separate "Remove Invisible Characters" option (see INVISIBLE_GROUPS
+ * below), so nothing is silently duplicated between the two features.
  */
+
+// Typography that normalizes the same way in every language.
+const COMMON_TYPOGRAPHY = {
+    // Dashes, hyphens and the minus sign -> ASCII hyphen
+    '‐': '-', '‑': '-', '‒': '-', '–': '-', '—': '-',
+    '―': '-', '−': '-',
+    // Ellipsis and leaders
+    '…': '...', '‥': '..',
+    // Bullets
+    '•': '-', '‣': '-', '⁃': '-', '◦': '-', '∙': '-',
+    // Symbols with a plain ASCII equivalent
+    '×': 'x', '⁄': '/',
+    // Primes, spacing accents and modifier letters used in place of quotes
+    '′': '\'', '″': '"', '´': '\'', 'ʼ': '\'',
+    'ʹ': '\'', 'ʺ': '"',
+    // Typographic ligatures - extremely common in text extracted from PDFs
+    'ﬀ': 'ff', 'ﬁ': 'fi', 'ﬂ': 'fl', 'ﬃ': 'ffi',
+    'ﬄ': 'ffl', 'ﬅ': 'st', 'ﬆ': 'st'
+};
+
+// Quotation marks. Every profile flattens them to ASCII " and ' - only the set
+// of marks a language actually uses differs.
+const QUOTES_CURLY = {
+    '“': '"', '”': '"', '‟': '"',
+    '‘': '\'', '’': '\'', '‛': '\''
+};
+const QUOTES_LOW = { '„': '"', '‚': '\'' };   // German-style low quotes
+const QUOTES_GUILLEMET = {
+    '«': '"', '»': '"', '‹': '\'', '›': '\''
+};
+
+// Letters that some languages spell out when reduced to ASCII.
+const LIGATURE_LETTERS = {
+    'æ': 'ae', 'Æ': 'Ae', 'œ': 'oe', 'Œ': 'Oe'
+};
+
+// French typography puts a space inside guillemets and before ; : ! ? - dropping
+// it is what makes the ASCII result look right. Multi-character keys are matched
+// first (object insertion order), and both the no-break and the plain space
+// variant are listed so the profile also works with invisible-character removal
+// switched off.
+const FRENCH_SPACING = {
+    '« ': '"', '« ': '"', '« ': '"',
+    ' »': '"', ' »': '"', ' »': '"',
+    ' ;': ';', ' ;': ';', ' ;': ';',
+    ' :': ':', ' :': ':', ' :': ':',
+    ' !': '!', ' !': '!', ' !': '!',
+    ' ?': '?', ' ?': '?', ' ?': '?'
+};
+
 const EMBEDDED_MAPPINGS = {
-    'swiss-german': {
-        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-        '-': '-', '‐': '-', '‑': '-', '–': '-', '—': '-',
-        '„': '"', '“': '"', '”': '"',
-        '‚': '\'', '‘': '\'', '’': '\'',
-        '‹': '\'', '›': '\'',
-        '«': '"', '»': '"',
-        'ß': 'ss',
-        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'', '×': 'x'
+    // Punctuation only - never touches letters. For text that must stay
+    // readable in its own language but should lose the fancy typography.
+    'universal': {
+        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET
     },
+    // Switzerland does not use the sharp s; guillemets are the primary quotes.
+    'swiss-german': {
+        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET,
+        ...LIGATURE_LETTERS,
+        'ß': 'ss'
+    },
+    // Germany/Austria keep the sharp s - only the typography is flattened.
     'german': {
-        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-        '‐': '-', '‑': '-', '–': '-', '—': '-',
-        '«': '"', '»': '"',
-        '„': '"', '“': '"', '”': '"', '‚': '\'', '‘': '\'', '’': '\'',
-        'œ': 'oe', 'Œ': 'Oe',
-        'æ': 'ae', 'Æ': 'Ae',
-        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-        '×': 'x'
+        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET,
+        ...LIGATURE_LETTERS
     },
     'french': {
-        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-        '‐': '-', '‑': '-', '–': '-', '—': '-',
-        '«': '"', '»': '"',
-        '„': '"', '“': '"', '”': '"', '‚': '\'', '‘': '\'', '’': '\'',
-        'œ': 'oe', 'Œ': 'Oe',
-        'æ': 'ae', 'Æ': 'Ae',
-        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-        '×': 'x'
+        ...FRENCH_SPACING,
+        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET,
+        ...LIGATURE_LETTERS
     },
+    // Italian has no ae/oe ligatures of its own, so foreign words keep them.
     'italian': {
-        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-        '‐': '-', '‑': '-', '–': '-', '—': '-',
-        '«': '"', '»': '"',
-        '„': '"', '“': '"', '”': '"', '‚': '\'', '‘': '\'', '’': '\'',
-        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-        '×': 'x'
+        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET
     },
-    'english-international': {
-        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-        '‐': '-', '‑': '-', '–': '-', '—': '-',
-        '“': '"', '”': '"', '„': '"', '‘': '\'', '’': '\'',
-        '«': '"', '»': '"',
-        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-        'œ': 'oe', 'Œ': 'Oe', 'æ': 'ae', 'Æ': 'Ae',
-        '×': 'x'
-    },
-    'english-us': {
-        ' ': ' ', ' ': ' ', ' ': ' ', ' ': ' ',
-        '‐': '-', '‑': '-', '–': '-', '—': '-',
-        '“': '"', '”': '"', '‘': '\'', '’': '\'',
-        '…': '...', '•': '-', '°': '°', '¨': '', '´': '\'',
-        'œ': 'oe', 'Œ': 'Oe', 'æ': 'ae', 'Æ': 'Ae',
-        '×': 'x'
+    'english': {
+        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET,
+        ...LIGATURE_LETTERS
     }
 };
+// The two English profiles were character-identical; they stay as aliases so
+// settings saved by earlier versions keep resolving.
+EMBEDDED_MAPPINGS['english-international'] = EMBEDDED_MAPPINGS['english'];
+EMBEDDED_MAPPINGS['english-us'] = EMBEDDED_MAPPINGS['english'];
+
+// Values that no longer exist in the dropdown. Without this the <select> would
+// silently fall back to an empty value for anyone with older saved settings.
+const LEGACY_LANGUAGE_ALIASES = {
+    'english-international': 'english',
+    'english-us': 'english'
+};
+
+/**
+ * Invisible, zero-width and format characters.
+ *
+ * They reach a document through copy-paste from PDFs and web pages, they are
+ * used to hide tracking IDs or watermarks inside AI output, and some of them can
+ * make text render differently from how it is stored (the bidi "Trojan Source"
+ * trick). None of them carry visible meaning in ordinary prose.
+ *
+ * Grouped by kind so the UI can report WHAT was removed, not just how much.
+ */
+const INVISIBLE_GROUPS = [
+    {
+        id: 'zero-width',
+        label: 'zero-width character',
+        // ZWSP, ZWNJ, ZWJ, word joiner, Mongolian vowel separator, ZWNBSP/BOM
+        ranges: [[0x200B, 0x200D], [0x2060, 0x2060], [0x180E, 0x180E], [0xFEFF, 0xFEFF]]
+    },
+    {
+        id: 'bidi',
+        label: 'bidi control',
+        // ALM, LRM/RLM, LRE/RLE/PDF/LRO/RLO, LRI/RLI/FSI/PDI
+        ranges: [[0x061C, 0x061C], [0x200E, 0x200F], [0x202A, 0x202E], [0x2066, 0x2069]]
+    },
+    {
+        id: 'invisible-math',
+        label: 'invisible math operator',
+        // function application, invisible times / separator / plus
+        ranges: [[0x2061, 0x2064]]
+    },
+    {
+        id: 'deprecated-format',
+        label: 'deprecated format character',
+        // inhibit/activate symmetric swapping and Arabic form shaping
+        ranges: [[0x206A, 0x206F]]
+    },
+    {
+        id: 'variation-selector',
+        label: 'variation selector',
+        // Mongolian FVS 1-3, VS1-16, VS17-256 (a popular steganography carrier)
+        ranges: [[0x180B, 0x180D], [0xFE00, 0xFE0F], [0xE0100, 0xE01EF]]
+    },
+    {
+        id: 'tag-char',
+        label: 'tag character',
+        // Invisible copies of ASCII - an entire hidden message fits in here
+        ranges: [[0xE0001, 0xE007F]]
+    },
+    {
+        id: 'hidden-format',
+        label: 'hidden format character',
+        // soft hyphen, combining grapheme joiner, Hangul fillers, Khmer inherent
+        // vowels, halfwidth Hangul filler, interlinear annotation
+        ranges: [
+            [0x00AD, 0x00AD], [0x034F, 0x034F], [0x115F, 0x1160], [0x17B4, 0x17B5],
+            [0x3164, 0x3164], [0xFFA0, 0xFFA0], [0xFFF9, 0xFFFB]
+        ]
+    }
+];
+
+// Spaces that look like (or stand in for) a plain U+0020.
+const SPACE_HOMOGLYPH_RANGES = [
+    [0x00A0, 0x00A0],   // no-break space
+    [0x1680, 0x1680],   // Ogham space mark
+    [0x2000, 0x200A],   // en/em quad, en/em space, three-per-em ... hair space
+    [0x202F, 0x202F],   // narrow no-break space
+    [0x205F, 0x205F],   // medium mathematical space
+    [0x3000, 0x3000]    // ideographic space
+];
+
+function expandRanges(ranges, visit) {
+    for (const [from, to] of ranges) {
+        for (let cp = from; cp <= to; cp++) visit(cp);
+    }
+}
+
+// codepoint -> group id, built once at load.
+const INVISIBLE_LOOKUP = new Map();
+for (const group of INVISIBLE_GROUPS) {
+    expandRanges(group.ranges, cp => INVISIBLE_LOOKUP.set(cp, group.id));
+}
+const INVISIBLE_LABELS = new Map(INVISIBLE_GROUPS.map(g => [g.id, g.label]));
+INVISIBLE_LABELS.set('space', 'unusual space');
+
+const SPACE_HOMOGLYPHS = new Set();
+expandRanges(SPACE_HOMOGLYPH_RANGES, cp => SPACE_HOMOGLYPHS.add(cp));
+
+// Advertised coverage. Derived, never hand-counted, and written into the page so
+// the option label can never drift away from what the code actually does.
+const INVISIBLE_CODEPOINT_COUNT = INVISIBLE_LOOKUP.size + SPACE_HOMOGLYPHS.size;
+
+// Cheap pre-check so clean text skips the per-codepoint scan entirely.
+const INVISIBLE_DETECT_RE = new RegExp(
+    '[' + [...INVISIBLE_GROUPS.map(g => g.ranges), SPACE_HOMOGLYPH_RANGES]
+        .flat()
+        .map(([from, to]) => {
+            const esc = cp => '\\u{' + cp.toString(16).toUpperCase() + '}';
+            return from === to ? esc(from) : esc(from) + '-' + esc(to);
+        })
+        .join('') + ']',
+    'u'
+);
+
+// U+200D and the variation selectors are genuine formatting inside emoji
+// sequences, so they are kept whenever they hold an emoji together.
+const PICTOGRAPH_RE = /\p{Extended_Pictographic}/u;
+const EMOJI_BASE_RE = /[\p{Extended_Pictographic}0-9#*]/u;
+// Skipped when looking back for the character an emoji modifier belongs to.
+const EMOJI_MODIFIER_RE = /[\uFE0E\uFE0F\u{1F3FB}-\u{1F3FF}]/u;
+
+/**
+ * Remove invisible, zero-width and format characters, and fold unusual spaces
+ * back to a plain U+0020.
+ *
+ * Emoji-safe: U+200D (zero width joiner) and the U+FE0E/U+FE0F variation
+ * selectors are the only members of the set that can be legitimate content.
+ * They are kept when they actually join or style an emoji, so a family emoji
+ * stays a family and a flag stays a flag.
+ *
+ * @param {string} text - Input text
+ * @returns {{text: string, removed: number, replaced: number, total: number,
+ *            byGroup: Object<string, number>}} Cleaned text plus a breakdown
+ *          of what was touched, so the UI can name it instead of just counting.
+ */
+function removeInvisibleCharacters(text) {
+    const empty = { text, removed: 0, replaced: 0, total: 0, byGroup: {} };
+    if (!text || !INVISIBLE_DETECT_RE.test(text)) return empty;
+
+    const chars = Array.from(text);   // code-point aware
+    const out = [];
+    const byGroup = {};
+    let removed = 0;
+    let replaced = 0;
+    const count = id => { byGroup[id] = (byGroup[id] || 0) + 1; };
+
+    // The last emitted character that an emoji modifier could attach to,
+    // looking past selectors and skin-tone modifiers already emitted.
+    const lastBase = () => {
+        for (let k = out.length - 1; k >= 0; k--) {
+            if (EMOJI_MODIFIER_RE.test(out[k])) continue;
+            return out[k];
+        }
+        return '';
+    };
+
+    for (let i = 0; i < chars.length; i++) {
+        const ch = chars[i];
+        const cp = ch.codePointAt(0);
+
+        if (cp === 0x200D) {
+            // Joins two pictographs (family, rainbow flag, profession emoji)?
+            if (PICTOGRAPH_RE.test(lastBase()) && PICTOGRAPH_RE.test(chars[i + 1] || '')) {
+                out.push(ch);
+                continue;
+            }
+        } else if (cp === 0xFE0E || cp === 0xFE0F) {
+            // Selects the text/emoji presentation of the character before it.
+            if (EMOJI_BASE_RE.test(lastBase())) {
+                out.push(ch);
+                continue;
+            }
+        }
+
+        if (SPACE_HOMOGLYPHS.has(cp)) {
+            out.push(' ');
+            replaced++;
+            count('space');
+            continue;
+        }
+
+        const group = INVISIBLE_LOOKUP.get(cp);
+        if (group !== undefined) {
+            removed++;
+            count(group);
+            continue;
+        }
+
+        out.push(ch);
+    }
+
+    return {
+        text: out.join(''),
+        removed,
+        replaced,
+        total: removed + replaced,
+        byGroup
+    };
+}
+
+/**
+ * Turn the byGroup breakdown into readable text, e.g.
+ * "9 tag characters, 3 zero-width, 2 bidi controls".
+ * @param {Object<string, number>} byGroup
+ * @returns {string}
+ */
+function describeInvisibleGroups(byGroup) {
+    return Object.entries(byGroup)
+        .sort((a, b) => b[1] - a[1])
+        .map(([id, n]) => {
+            const label = INVISIBLE_LABELS.get(id) || id;
+            return `${n} ${label}${n === 1 ? '' : 's'}`;
+        })
+        .join(', ');
+}
 
 /**
  * Precompiled single-pass replacement tables. Building one regex per feature
@@ -176,6 +421,7 @@ class TextOptimizer {
     constructor() {
         this.settings = {
             applyLanguageMapping: false,  // New setting for language character replacement
+            removeInvisibleChars: true,   // Invisible/zero-width/format characters (baseline hygiene)
             removeDiacritics: false,
             removeCitations: false,
             convertMarkdown: false,
@@ -192,6 +438,8 @@ class TextOptimizer {
 
     updateSettings(newSettings) {
         this.settings = { ...this.settings, ...newSettings };
+        const alias = LEGACY_LANGUAGE_ALIASES[this.settings.languageMapping];
+        if (alias) this.settings.languageMapping = alias;
     }
 
     /**
@@ -201,7 +449,7 @@ class TextOptimizer {
      */
     processText(inputText) {
         if (!inputText || typeof inputText !== 'string') {
-            return { text: '', changed: false, applied: [] };
+            return { text: '', changed: false, applied: [], invisible: null };
         }
 
         const originalText = inputText;
@@ -215,8 +463,19 @@ class TextOptimizer {
             if (processedText !== before) applied.push(label);
         };
 
-        // Cross-platform normalization runs FIRST (always on)
-        run('encoding & whitespace normalization', t => this.normalizeForTargetSystem(t));
+        // Encoding and line-ending normalization runs FIRST (always on)
+        run('encoding & line endings', t => this.normalizeForTargetSystem(t));
+
+        // Invisible characters go next, so every later step sees clean input.
+        let invisible = null;
+        if (this.settings.removeInvisibleChars) {
+            const report = removeInvisibleCharacters(processedText);
+            if (report.total > 0) {
+                processedText = report.text;
+                invisible = report;
+                applied.push('invisible characters');
+            }
+        }
 
         if (this.settings.removeDiacritics) {
             run('diacritics', t => this.removeDiacritics(t));
@@ -252,7 +511,8 @@ class TextOptimizer {
         return {
             text: processedText,
             changed: processedText !== originalText,
-            applied
+            applied,
+            invisible
         };
     }
 
@@ -440,34 +700,25 @@ class TextOptimizer {
     }
 
     /**
-     * Normalize text for cross-platform compatibility.
-     * Fixes BOM, line endings, mojibake (CP-1252 to UTF-8), invisible characters,
-     * and non-breaking spaces.
+     * Normalize encoding and line endings for cross-platform compatibility.
+     * Fixes the leading BOM, mojibake (CP-1252 read as UTF-8) and line endings.
+     * Invisible characters are NOT handled here any more - they are their own
+     * option (see removeInvisibleCharacters) so users can switch them off.
      * @param {string} text - Input text
      * @returns {string} - Normalized text
      */
     normalizeForTargetSystem(text) {
         let result = text;
 
-        // 1. Remove BOM (Byte Order Mark) from start and mid-text
-        result = result.replace(/\uFEFF/g, '');
+        // 1. Drop the leading BOM (an encoding artefact, not content). A U+FEFF
+        //    anywhere else is a zero-width character and belongs to that option.
+        result = result.replace(/^\uFEFF/, '');
 
         // 2. Fix common CP-1252 to UTF-8 mojibake patterns in one pass
         // (see MOJIBAKE_PAIRS at module level)
         result = result.replace(MOJIBAKE_RE, seq => MOJIBAKE_LOOKUP.get(seq));
 
-        // 3. Remove invisible/zero-width characters
-        result = result.replace(/[\u200B\u200C\u200D]/g, '');  // Zero-width space/joiner/non-joiner
-        result = result.replace(/\u00AD/g, '');                 // Soft hyphen
-
-        // 4. Replace non-breaking spaces with regular spaces
-        result = result.replace(/\u00A0/g, ' ');
-
-        // 5. Replace other unusual whitespace with normal space
-        // Thin space, hair space, en space, em space, figure space, narrow no-break space
-        result = result.replace(/[\u2000-\u200A\u202F\u205F]/g, ' ');
-
-        // 6. Normalize line endings based on target system
+        // 3. Normalize line endings based on target system
         const target = this.settings.targetSystem;
         // First, normalize all line endings to LF
         result = result.replace(/\r\n/g, '\n');
@@ -571,6 +822,18 @@ class OptimizerUI {
         this.setupElements();
         this.setupEventListeners();
         this.loadUserSettings();
+        this.publishInvisibleCoverage();
+    }
+
+    /**
+     * Keep the number advertised in the option label tied to the table the code
+     * actually uses, so extending INVISIBLE_GROUPS can never leave a stale claim
+     * on the page.
+     */
+    publishInvisibleCoverage() {
+        document.querySelectorAll('[data-invisible-count]').forEach(el => {
+            el.textContent = INVISIBLE_CODEPOINT_COUNT.toLocaleString('en-US');
+        });
     }
 
     setupElements() {
@@ -646,8 +909,11 @@ class OptimizerUI {
         if (!preset) return;
 
         // Reset all processing toggles, then apply the preset on top.
+        // Invisible-character removal is baseline hygiene rather than a style
+        // choice, so it stays on unless a preset switches it off explicitly.
         this.optimizer.updateSettings({
             applyLanguageMapping: false,
+            removeInvisibleChars: true,
             removeDiacritics: false,
             removeCitations: false,
             convertMarkdown: false,
@@ -688,6 +954,7 @@ class OptimizerUI {
     handleToggleChange(toggleId, value) {
         const settingMap = {
             'apply-language-mapping': 'applyLanguageMapping',
+            'remove-invisible-chars': 'removeInvisibleChars',
             'remove-diacritics': 'removeDiacritics',
             'remove-citations': 'removeCitations',
             'convert-markdown': 'convertMarkdown',
@@ -750,7 +1017,14 @@ class OptimizerUI {
                 const summary = result.applied.length
                     ? ` Applied: ${result.applied.join(', ')}.`
                     : '';
-                this.showMessage(`Text processed.${summary}`, 'success');
+                // Invisible characters leave no visible trace, so spell out what
+                // was found - otherwise the user cannot tell it happened at all.
+                const hidden = result.invisible
+                    ? ` Found ${result.invisible.total} hidden character` +
+                      `${result.invisible.total === 1 ? '' : 's'}: ` +
+                      `${describeInvisibleGroups(result.invisible.byGroup)}.`
+                    : '';
+                this.showMessage(`Text processed.${summary}${hidden}`, 'success');
             } else {
                 this.showMessage('No changes were made to the text.', 'info');
             }
@@ -844,7 +1118,9 @@ class OptimizerUI {
         const settings = this.storage.loadSettings();
         if (settings.optimizer) {
             this.optimizer.updateSettings(settings.optimizer);
-            this.applySettingsToUI(settings.optimizer);
+            // Reflect the normalized settings, not the raw stored ones, so
+            // retired language values resolve to their replacement in the UI.
+            this.applySettingsToUI(this.optimizer.settings);
         }
         if (settings.ui && settings.ui.textareaHeight && this.textarea) {
             this.textarea.style.height = settings.ui.textareaHeight;
@@ -855,6 +1131,7 @@ class OptimizerUI {
         // Apply toggle states
         const toggleMap = {
             'applyLanguageMapping': 'apply-language-mapping',
+            'removeInvisibleChars': 'remove-invisible-chars',
             'removeDiacritics': 'remove-diacritics',
             'removeCitations': 'remove-citations',
             'convertMarkdown': 'convert-markdown',
@@ -891,6 +1168,7 @@ class StorageManager {
         this.defaultSettings = {
             optimizer: {
                 applyLanguageMapping: false,
+                removeInvisibleChars: true,
                 removeDiacritics: false,
                 removeCitations: false,
                 convertMarkdown: false,

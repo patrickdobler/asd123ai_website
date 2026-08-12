@@ -231,7 +231,7 @@
                             <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Auto</h4>
-                                    <p class="text-sm">Default mode. Normalizes common encoding, invisible characters, unusual whitespace, and line endings for browser use.</p>
+                                    <p class="text-sm">Default mode. Normalizes common encoding and line endings for browser use.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Windows / Linux / macOS</h4>
@@ -239,7 +239,7 @@
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Always-on base normalization</h4>
-                                    <p class="text-sm">This step runs on every clean, even with all toggles off: it repairs broken encoding (mojibake such as <code>&Atilde;&curren;</code> &rarr; <code>&auml;</code>), removes the BOM, zero-width and other invisible characters, converts non-breaking and unusual spaces to normal spaces, and unifies line endings. If the result changes with no options enabled, this is why.</p>
+                                    <p class="text-sm">This step runs on every clean, even with all toggles off: it repairs broken encoding (mojibake such as <code>&Atilde;&curren;</code> &rarr; <code>&auml;</code>), drops the leading BOM, and unifies line endings. If the result changes with no options enabled, this is why. Invisible characters used to be part of this step; they now have their own switch so you can turn them off.</p>
                                 </div>
                             </div>
                         </div>
@@ -250,20 +250,32 @@
                             </h3>
                             <div class="space-y-4 text-[var(--text-secondary)]">
                                 <p class="leading-relaxed">
-                                    Language mappings replace quotes, dashes, ligatures, spaces, and language-specific characters according to the selected profile. They only run when <strong>Apply Language Character Mapping</strong> is enabled.
+                                    Every profile flattens the same typography to plain ASCII: curly and low quotes, guillemets, the whole family of dashes and the minus sign, ellipses, bullets, primes, and the ligatures that text extracted from PDFs is full of (<code>&#xFB01;nal</code> &rarr; <code>final</code>). Only the language-specific rules on top of that differ. Mappings run only when <strong>Apply Language Character Mapping</strong> is enabled &mdash; and they never touch invisible characters, which are handled by their own option.
                                 </p>
                                 <div class="grid md:grid-cols-3 gap-4">
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Universal</h4>
+                                        <p class="text-sm">Punctuation only &mdash; never rewrites a letter. Pick this when the text has to stay correct in its own language but should lose the fancy typography.</p>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                         <h4 class="font-bold text-[var(--text-primary)] mb-2">Swiss German</h4>
-                                        <p class="text-sm">Useful for Swiss text conventions, including replacements such as ß to ss and normalized punctuation.</p>
+                                        <p class="text-sm">Adds the Swiss convention &szlig; &rarr; ss, which Germany and Austria do not use, plus &aelig;/&oelig; spelled out as ae/oe.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">German, French, Italian</h4>
-                                        <p class="text-sm">Normalize quotes, dashes, spaces, ligatures, and common language-specific characters.</p>
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">German</h4>
+                                        <p class="text-sm">Keeps &szlig; intact and spells out &aelig;/&oelig; as ae/oe.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">English US / International</h4>
-                                        <p class="text-sm">Normalize English punctuation, quote styles, ellipses, dashes, and spacing.</p>
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">French</h4>
+                                        <p class="text-sm">Removes the space French typography puts inside guillemets and before <code>;&nbsp;:&nbsp;!&nbsp;?</code>, so <code>&laquo;&nbsp;bonjour&nbsp;&raquo;</code> becomes <code>"bonjour"</code>. &oelig; becomes oe.</p>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Italian</h4>
+                                        <p class="text-sm">Punctuation only. Italian has no &aelig;/&oelig; of its own, so foreign words keep their spelling.</p>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">English</h4>
+                                        <p class="text-sm">Curly quotes, dashes and ellipses to ASCII, &aelig;/&oelig; spelled out. The former US and International profiles were character-identical and are now one option.</p>
                                     </div>
                                 </div>
                             </div>
@@ -274,9 +286,16 @@
                                 <span class="text-[var(--primary-color)]">5.</span> Processing Options
                             </h3>
                             <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
+                                <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Invisible Characters <span class="text-xs font-normal text-[var(--text-secondary)]">(on by default)</span></h4>
+                                    <p class="text-sm">Covers <strong class="text-[var(--text-primary)]">441</strong> invisible code points in seven groups: zero-width characters, bidi controls, invisible math operators, deprecated format characters, variation selectors, tag characters, and other hidden formatting &mdash; plus 16 unusual spaces that are folded back to a normal space.</p>
+                                    <p class="text-sm mt-3">These characters carry no visible meaning, but they do carry consequences. They are used to hide tracking IDs and watermarks inside AI output; <strong class="text-[var(--text-primary)]">tag characters</strong> (U+E0001&ndash;E007F) can smuggle an entire invisible message inside visible text; <strong class="text-[var(--text-primary)]">bidi controls</strong> can make text render differently from how it is stored, which is the basis of the &quot;Trojan Source&quot; attack; and zero-width characters from copy-paste break search, diffs, and string comparisons.</p>
+                                    <p class="text-sm mt-3"><strong class="text-[var(--text-primary)]">Emoji stay intact.</strong> The zero-width joiner and the variation selectors are the only members of the set that can be legitimate content &mdash; they are kept when they actually hold an emoji together, so <span aria-hidden="true">&#128104;&zwj;&#128105;&zwj;&#128103;</span> stays one family and <span aria-hidden="true">&#127987;&#65039;&zwj;&#127752;</span> stays one flag, while the same characters hidden in ordinary prose are removed.</p>
+                                    <p class="text-sm mt-3">After each clean you get a breakdown of what was found, for example <em>&quot;Found 10 hidden characters: 5 tag characters, 2 zero-width characters, 1 bidi control, 1 hidden format character, 1 unusual space&quot;</em> &mdash; otherwise there is no way to tell the option did anything.</p>
+                                </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Apply Language Character Mapping</h4>
-                                    <p class="text-sm">Applies the selected language profile to punctuation, spaces, ligatures, and special characters.</p>
+                                    <p class="text-sm">Applies the selected language profile to quotes, dashes, ellipses, bullets and ligatures. Visible typography only &mdash; invisible characters are a separate option.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Diacritics</h4>
@@ -340,7 +359,7 @@
                                         <li><strong class="text-[var(--text-primary)]">Local processing:</strong> Text cleanup runs in your browser.</li>
                                         <li><strong class="text-[var(--text-primary)]">No text upload:</strong> Your text is not sent to ASD123.ai for processing.</li>
                                         <li><strong class="text-[var(--text-primary)]">Local preferences:</strong> Settings are saved in browser storage; text content is not saved by the app.</li>
-                                        <li><strong class="text-[var(--text-primary)]">Local mappings:</strong> Language mapping JSON files are static assets loaded by the browser.</li>
+                                        <li><strong class="text-[var(--text-primary)]">Local mappings:</strong> Language mappings and the invisible-character tables are embedded in the script itself &mdash; nothing is fetched at runtime.</li>
                                     </ul>
                                 </div>
                             </div>
