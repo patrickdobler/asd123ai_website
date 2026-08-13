@@ -98,6 +98,13 @@ const EMBEDDED_MAPPINGS = {
 EMBEDDED_MAPPINGS['english-international'] = EMBEDDED_MAPPINGS['english'];
 EMBEDDED_MAPPINGS['english-us'] = EMBEDDED_MAPPINGS['english'];
 
+// Input box sizing. Must match the #optimizer-textarea rule in components.css.
+const TEXTAREA_MIN_HEIGHT = 270;
+// Anything at or below the previous floor was never a deliberate size, so it is
+// discarded on load - otherwise saved settings would pin the box to its old
+// height forever and the new default would never show up.
+const LEGACY_TEXTAREA_HEIGHT = 300;
+
 // Values that no longer exist in the dropdown. Without this the <select> would
 // silently fall back to an empty value for anyone with older saved settings.
 const LEGACY_LANGUAGE_ALIASES = {
@@ -947,7 +954,8 @@ class OptimizerUI {
     autoResizeTextarea() {
         if (this.textarea) {
             this.textarea.style.height = 'auto';
-            this.textarea.style.height = Math.max(300, this.textarea.scrollHeight) + 'px';
+            this.textarea.style.height =
+                Math.max(TEXTAREA_MIN_HEIGHT, this.textarea.scrollHeight) + 'px';
         }
     }
 
@@ -1123,7 +1131,10 @@ class OptimizerUI {
             this.applySettingsToUI(this.optimizer.settings);
         }
         if (settings.ui && settings.ui.textareaHeight && this.textarea) {
-            this.textarea.style.height = settings.ui.textareaHeight;
+            const stored = parseInt(settings.ui.textareaHeight, 10);
+            if (Number.isFinite(stored) && stored > LEGACY_TEXTAREA_HEIGHT) {
+                this.textarea.style.height = settings.ui.textareaHeight;
+            }
         }
     }
 

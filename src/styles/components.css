@@ -271,6 +271,13 @@ input:checked + .toggle-slider:before {
     transition: all 150ms ease;
 }
 
+/* The Optimizer is used on pasted snippets far more often than on long
+   documents, so its input starts compact and grows with the content. The
+   Anonymizer keeps the taller default above. */
+#optimizer-textarea {
+    min-height: 270px;
+}
+
 .textarea-field:focus {
     outline: none;
     border-color: var(--text-primary);
@@ -457,28 +464,6 @@ input:checked + .toggle-slider:before {
 .toggle-label {
     font-weight: 500;
     font-size: 15px;
-    color: var(--text-primary);
-}
-
-/* A toggle that carries an explanatory second line stacks instead of putting
-   label and switch on opposite ends of one row. */
-.toggle-item--stacked {
-    flex-direction: column;
-    align-items: stretch;
-}
-
-/* Second line under a toggle, for options whose effect is not self-evident.
-   Indented to line up with the label rather than the switch. */
-.toggle-note {
-    display: block;
-    margin-top: var(--space-2);
-    padding-left: calc(48px + var(--space-3));
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--text-secondary);
-}
-
-.toggle-note strong {
     color: var(--text-primary);
 }
 
@@ -1006,12 +991,6 @@ footer {
     .toggle-item__content {
         width: 100%;
         justify-content: space-between;
-    }
-
-    /* Drop the label-aligned indent - it costs too much width on a phone. */
-    .toggle-note {
-        padding-left: 0;
-        margin-top: 0;
     }
 
     .footer-content {

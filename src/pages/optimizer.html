@@ -287,7 +287,7 @@ All processing happens entirely in your browser for complete privacy."></textare
                     <div class="toggle-section">
                         <div class="section-label">Character Processing</div>
                         <div class="toggle-list">
-                            <div class="toggle-item toggle-item--stacked">
+                            <div class="toggle-item">
                                 <div class="toggle-content">
                                     <label class="toggle-switch">
                                         <input type="checkbox" class="toggle-input" checked
@@ -303,16 +303,15 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             <path d="M12 16v-4" />
                                             <path d="M12 8h.01" />
                                         </svg>
-                                        <span class="tooltip-text">Strips zero-width characters, bidi controls,
-                                            variation selectors, tag characters and other hidden formatting, and folds
-                                            unusual spaces back to a normal space. Emoji stay intact. After cleaning you
-                                            get a breakdown of what was found.</span>
+                                        <span class="tooltip-text">Covers <strong data-invisible-count>441</strong>
+                                            invisible code points: zero-width characters, bidi controls, variation
+                                            selectors, tag characters and other hidden formatting, plus unusual spaces
+                                            folded back to a normal space. Catches hidden tracking marks and AI
+                                            watermarks, and bidi controls that make text read differently than it is
+                                            stored. Emoji stay intact, and after cleaning you get a breakdown of what
+                                            was found.</span>
                                     </div>
                                 </div>
-                                <small class="toggle-note">Covers <strong data-invisible-count>441</strong> invisible
-                                    code points — hidden tracking marks and AI watermarks, zero-width characters from
-                                    copy-paste, and bidi controls that make text read differently than it is
-                                    stored.</small>
                             </div>
 
                             <div class="toggle-item">
