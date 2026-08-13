@@ -4,7 +4,7 @@ This document describes the normalization mappings used by the [ASD123.ai Optimi
 
 Mappings cover **visible typography only** and run when *Apply Character Mapping* is enabled. Invisible and zero-width characters are handled by the separate *Remove Invisible Characters* option, listed at the end of this document.
 
-There is one base table plus three optional switches. Earlier versions offered six named language profiles instead, but four of them held byte-identical tables (Italian == Universal, English == German), because a "language" only ever decided these three yes/no questions.
+The mapping is assembled from five groups covering the 41 base rules, plus three optional switches. All five groups are on by default. Earlier versions offered six named language profiles instead, but four of them held byte-identical tables (Italian == Universal, English == German), because a "language" only ever decided these three yes/no questions.
 
 | Retired profile | Equalled |
 |---|---|
@@ -28,9 +28,9 @@ Placeholders: `(NBSP)` = no-break space U+00A0, `(NNBSP)` = narrow no-break spac
 
 ---
 
-## Base mapping
+## Group: hyphens and dashes
 
-Applies whenever character mapping is enabled. Normalizes dashes and the minus sign, ellipsis and leaders, bullets, primes and modifier letters, typographic ligatures, and every quotation mark including guillemets and the German low quotes. On its own it never rewrites a letter. (41 rules.)
+Every dash and the minus sign becomes the ASCII hyphen. Switch it off to keep em dashes as they are. (7 rules.)
 
 | From | Unicode | To | Unicode | Note |
 |---|---|---|---|---|
@@ -41,6 +41,51 @@ Applies whenever character mapping is enabled. Normalizes dashes and the minus s
 | `—` | U+2014 | `-` | U+002D | Em dash to hyphen-minus |
 | `―` | U+2015 | `-` | U+002D | Horizontal bar to hyphen-minus |
 | `−` | U+2212 | `-` | U+002D | Minus sign to hyphen-minus |
+
+---
+
+## Group: quotation marks
+
+Curly and low double quotes, guillemets and the double prime, flattened to the ASCII quotation mark. (8 rules.)
+
+| From | Unicode | To | Unicode | Note |
+|---|---|---|---|---|
+| `“` | U+201C | `"` | U+0022 | Left double quote to quotation mark |
+| `”` | U+201D | `"` | U+0022 | Right double quote to quotation mark |
+| `‟` | U+201F | `"` | U+0022 | Double high-reversed-9 quote to quotation mark |
+| `„` | U+201E | `"` | U+0022 | Double low-9 quote to quotation mark |
+| `«` | U+00AB | `"` | U+0022 | Guillemet left to quotation mark |
+| `»` | U+00BB | `"` | U+0022 | Guillemet right to quotation mark |
+| `″` | U+2033 | `"` | U+0022 | Double prime to quotation mark |
+| `ʺ` | U+02BA | `"` | U+0022 | Modifier letter double prime |
+
+---
+
+## Group: apostrophes
+
+Single quotes, apostrophes, primes and the spacing accents that get used in their place, flattened to the ASCII apostrophe. (10 rules.)
+
+| From | Unicode | To | Unicode | Note |
+|---|---|---|---|---|
+| `‘` | U+2018 | `'` | U+0027 | Left single quote to apostrophe |
+| `’` | U+2019 | `'` | U+0027 | Right single quote to apostrophe |
+| `‛` | U+201B | `'` | U+0027 | Single high-reversed-9 quote to apostrophe |
+| `‚` | U+201A | `'` | U+0027 | Single low-9 quote to apostrophe |
+| `‹` | U+2039 | `'` | U+0027 | Single left angle quote to apostrophe |
+| `›` | U+203A | `'` | U+0027 | Single right angle quote to apostrophe |
+| `′` | U+2032 | `'` | U+0027 | Prime to apostrophe |
+| `´` | U+00B4 | `'` | U+0027 | Acute accent to apostrophe |
+| `ʼ` | U+02BC | `'` | U+0027 | Modifier letter apostrophe |
+| `ʹ` | U+02B9 | `'` | U+0027 | Modifier letter prime |
+
+---
+
+## Group: bullets, ellipses and symbols
+
+Ellipsis and two-dot leader spelled out, bullet characters turned into a hyphen, multiplication sign and fraction slash replaced by x and /. (9 rules.)
+
+| From | Unicode | To | Unicode | Note |
+|---|---|---|---|---|
 | `…` | U+2026 | `...` | U+002E U+002E U+002E | Ellipsis to three dots |
 | `‥` | U+2025 | `..` | U+002E U+002E | Two dot leader to two dots |
 | `•` | U+2022 | `-` | U+002D | Bullet to hyphen-minus |
@@ -50,12 +95,15 @@ Applies whenever character mapping is enabled. Normalizes dashes and the minus s
 | `∙` | U+2219 | `-` | U+002D | Bullet operator to hyphen-minus |
 | `×` | U+00D7 | `x` | U+0078 | Multiplication sign to x |
 | `⁄` | U+2044 | `/` | U+002F | Fraction slash to solidus |
-| `′` | U+2032 | `'` | U+0027 | Prime to apostrophe |
-| `″` | U+2033 | `"` | U+0022 | Double prime to quotation mark |
-| `´` | U+00B4 | `'` | U+0027 | Acute accent to apostrophe |
-| `ʼ` | U+02BC | `'` | U+0027 | Modifier letter apostrophe |
-| `ʹ` | U+02B9 | `'` | U+0027 | Modifier letter prime |
-| `ʺ` | U+02BA | `"` | U+0022 | Modifier letter double prime |
+
+---
+
+## Group: PDF ligatures
+
+Text extracted from PDFs stores fi and fl as a single glyph; this splits them back apart. (7 rules.)
+
+| From | Unicode | To | Unicode | Note |
+|---|---|---|---|---|
 | `ﬀ` | U+FB00 | `ff` | U+0066 U+0066 | PDF ligature |
 | `ﬁ` | U+FB01 | `fi` | U+0066 U+0069 | PDF ligature |
 | `ﬂ` | U+FB02 | `fl` | U+0066 U+006C | PDF ligature |
@@ -63,18 +111,6 @@ Applies whenever character mapping is enabled. Normalizes dashes and the minus s
 | `ﬄ` | U+FB04 | `ffl` | U+0066 U+0066 U+006C | PDF ligature |
 | `ﬅ` | U+FB05 | `st` | U+0073 U+0074 | PDF ligature (long s) |
 | `ﬆ` | U+FB06 | `st` | U+0073 U+0074 | PDF ligature |
-| `“` | U+201C | `"` | U+0022 | Left double quote to quotation mark |
-| `”` | U+201D | `"` | U+0022 | Right double quote to quotation mark |
-| `‟` | U+201F | `"` | U+0022 | Double high-reversed-9 quote to quotation mark |
-| `‘` | U+2018 | `'` | U+0027 | Left single quote to apostrophe |
-| `’` | U+2019 | `'` | U+0027 | Right single quote to apostrophe |
-| `‛` | U+201B | `'` | U+0027 | Single high-reversed-9 quote to apostrophe |
-| `„` | U+201E | `"` | U+0022 | Double low-9 quote to quotation mark |
-| `‚` | U+201A | `'` | U+0027 | Single low-9 quote to apostrophe |
-| `«` | U+00AB | `"` | U+0022 | Guillemet left to quotation mark |
-| `»` | U+00BB | `"` | U+0022 | Guillemet right to quotation mark |
-| `‹` | U+2039 | `'` | U+0027 | Single left angle quote to apostrophe |
-| `›` | U+203A | `'` | U+0027 | Single right angle quote to apostrophe |
 
 ---
 

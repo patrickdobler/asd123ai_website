@@ -250,10 +250,32 @@
                             </h3>
                             <div class="space-y-4 text-[var(--text-secondary)]">
                                 <p class="leading-relaxed">
-                                    <strong class="text-[var(--text-primary)]">Apply Character Mapping</strong> flattens typography to plain ASCII: every dash and the minus sign, all quotation marks including guillemets and the German low quotes, ellipses, bullets, primes, and the ligatures that text extracted from PDFs is full of (<code>&#xFB01;nal</code> &rarr; <code>final</code>). That is 41 rules, and on its own it never rewrites a letter. Invisible characters are not part of this &mdash; they have their own option.
+                                    <strong class="text-[var(--text-primary)]">Apply Character Mapping</strong> flattens typography to plain ASCII. It is split into five groups, all on by default, so each kind of typography can be left alone &mdash; you can fix quotation marks while keeping em dashes exactly as they are. Invisible characters are not part of this; they have their own option.
                                 </p>
+                                <div class="grid md:grid-cols-3 gap-4">
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Hyphens &amp; dashes <span class="text-xs font-normal text-[var(--text-secondary)]">7 rules</span></h4>
+                                        <p class="text-sm">Hyphen, non-breaking hyphen, figure dash, en dash, em dash, horizontal bar and the minus sign all become the ASCII hyphen.</p>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Quotation marks <span class="text-xs font-normal text-[var(--text-secondary)]">8 rules</span></h4>
+                                        <p class="text-sm">Curly and low double quotes, guillemets and the double prime, flattened to the ASCII <code>"</code>.</p>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Apostrophes <span class="text-xs font-normal text-[var(--text-secondary)]">10 rules</span></h4>
+                                        <p class="text-sm">Single quotes, apostrophes, primes and the spacing accents that get used in their place.</p>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Bullets, ellipses &amp; symbols <span class="text-xs font-normal text-[var(--text-secondary)]">9 rules</span></h4>
+                                        <p class="text-sm">Ellipsis spelled out as three dots, bullet characters turned into a hyphen, multiplication sign and fraction slash to x and /.</p>
+                                    </div>
+                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">PDF ligatures <span class="text-xs font-normal text-[var(--text-secondary)]">7 rules</span></h4>
+                                        <p class="text-sm">Text extracted from PDFs stores fi and fl as single glyphs. This splits them apart: <code>&#xFB01;nal</code> &rarr; <code>final</code>.</p>
+                                    </div>
+                                </div>
                                 <p class="leading-relaxed">
-                                    Three switches add the rules that used to be hidden behind a language dropdown. That dropdown offered six languages but held only four distinct tables: Italian was byte-identical to Universal, English to German. Naming the actual rules is both shorter and honest.
+                                    Three further switches add rules that used to be hidden behind a language dropdown. That dropdown offered six languages but held only four distinct tables: Italian was byte-identical to Universal, English to German. Naming the actual rules is both shorter and honest.
                                 </p>
                                 <div class="grid md:grid-cols-3 gap-4">
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
@@ -270,7 +292,7 @@
                                     </div>
                                 </div>
                                 <p class="leading-relaxed">
-                                    The switches are greyed out while character mapping is off. They keep their state, so nothing is lost when you switch it back on. If you used a language before, your setting was carried over to the equivalent switches automatically.
+                                    All eight switches are greyed out while character mapping is off. They keep their state, so nothing is lost when you switch it back on. If you used a language before, your setting was carried over to the equivalent switches automatically.
                                 </p>
                             </div>
                         </div>

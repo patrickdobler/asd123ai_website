@@ -14,31 +14,42 @@
  * There used to be six named language profiles here. Four of them held byte
  * identical tables (Italian == Universal, English == German), because a
  * "language" only ever decided three yes/no questions. Those three are now
- * explicit switches on top of one shared base.
+ * explicit switches, and the base itself is split into groups so each kind of
+ * typography can be left alone.
  */
 
-// The base: applies whenever character mapping is on.
-const BASE_MAPPING = {
+// The mapping is assembled from switchable groups. Splitting them lets someone
+// fix quotation marks while keeping em dashes, which one combined table made
+// impossible.
+const MAPPING_GROUPS = {
     // Dashes, hyphens and the minus sign -> ASCII hyphen
-    '\u2010': '-', '\u2011': '-', '\u2012': '-', '\u2013': '-', '\u2014': '-',
-    '\u2015': '-', '\u2212': '-',
-    // Ellipsis and leaders
-    '\u2026': '...', '\u2025': '..',
-    // Bullets
-    '\u2022': '-', '\u2023': '-', '\u2043': '-', '\u25E6': '-', '\u2219': '-',
-    // Symbols with a plain ASCII equivalent
-    '\u00D7': 'x', '\u2044': '/',
-    // Primes, spacing accents and modifier letters used in place of quotes
-    '\u2032': '\'', '\u2033': '"', '\u00B4': '\'', '\u02BC': '\'',
-    '\u02B9': '\'', '\u02BA': '"',
+    mapDashes: {
+        '\u2010': '-', '\u2011': '-', '\u2012': '-', '\u2013': '-',
+        '\u2014': '-', '\u2015': '-', '\u2212': '-'
+    },
+    // Double quotation marks, including guillemets and the German low quotes
+    mapQuotes: {
+        '\u201C': '"', '\u201D': '"', '\u201F': '"', '\u201E': '"',
+        '\u00AB': '"', '\u00BB': '"',
+        '\u2033': '"', '\u02BA': '"'
+    },
+    // Single quotes, apostrophes, primes and the spacing accents used as one
+    mapApostrophes: {
+        '\u2018': '\'', '\u2019': '\'', '\u201B': '\'', '\u201A': '\'',
+        '\u2039': '\'', '\u203A': '\'',
+        '\u2032': '\'', '\u00B4': '\'', '\u02BC': '\'', '\u02B9': '\''
+    },
+    // Bullets, ellipsis and leaders, plus symbols with an ASCII equivalent
+    mapBulletsSymbols: {
+        '\u2026': '...', '\u2025': '..',
+        '\u2022': '-', '\u2023': '-', '\u2043': '-', '\u25E6': '-', '\u2219': '-',
+        '\u00D7': 'x', '\u2044': '/'
+    },
     // Typographic ligatures - extremely common in text extracted from PDFs
-    '\uFB00': 'ff', '\uFB01': 'fi', '\uFB02': 'fl', '\uFB03': 'ffi',
-    '\uFB04': 'ffl', '\uFB05': 'st', '\uFB06': 'st',
-    // Quotation marks, flattened to the ASCII " and '
-    '\u201C': '"', '\u201D': '"', '\u201F': '"',
-    '\u2018': '\'', '\u2019': '\'', '\u201B': '\'',
-    '\u201E': '"', '\u201A': '\'',
-    '\u00AB': '"', '\u00BB': '"', '\u2039': '\'', '\u203A': '\''
+    mapPdfLigatures: {
+        '\uFB00': 'ff', '\uFB01': 'fi', '\uFB02': 'fl', '\uFB03': 'ffi',
+        '\uFB04': 'ffl', '\uFB05': 'st', '\uFB06': 'st'
+    }
 };
 
 // Optional fragment: letters spelled out in ASCII. Not wanted for languages
@@ -65,19 +76,21 @@ const FRENCH_SPACING = {
 };
 
 /**
- * Compose the active mapping table from the enabled fragments.
- * French spacing goes first so its two-character keys win over the bare
- * guillemets in the base.
+ * Compose the active mapping table from the enabled groups.
  * @param {object} settings - Current optimizer settings
  * @returns {Object<string, string>} - Replacement table
  */
 function buildCharacterMapping(settings) {
-    return {
-        ...(settings.mapFrenchSpacing ? FRENCH_SPACING : null),
-        ...BASE_MAPPING,
-        ...(settings.mapLigatures ? LIGATURE_LETTERS : null),
-        ...(settings.mapSharpS ? SHARP_S : null)
-    };
+    const table = {};
+    // French spacing goes first: its two-character keys must be matched before
+    // the bare guillemets that mapQuotes contributes.
+    if (settings.mapFrenchSpacing) Object.assign(table, FRENCH_SPACING);
+    for (const [key, group] of Object.entries(MAPPING_GROUPS)) {
+        if (settings[key]) Object.assign(table, group);
+    }
+    if (settings.mapLigatures) Object.assign(table, LIGATURE_LETTERS);
+    if (settings.mapSharpS) Object.assign(table, SHARP_S);
+    return table;
 }
 
 // Retired language profiles, mapped to the switches that reproduce them. Used
@@ -454,8 +467,15 @@ class TextOptimizer {
         this.settings = {
             removeInvisibleChars: true,   // Invisible/zero-width/format characters (baseline hygiene)
             applyCharacterMapping: false,
-            // Mapping detail switches. The defaults reproduce what the retired
-            // "Swiss German" profile did, which used to be the preselected one.
+            // Which groups the mapping covers - all on, which is what the single
+            // combined table used to do.
+            mapDashes: true,
+            mapQuotes: true,
+            mapApostrophes: true,
+            mapBulletsSymbols: true,
+            mapPdfLigatures: true,
+            // Extra rules. The defaults reproduce what the retired "Swiss German"
+            // profile did, which used to be the preselected one.
             mapLigatures: true,
             mapSharpS: true,
             mapFrenchSpacing: false,
@@ -819,7 +839,10 @@ const OPTIMIZER_PRESETS = {
     'swiss': {
         label: 'Swiss standardization',
         settings: {
-            applyCharacterMapping: true, mapLigatures: true, mapSharpS: true,
+            applyCharacterMapping: true,
+            mapDashes: true, mapQuotes: true, mapApostrophes: true,
+            mapBulletsSymbols: true, mapPdfLigatures: true,
+            mapLigatures: true, mapSharpS: true,
             mapFrenchSpacing: false, umlautDigraphs: true,
             removeFancyFont: true, removeCitations: true, replaceEmDash: true
         }
@@ -945,6 +968,11 @@ class OptimizerUI {
             applyCharacterMapping: false,
             // Detail switches reset to their defaults too, so a preset always
             // lands on the same state no matter what was configured before.
+            mapDashes: true,
+            mapQuotes: true,
+            mapApostrophes: true,
+            mapBulletsSymbols: true,
+            mapPdfLigatures: true,
             mapLigatures: true,
             mapSharpS: true,
             mapFrenchSpacing: false,
@@ -991,6 +1019,11 @@ class OptimizerUI {
     handleToggleChange(toggleId, value) {
         const settingMap = {
             'apply-character-mapping': 'applyCharacterMapping',
+            'map-dashes': 'mapDashes',
+            'map-quotes': 'mapQuotes',
+            'map-apostrophes': 'mapApostrophes',
+            'map-bullets-symbols': 'mapBulletsSymbols',
+            'map-pdf-ligatures': 'mapPdfLigatures',
             'map-ligatures': 'mapLigatures',
             'map-sharp-s': 'mapSharpS',
             'map-french-spacing': 'mapFrenchSpacing',
@@ -1171,6 +1204,11 @@ class OptimizerUI {
         // Apply toggle states
         const toggleMap = {
             'applyCharacterMapping': 'apply-character-mapping',
+            'mapDashes': 'map-dashes',
+            'mapQuotes': 'map-quotes',
+            'mapApostrophes': 'map-apostrophes',
+            'mapBulletsSymbols': 'map-bullets-symbols',
+            'mapPdfLigatures': 'map-pdf-ligatures',
             'mapLigatures': 'map-ligatures',
             'mapSharpS': 'map-sharp-s',
             'mapFrenchSpacing': 'map-french-spacing',
@@ -1226,6 +1264,11 @@ class StorageManager {
             optimizer: {
                 removeInvisibleChars: true,
                 applyCharacterMapping: false,
+                mapDashes: true,
+                mapQuotes: true,
+                mapApostrophes: true,
+                mapBulletsSymbols: true,
+                mapPdfLigatures: true,
                 mapLigatures: true,
                 mapSharpS: true,
                 mapFrenchSpacing: false,
