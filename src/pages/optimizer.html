@@ -6,14 +6,14 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>ASD123.ai Optimizer - Clean & Standardize AI Text</title>
     <meta name="description"
-        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, invisible characters, and normalize typography. 100% privacy-focused browser processing." />
+        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove invisible characters and watermarks, diacritics, citations and markdown, and normalize typography. 100% privacy-focused browser processing." />
     <meta name="keywords"
-        content="AI text optimizer, text cleaning tool, diacritic removal, citation cleaner, markdown converter, invisible characters, privacy-first text processing" />
+        content="AI text optimizer, remove watermarks from text, invisible characters, zero-width characters, text cleaning tool, diacritic removal, citation cleaner, markdown converter, privacy-first text processing" />
     <meta name="author" content="ASD123.ai" />
     <meta name="robots" content="index, follow" />
     <meta property="og:title" content="ASD123.ai Optimizer - Clean & Standardize AI Text" />
     <meta property="og:description"
-        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, invisible characters, and normalize typography." />
+        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove invisible characters and watermarks, diacritics, citations and markdown, and normalize typography." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://asd123.ai/optimizer" />
     <meta property="og:site_name" content="ASD123.ai" />
@@ -21,7 +21,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ASD123.ai Optimizer - Clean & Standardize AI Text" />
     <meta name="twitter:description"
-        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, invisible characters, and normalize typography." />
+        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove invisible characters and watermarks, diacritics, citations and markdown, and normalize typography." />
     <link rel="canonical" href="https://asd123.ai/optimizer" />
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link href="styles/main.css" rel="stylesheet" />
@@ -71,7 +71,7 @@
           "@id": "https://asd123.ai/optimizer#app",
           "name": "Optimizer — ASD123.ai",
           "url": "https://asd123.ai/optimizer",
-          "description": "Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, invisible characters, and normalize typography. 100% privacy-focused browser processing.",
+          "description": "Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove invisible characters and watermarks, diacritics, citations and markdown, and normalize typography. 100% privacy-focused browser processing.",
           "applicationCategory": "UtilitiesApplication",
           "operatingSystem": "Web browser",
           "browserRequirements": "Requires JavaScript; on-device AI features require WebGPU",
@@ -280,7 +280,7 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="remove-invisible-chars">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Remove Invisible Characters</span>
+                                    <span class="toggle-label">Remove Invisible Characters &amp; Watermarks</span>
                                     <div class="tooltip">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -292,10 +292,11 @@ All processing happens entirely in your browser for complete privacy."></textare
                                         <span class="tooltip-text">Covers <strong data-invisible-count>441</strong>
                                             invisible code points: zero-width characters, bidi controls, variation
                                             selectors, tag characters and other hidden formatting, plus unusual spaces
-                                            folded back to a normal space. Catches hidden tracking marks and AI
-                                            watermarks, and bidi controls that make text read differently than it is
-                                            stored. Emoji stay intact, and after cleaning you get a breakdown of what
-                                            was found.</span>
+                                            folded back to a normal space. This catches character-based watermarks and
+                                            tracking marks - the invisible markers some tools embed in generated text.
+                                            Statistical watermarks, woven into word choice itself, leave no character
+                                            behind and are not affected. Emoji stay intact, and after cleaning you get
+                                            a breakdown of what was found.</span>
                                     </div>
                                 </div>
                             </div>
