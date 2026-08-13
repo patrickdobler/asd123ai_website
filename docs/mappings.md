@@ -132,6 +132,20 @@ French typography places a space inside guillemets and before the semicolon, col
 
 Not part of the character mapping. These are removed by the separate *Remove Invisible Characters* option, which covers 441 code points in total. They carry no visible meaning, but are used to hide tracking IDs and watermarks, and some of them make text render differently from how it is stored.
 
+The table below has 59 rows, but four of them are ranges that cover 386 code points between them - that is where the bulk of the number comes from:
+
+| Rows | Code points |
+|---|---|
+| 39 individually listed characters | 39 |
+| U+E0100-E01EF, variation selector supplement | 240 |
+| U+E0001-E007F, tag characters | 127 |
+| U+FE00-FE0F, variation selectors 1-16 | 16 |
+| U+180B-180D, Mongolian free variation selectors | 3 |
+| 16 unusual spaces | 16 |
+| **Total** | **441** |
+
+Of those 441, **411 are assigned characters**. The remaining 30 sit in the unassigned gap U+E0002-E001F inside the tag block, which is stripped as a whole range rather than character by character.
+
 Emoji safety: U+200D, U+FE0E and U+FE0F are the only entries that can be legitimate content, because they hold composed emoji together. They are kept when they sit between emoji and removed everywhere else.
 
 ### Removed
