@@ -4,99 +4,105 @@
  */
 
 /**
- * Language character mappings (embedded; no runtime fetch, works on file:// too).
+ * Character mappings (embedded; no runtime fetch, works on file:// too).
  *
  * These tables only handle VISIBLE typography - quotes, dashes, ligatures and
- * the few letters a language spells out differently in plain ASCII. Invisible
- * and zero-width characters used to be buried in here as well; they now live in
- * the separate "Remove Invisible Characters" option (see INVISIBLE_GROUPS
- * below), so nothing is silently duplicated between the two features.
+ * the few letters that get spelled out in plain ASCII. Invisible and zero-width
+ * characters live in the separate "Remove Invisible Characters" option (see
+ * INVISIBLE_GROUPS below), so nothing is duplicated between the two features.
+ *
+ * There used to be six named language profiles here. Four of them held byte
+ * identical tables (Italian == Universal, English == German), because a
+ * "language" only ever decided three yes/no questions. Those three are now
+ * explicit switches on top of one shared base.
  */
 
-// Typography that normalizes the same way in every language.
-const COMMON_TYPOGRAPHY = {
+// The base: applies whenever character mapping is on.
+const BASE_MAPPING = {
     // Dashes, hyphens and the minus sign -> ASCII hyphen
-    '‐': '-', '‑': '-', '‒': '-', '–': '-', '—': '-',
-    '―': '-', '−': '-',
+    '\u2010': '-', '\u2011': '-', '\u2012': '-', '\u2013': '-', '\u2014': '-',
+    '\u2015': '-', '\u2212': '-',
     // Ellipsis and leaders
-    '…': '...', '‥': '..',
+    '\u2026': '...', '\u2025': '..',
     // Bullets
-    '•': '-', '‣': '-', '⁃': '-', '◦': '-', '∙': '-',
+    '\u2022': '-', '\u2023': '-', '\u2043': '-', '\u25E6': '-', '\u2219': '-',
     // Symbols with a plain ASCII equivalent
-    '×': 'x', '⁄': '/',
+    '\u00D7': 'x', '\u2044': '/',
     // Primes, spacing accents and modifier letters used in place of quotes
-    '′': '\'', '″': '"', '´': '\'', 'ʼ': '\'',
-    'ʹ': '\'', 'ʺ': '"',
+    '\u2032': '\'', '\u2033': '"', '\u00B4': '\'', '\u02BC': '\'',
+    '\u02B9': '\'', '\u02BA': '"',
     // Typographic ligatures - extremely common in text extracted from PDFs
-    'ﬀ': 'ff', 'ﬁ': 'fi', 'ﬂ': 'fl', 'ﬃ': 'ffi',
-    'ﬄ': 'ffl', 'ﬅ': 'st', 'ﬆ': 'st'
+    '\uFB00': 'ff', '\uFB01': 'fi', '\uFB02': 'fl', '\uFB03': 'ffi',
+    '\uFB04': 'ffl', '\uFB05': 'st', '\uFB06': 'st',
+    // Quotation marks, flattened to the ASCII " and '
+    '\u201C': '"', '\u201D': '"', '\u201F': '"',
+    '\u2018': '\'', '\u2019': '\'', '\u201B': '\'',
+    '\u201E': '"', '\u201A': '\'',
+    '\u00AB': '"', '\u00BB': '"', '\u2039': '\'', '\u203A': '\''
 };
 
-// Quotation marks. Every profile flattens them to ASCII " and ' - only the set
-// of marks a language actually uses differs.
-const QUOTES_CURLY = {
-    '“': '"', '”': '"', '‟': '"',
-    '‘': '\'', '’': '\'', '‛': '\''
-};
-const QUOTES_LOW = { '„': '"', '‚': '\'' };   // German-style low quotes
-const QUOTES_GUILLEMET = {
-    '«': '"', '»': '"', '‹': '\'', '›': '\''
-};
-
-// Letters that some languages spell out when reduced to ASCII.
+// Optional fragment: letters spelled out in ASCII. Not wanted for languages
+// that have no ae/oe of their own, where they only appear in foreign words.
 const LIGATURE_LETTERS = {
-    'æ': 'ae', 'Æ': 'Ae', 'œ': 'oe', 'Œ': 'Oe'
+    '\u00E6': 'ae', '\u00C6': 'Ae', '\u0153': 'oe', '\u0152': 'Oe'
 };
 
-// French typography puts a space inside guillemets and before ; : ! ? - dropping
-// it is what makes the ASCII result look right. Multi-character keys are matched
-// first (object insertion order), and both the no-break and the plain space
-// variant are listed so the profile also works with invisible-character removal
-// switched off.
+// Optional fragment: Switzerland does not use the sharp s.
+const SHARP_S = { '\u00DF': 'ss' };
+
+// Optional fragment: French typography puts a space inside guillemets and
+// before ; : ! ? - dropping it is what makes the ASCII result look right.
+// Multi-character keys must be matched first (object insertion order), and each
+// rule is listed for the no-break space, the narrow no-break space and the
+// plain space, so it also works with invisible-character removal switched off.
 const FRENCH_SPACING = {
-    '« ': '"', '« ': '"', '« ': '"',
-    ' »': '"', ' »': '"', ' »': '"',
-    ' ;': ';', ' ;': ';', ' ;': ';',
-    ' :': ':', ' :': ':', ' :': ':',
-    ' !': '!', ' !': '!', ' !': '!',
-    ' ?': '?', ' ?': '?', ' ?': '?'
+    '\u00AB\u00A0': '"', '\u00AB\u202F': '"', '\u00AB ': '"',
+    '\u00A0\u00BB': '"', '\u202F\u00BB': '"', ' \u00BB': '"',
+    '\u00A0;': ';', '\u202F;': ';', ' ;': ';',
+    '\u00A0:': ':', '\u202F:': ':', ' :': ':',
+    '\u00A0!': '!', '\u202F!': '!', ' !': '!',
+    '\u00A0?': '?', '\u202F?': '?', ' ?': '?'
 };
 
-const EMBEDDED_MAPPINGS = {
-    // Punctuation only - never touches letters. For text that must stay
-    // readable in its own language but should lose the fancy typography.
-    'universal': {
-        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET
-    },
-    // Switzerland does not use the sharp s; guillemets are the primary quotes.
-    'swiss-german': {
-        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET,
-        ...LIGATURE_LETTERS,
-        'ß': 'ss'
-    },
-    // Germany/Austria keep the sharp s - only the typography is flattened.
-    'german': {
-        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET,
-        ...LIGATURE_LETTERS
-    },
-    'french': {
-        ...FRENCH_SPACING,
-        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET,
-        ...LIGATURE_LETTERS
-    },
-    // Italian has no ae/oe ligatures of its own, so foreign words keep them.
-    'italian': {
-        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET
-    },
-    'english': {
-        ...COMMON_TYPOGRAPHY, ...QUOTES_CURLY, ...QUOTES_LOW, ...QUOTES_GUILLEMET,
-        ...LIGATURE_LETTERS
-    }
+/**
+ * Compose the active mapping table from the enabled fragments.
+ * French spacing goes first so its two-character keys win over the bare
+ * guillemets in the base.
+ * @param {object} settings - Current optimizer settings
+ * @returns {Object<string, string>} - Replacement table
+ */
+function buildCharacterMapping(settings) {
+    return {
+        ...(settings.mapFrenchSpacing ? FRENCH_SPACING : null),
+        ...BASE_MAPPING,
+        ...(settings.mapLigatures ? LIGATURE_LETTERS : null),
+        ...(settings.mapSharpS ? SHARP_S : null)
+    };
+}
+
+// Retired language profiles, mapped to the switches that reproduce them. Used
+// once to migrate saved settings; the dropdown itself is gone. Every switch is
+// listed explicitly - a missing key would leave the default in place and turn a
+// profile into something it never was.
+function retiredProfile(ligatures, sharpS, french, digraphs) {
+    return {
+        mapLigatures: ligatures,
+        mapSharpS: sharpS,
+        mapFrenchSpacing: french,
+        umlautDigraphs: digraphs
+    };
+}
+const RETIRED_LANGUAGE_PROFILES = {
+    //                             ligatures  sharpS  french  digraphs
+    'universal': retiredProfile(false, false, false, false),
+    'italian': retiredProfile(false, false, false, false),
+    'german': retiredProfile(true, false, false, true),
+    'english': retiredProfile(true, false, false, false),
+    'english-international': retiredProfile(true, false, false, false),
+    'english-us': retiredProfile(true, false, false, false),
+    'swiss-german': retiredProfile(true, true, false, true),
+    'french': retiredProfile(true, false, true, false)
 };
-// The two English profiles were character-identical; they stay as aliases so
-// settings saved by earlier versions keep resolving.
-EMBEDDED_MAPPINGS['english-international'] = EMBEDDED_MAPPINGS['english'];
-EMBEDDED_MAPPINGS['english-us'] = EMBEDDED_MAPPINGS['english'];
 
 // Input box sizing. Must match the #optimizer-textarea rule in components.css.
 const TEXTAREA_MIN_HEIGHT = 270;
@@ -105,12 +111,31 @@ const TEXTAREA_MIN_HEIGHT = 270;
 // height forever and the new default would never show up.
 const LEGACY_TEXTAREA_HEIGHT = 300;
 
-// Values that no longer exist in the dropdown. Without this the <select> would
-// silently fall back to an empty value for anyone with older saved settings.
-const LEGACY_LANGUAGE_ALIASES = {
-    'english-international': 'english',
-    'english-us': 'english'
-};
+/**
+ * Convert settings saved by an older version, which selected a language profile
+ * instead of the individual switches. Runs on load only; without it everyone
+ * with a stored language would silently drop to the bare base mapping.
+ * @param {object} stored - Settings object from localStorage
+ * @returns {object} - Settings using the current keys
+ */
+function migrateLegacySettings(stored) {
+    if (!stored || typeof stored !== 'object') return stored;
+    if (!('languageMapping' in stored) && !('applyLanguageMapping' in stored)) {
+        return stored;
+    }
+
+    const migrated = { ...stored };
+    if ('applyLanguageMapping' in migrated) {
+        migrated.applyCharacterMapping = migrated.applyLanguageMapping;
+        delete migrated.applyLanguageMapping;
+    }
+    if ('languageMapping' in migrated) {
+        Object.assign(migrated, RETIRED_LANGUAGE_PROFILES[migrated.languageMapping]
+            || RETIRED_LANGUAGE_PROFILES['swiss-german']);
+        delete migrated.languageMapping;
+    }
+    return migrated;
+}
 
 /**
  * Invisible, zero-width and format characters.
@@ -427,26 +452,26 @@ const MOJIBAKE_RE = new RegExp(
 class TextOptimizer {
     constructor() {
         this.settings = {
-            applyLanguageMapping: false,  // New setting for language character replacement
             removeInvisibleChars: true,   // Invisible/zero-width/format characters (baseline hygiene)
+            applyCharacterMapping: false,
+            // Mapping detail switches. The defaults reproduce what the retired
+            // "Swiss German" profile did, which used to be the preselected one.
+            mapLigatures: true,
+            mapSharpS: true,
+            mapFrenchSpacing: false,
             removeDiacritics: false,
+            umlautDigraphs: true,         // ae/oe/ue instead of a/o/u
             removeCitations: false,
             convertMarkdown: false,
             removeFancyFont: false,
             replaceEmDash: false,
-            languageMapping: 'swiss-german',
             targetSystem: 'auto',         // 'auto' | 'windows' | 'linux' | 'macos'
             removeLineBreaks: false        // Remove all line breaks (default off)
         };
-
-        // Mappings are embedded; no network fetch needed (works on file:// too).
-        this.languageMappings = EMBEDDED_MAPPINGS;
     }
 
     updateSettings(newSettings) {
         this.settings = { ...this.settings, ...newSettings };
-        const alias = LEGACY_LANGUAGE_ALIASES[this.settings.languageMapping];
-        if (alias) this.settings.languageMapping = alias;
     }
 
     /**
@@ -500,14 +525,14 @@ class TextOptimizer {
             run('fancy font', t => this.removeFancyFont(t));
         }
 
-        // Apply em dash replacement BEFORE language mapping
+        // Apply em dash replacement BEFORE character mapping
         if (this.settings.replaceEmDash) {
             run('em dashes', t => this.replaceEmDash(t));
         }
 
-        // Apply language mapping AFTER em dash replacement
-        if (this.settings.applyLanguageMapping) {
-            run('language mapping', t => this.applyLanguageCharacterMapping(t));
+        // Apply character mapping AFTER em dash replacement
+        if (this.settings.applyCharacterMapping) {
+            run('character mapping', t => this.applyCharacterMapping(t));
         }
 
         // Line break removal runs LAST
@@ -524,13 +549,12 @@ class TextOptimizer {
     }
 
     /**
-     * Apply language-specific character mappings (quotes, dashes, etc.)
+     * Apply the composed character mapping (quotes, dashes, ligatures, ...)
      * @param {string} text - Input text
-     * @returns {string} - Text with language mappings applied
+     * @returns {string} - Text with the mapping applied
      */
-    applyLanguageCharacterMapping(text) {
-        const mapping = this.languageMappings[this.settings.languageMapping];
-        if (!mapping) return text;
+    applyCharacterMapping(text) {
+        const mapping = buildCharacterMapping(this.settings);
 
         // Normalize to ensure composed characters match mapping keys
         let result = (text ?? '').normalize('NFC');
@@ -546,16 +570,16 @@ class TextOptimizer {
     }
 
     /**
-     * Remove diacritics, respecting the selected language convention:
-     * German/Swiss German turn umlauts into digraphs (ä→ae); every other
-     * language gets the plain letter (ä→a). Single regex pass.
+     * Remove diacritics. With the umlaut-digraph switch on, ä/ö/ü become
+     * ae/oe/ue (the German and Swiss convention); otherwise they become the
+     * plain letter a/o/u. Single regex pass.
      * @param {string} text - Input text
      * @returns {string} - Text with diacritics removed
      */
     removeDiacritics(text) {
-        const lang = this.settings.languageMapping;
-        const useGermanDigraphs = lang === 'swiss-german' || lang === 'german';
-        const { re, map } = useGermanDigraphs ? DIACRITICS_GERMAN : DIACRITICS_PLAIN;
+        const { re, map } = this.settings.umlautDigraphs
+            ? DIACRITICS_GERMAN
+            : DIACRITICS_PLAIN;
         return text.normalize('NFC').replace(re, ch => map[ch]);
     }
 
@@ -794,7 +818,11 @@ const OPTIMIZER_PRESETS = {
     },
     'swiss': {
         label: 'Swiss standardization',
-        settings: { applyLanguageMapping: true, removeFancyFont: true, removeCitations: true, replaceEmDash: true, languageMapping: 'swiss-german' }
+        settings: {
+            applyCharacterMapping: true, mapLigatures: true, mapSharpS: true,
+            mapFrenchSpacing: false, umlautDigraphs: true,
+            removeFancyFont: true, removeCitations: true, replaceEmDash: true
+        }
     },
     'paragraph': {
         label: 'Paragraph cleanup',
@@ -850,7 +878,6 @@ class OptimizerUI {
         this.copyButton = document.getElementById('copy-text-btn');
         this.clearButton = document.getElementById('clear-text-btn');
         this.undoButton = document.getElementById('undo-text-btn');
-        this.languageSelect = document.getElementById('language-select');
         this.targetSystemButtons = document.querySelectorAll('#target-system-buttons button');
         this.presetButtons = document.querySelectorAll('[data-preset]');
     }
@@ -891,10 +918,6 @@ class OptimizerUI {
         }
 
         // Language selection
-        if (this.languageSelect) {
-            this.languageSelect.addEventListener('change', (e) => this.handleLanguageChange(e.target.value));
-        }
-
         // Target system selection
         if (this.targetSystemButtons) {
             this.targetSystemButtons.forEach(btn => {
@@ -919,7 +942,13 @@ class OptimizerUI {
         // Invisible-character removal is baseline hygiene rather than a style
         // choice, so it stays on unless a preset switches it off explicitly.
         this.optimizer.updateSettings({
-            applyLanguageMapping: false,
+            applyCharacterMapping: false,
+            // Detail switches reset to their defaults too, so a preset always
+            // lands on the same state no matter what was configured before.
+            mapLigatures: true,
+            mapSharpS: true,
+            mapFrenchSpacing: false,
+            umlautDigraphs: true,
             removeInvisibleChars: true,
             removeDiacritics: false,
             removeCitations: false,
@@ -961,7 +990,11 @@ class OptimizerUI {
 
     handleToggleChange(toggleId, value) {
         const settingMap = {
-            'apply-language-mapping': 'applyLanguageMapping',
+            'apply-character-mapping': 'applyCharacterMapping',
+            'map-ligatures': 'mapLigatures',
+            'map-sharp-s': 'mapSharpS',
+            'map-french-spacing': 'mapFrenchSpacing',
+            'umlaut-digraphs': 'umlautDigraphs',
             'remove-invisible-chars': 'removeInvisibleChars',
             'remove-diacritics': 'removeDiacritics',
             'remove-citations': 'removeCitations',
@@ -974,13 +1007,9 @@ class OptimizerUI {
         const settingKey = settingMap[toggleId];
         if (settingKey) {
             this.optimizer.updateSettings({ [settingKey]: value });
+            this.updateOptionAvailability();
             this.saveUserSettings();
         }
-    }
-
-    handleLanguageChange(language) {
-        this.optimizer.updateSettings({ languageMapping: language });
-        this.saveUserSettings();
     }
 
     handleTargetSystemChange(targetSystem) {
@@ -1125,7 +1154,7 @@ class OptimizerUI {
     loadUserSettings() {
         const settings = this.storage.loadSettings();
         if (settings.optimizer) {
-            this.optimizer.updateSettings(settings.optimizer);
+            this.optimizer.updateSettings(migrateLegacySettings(settings.optimizer));
             // Reflect the normalized settings, not the raw stored ones, so
             // retired language values resolve to their replacement in the UI.
             this.applySettingsToUI(this.optimizer.settings);
@@ -1141,7 +1170,11 @@ class OptimizerUI {
     applySettingsToUI(settings) {
         // Apply toggle states
         const toggleMap = {
-            'applyLanguageMapping': 'apply-language-mapping',
+            'applyCharacterMapping': 'apply-character-mapping',
+            'mapLigatures': 'map-ligatures',
+            'mapSharpS': 'map-sharp-s',
+            'mapFrenchSpacing': 'map-french-spacing',
+            'umlautDigraphs': 'umlaut-digraphs',
             'removeInvisibleChars': 'remove-invisible-chars',
             'removeDiacritics': 'remove-diacritics',
             'removeCitations': 'remove-citations',
@@ -1158,15 +1191,28 @@ class OptimizerUI {
             }
         }
 
-        // Apply language selection
-        if (this.languageSelect && settings.languageMapping) {
-            this.languageSelect.value = settings.languageMapping;
-        }
-
         // Apply target system selection
         if (this.targetSystemButtons && settings.targetSystem) {
             this.updateTargetSystemUI(settings.targetSystem);
         }
+
+        this.updateOptionAvailability();
+    }
+
+    /**
+     * Dim the detail switches whose parent option is off. They keep their state
+     * so nothing is lost when the parent comes back on - they simply stop
+     * claiming to do anything while they cannot.
+     */
+    updateOptionAvailability() {
+        document.querySelectorAll('[data-requires]').forEach(item => {
+            const parent = document.querySelector(
+                `[data-toggle="${item.dataset.requires}"]`);
+            const active = !!(parent && parent.checked);
+            item.classList.toggle('toggle-item--muted', !active);
+            const input = item.querySelector('.toggle-input');
+            if (input) input.disabled = !active;
+        });
     }
 }
 
@@ -1178,14 +1224,17 @@ class StorageManager {
         this.storageKey = 'asd123-optimizer-settings';
         this.defaultSettings = {
             optimizer: {
-                applyLanguageMapping: false,
                 removeInvisibleChars: true,
+                applyCharacterMapping: false,
+                mapLigatures: true,
+                mapSharpS: true,
+                mapFrenchSpacing: false,
                 removeDiacritics: false,
+                umlautDigraphs: true,
                 removeCitations: false,
                 convertMarkdown: false,
                 removeFancyFont: false,
                 replaceEmDash: false,
-                languageMapping: 'swiss-german',
                 targetSystem: 'auto',
                 removeLineBreaks: false
             },

@@ -467,6 +467,34 @@ input:checked + .toggle-slider:before {
     color: var(--text-primary);
 }
 
+/* Detail switches that only refine the option above them. Indented and lighter
+   so the list still reads as a flat set of features with a few sub-choices. */
+.toggle-item--sub {
+    margin-left: var(--space-6);
+    background: transparent;
+    border-style: dashed;
+}
+
+.toggle-item--sub .toggle-label {
+    font-weight: 400;
+    font-size: 14px;
+}
+
+/* Parent option is off: the switch keeps its state but stops pretending to do
+   anything. Pointer events stay on so the tooltip is still reachable. */
+.toggle-item--muted {
+    opacity: 0.45;
+}
+
+.toggle-item--muted:hover {
+    background: transparent;
+    border-color: var(--border-color);
+}
+
+.toggle-item--muted .toggle-switch {
+    cursor: not-allowed;
+}
+
 .badge-experimental {
     font-size: 10px;
     font-weight: 700;
@@ -991,6 +1019,11 @@ footer {
     .toggle-item__content {
         width: 100%;
         justify-content: space-between;
+    }
+
+    /* A full indent costs too much width on a phone. */
+    .toggle-item--sub {
+        margin-left: var(--space-3);
     }
 
     .footer-content {

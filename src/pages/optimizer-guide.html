@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>Optimizer User Guide - ASD123.ai</title>
     <meta name="description" content="Current user guide for the ASD123.ai Optimizer. Learn how to clean AI-generated text locally in your browser.">
-    <meta name="keywords" content="optimizer guide, text cleaning, AI text processing, markdown cleanup, citation removal, language mapping">
+    <meta name="keywords" content="optimizer guide, text cleaning, AI text processing, markdown cleanup, citation removal, character mapping, invisible characters">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Optimizer User Guide - ASD123.ai">
@@ -171,7 +171,7 @@
                                 <a href="#overview" class="text-[var(--primary-color)] hover:underline">→ Overview</a>
                                 <a href="#workflow" class="text-[var(--primary-color)] hover:underline">→ Basic Workflow</a>
                                 <a href="#target-system" class="text-[var(--primary-color)] hover:underline">→ Target System</a>
-                                <a href="#language-mapping" class="text-[var(--primary-color)] hover:underline">→ Language Mapping</a>
+                                <a href="#character-mapping" class="text-[var(--primary-color)] hover:underline">→ Character Mapping</a>
                                 <a href="#processing-options" class="text-[var(--primary-color)] hover:underline">→ Processing Options</a>
                                 <a href="#common-presets" class="text-[var(--primary-color)] hover:underline">→ Common Presets</a>
                                 <a href="#privacy" class="text-[var(--primary-color)] hover:underline">→ Privacy</a>
@@ -189,7 +189,7 @@
                                 </p>
                                 <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
                                     <p class="text-sm text-[var(--text-secondary)]">
-                                        <strong class="text-[var(--text-primary)]">Always local:</strong> The Optimizer runs in browser JavaScript. Only preferences such as selected language and enabled options are saved locally.
+                                        <strong class="text-[var(--text-primary)]">Always local:</strong> The Optimizer runs in browser JavaScript. Only preferences such as the enabled options are saved locally.
                                     </p>
                                 </div>
                             </div>
@@ -211,7 +211,7 @@
                                     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">2</div>
                                     <div>
                                         <h4 class="font-bold text-[var(--text-primary)] mb-1">Choose target system and options</h4>
-                                        <p class="text-sm">Select a target system, choose a language mapping, then enable only the cleanup options you need.</p>
+                                        <p class="text-sm">Select a target system, then enable only the cleanup options you need &mdash; or start from a preset.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-4">
@@ -244,40 +244,34 @@
                             </div>
                         </div>
 
-                        <div id="language-mapping" class="mb-12">
+                        <div id="character-mapping" class="mb-12">
                             <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                                <span class="text-[var(--primary-color)]">4.</span> Language Mapping
+                                <span class="text-[var(--primary-color)]">4.</span> Character Mapping
                             </h3>
                             <div class="space-y-4 text-[var(--text-secondary)]">
                                 <p class="leading-relaxed">
-                                    Every profile flattens the same typography to plain ASCII: curly and low quotes, guillemets, the whole family of dashes and the minus sign, ellipses, bullets, primes, and the ligatures that text extracted from PDFs is full of (<code>&#xFB01;nal</code> &rarr; <code>final</code>). Only the language-specific rules on top of that differ. Mappings run only when <strong>Apply Language Character Mapping</strong> is enabled &mdash; and they never touch invisible characters, which are handled by their own option.
+                                    <strong class="text-[var(--text-primary)]">Apply Character Mapping</strong> flattens typography to plain ASCII: every dash and the minus sign, all quotation marks including guillemets and the German low quotes, ellipses, bullets, primes, and the ligatures that text extracted from PDFs is full of (<code>&#xFB01;nal</code> &rarr; <code>final</code>). That is 41 rules, and on its own it never rewrites a letter. Invisible characters are not part of this &mdash; they have their own option.
+                                </p>
+                                <p class="leading-relaxed">
+                                    Three switches add the rules that used to be hidden behind a language dropdown. That dropdown offered six languages but held only four distinct tables: Italian was byte-identical to Universal, English to German. Naming the actual rules is both shorter and honest.
                                 </p>
                                 <div class="grid md:grid-cols-3 gap-4">
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Universal</h4>
-                                        <p class="text-sm">Punctuation only &mdash; never rewrites a letter. Pick this when the text has to stay correct in its own language but should lose the fancy typography.</p>
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Spell out &aelig;/&oelig; as ae/oe</h4>
+                                        <p class="text-sm">German, French and English write these out in ASCII. Leave it off for Italian, which has no &aelig;/&oelig; of its own, so foreign words keep their spelling.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Swiss German</h4>
-                                        <p class="text-sm">Adds the Swiss convention &szlig; &rarr; ss, which Germany and Austria do not use, plus &aelig;/&oelig; spelled out as ae/oe.</p>
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Convert &szlig; to ss</h4>
+                                        <p class="text-sm">The Swiss convention. Germany and Austria keep &szlig;, so leave it off for German from those countries.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">German</h4>
-                                        <p class="text-sm">Keeps &szlig; intact and spells out &aelig;/&oelig; as ae/oe.</p>
-                                    </div>
-                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">French</h4>
-                                        <p class="text-sm">Removes the space French typography puts inside guillemets and before <code>;&nbsp;:&nbsp;!&nbsp;?</code>, so <code>&laquo;&nbsp;bonjour&nbsp;&raquo;</code> becomes <code>"bonjour"</code>. &oelig; becomes oe.</p>
-                                    </div>
-                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Italian</h4>
-                                        <p class="text-sm">Punctuation only. Italian has no &aelig;/&oelig; of its own, so foreign words keep their spelling.</p>
-                                    </div>
-                                    <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">English</h4>
-                                        <p class="text-sm">Curly quotes, dashes and ellipses to ASCII, &aelig;/&oelig; spelled out. The former US and International profiles were character-identical and are now one option.</p>
+                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">French spacing rules</h4>
+                                        <p class="text-sm">French typography puts a space inside guillemets and before <code>;&nbsp;:&nbsp;!&nbsp;?</code>. This removes it, so <code>&laquo;&nbsp;bonjour&nbsp;&raquo;</code> becomes <code>"bonjour"</code>.</p>
                                     </div>
                                 </div>
+                                <p class="leading-relaxed">
+                                    The switches are greyed out while character mapping is off. They keep their state, so nothing is lost when you switch it back on. If you used a language before, your setting was carried over to the equivalent switches automatically.
+                                </p>
                             </div>
                         </div>
 
@@ -294,12 +288,12 @@
                                     <p class="text-sm mt-3">After each clean you get a breakdown of what was found, for example <em>&quot;Found 10 hidden characters: 5 tag characters, 2 zero-width characters, 1 bidi control, 1 hidden format character, 1 unusual space&quot;</em> &mdash; otherwise there is no way to tell the option did anything.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Apply Language Character Mapping</h4>
-                                    <p class="text-sm">Applies the selected language profile to quotes, dashes, ellipses, bullets and ligatures. Visible typography only &mdash; invisible characters are a separate option.</p>
+                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Apply Character Mapping</h4>
+                                    <p class="text-sm">Flattens quotes, dashes, ellipses, bullets, primes and PDF ligatures to plain ASCII, plus whatever the three detail switches add. Visible typography only &mdash; invisible characters are a separate option.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Diacritics</h4>
-                                    <p class="text-sm">Converts accented characters to plain forms, following the selected language: with German or Swiss German, &auml;/&ouml;/&uuml; become ae/oe/ue; for all other languages they become a/o/u. &szlig; always becomes ss.</p>
+                                    <p class="text-sm">Converts accented characters to plain forms. The <strong class="text-[var(--text-primary)]">Umlauts as ae/oe/ue</strong> switch below it picks the convention: on, &auml;/&ouml;/&uuml; become ae/oe/ue; off, they become a/o/u. &szlig; always becomes ss.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
                                     <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Fancy Text Font</h4>

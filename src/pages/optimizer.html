@@ -6,14 +6,14 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>ASD123.ai Optimizer - Clean & Standardize AI Text</title>
     <meta name="description"
-        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, and apply language mappings. 100% privacy-focused browser processing." />
+        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, invisible characters, and normalize typography. 100% privacy-focused browser processing." />
     <meta name="keywords"
-        content="AI text optimizer, text cleaning tool, diacritic removal, citation cleaner, markdown converter, language mapping, privacy-first text processing" />
+        content="AI text optimizer, text cleaning tool, diacritic removal, citation cleaner, markdown converter, invisible characters, privacy-first text processing" />
     <meta name="author" content="ASD123.ai" />
     <meta name="robots" content="index, follow" />
     <meta property="og:title" content="ASD123.ai Optimizer - Clean & Standardize AI Text" />
     <meta property="og:description"
-        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, and apply language mappings." />
+        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, invisible characters, and normalize typography." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://asd123.ai/optimizer" />
     <meta property="og:site_name" content="ASD123.ai" />
@@ -21,7 +21,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ASD123.ai Optimizer - Clean & Standardize AI Text" />
     <meta name="twitter:description"
-        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, and apply language mappings." />
+        content="Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, invisible characters, and normalize typography." />
     <link rel="canonical" href="https://asd123.ai/optimizer" />
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link href="styles/main.css" rel="stylesheet" />
@@ -71,7 +71,7 @@
           "@id": "https://asd123.ai/optimizer#app",
           "name": "Optimizer — ASD123.ai",
           "url": "https://asd123.ai/optimizer",
-          "description": "Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, and apply language mappings. 100% privacy-focused browser processing.",
+          "description": "Advanced AI text optimizer for cleaning, standardizing, and processing AI-generated content. Remove diacritics, citations, markdown, invisible characters, and normalize typography. 100% privacy-focused browser processing.",
           "applicationCategory": "UtilitiesApplication",
           "operatingSystem": "Web browser",
           "browserRequirements": "Requires JavaScript; on-device AI features require WebGPU",
@@ -267,20 +267,6 @@ All processing happens entirely in your browser for complete privacy."></textare
                         </div>
                     </div>
 
-                    <!-- Language Mapping -->
-                    <div class="form-group">
-                        <label class="form-label" for="language-select">Language Mapping</label>
-                        <select id="language-select" class="select-field">
-                            <option value="universal">Universal (punctuation only)</option>
-                            <option value="swiss-german" selected>Swiss German</option>
-                            <option value="german">German</option>
-                            <option value="french">French</option>
-                            <option value="italian">Italian</option>
-                            <option value="english">English</option>
-                        </select>
-                        <small style="display: block; margin-top: var(--space-2); color: var(--text-secondary);">Flattens quotes, dashes, ellipses and PDF ligatures to plain ASCII. Only the language-specific rules differ — Swiss German turns ß into ss, French drops the space inside « guillemets », Universal never touches letters.</small>
-                    </div>
-
                     <div class="section-divider"></div>
 
                     <!-- Character Processing Section -->
@@ -318,10 +304,10 @@ All processing happens entirely in your browser for complete privacy."></textare
                                 <div class="toggle-content">
                                     <label class="toggle-switch">
                                         <input type="checkbox" class="toggle-input"
-                                            data-toggle="apply-language-mapping">
+                                            data-toggle="apply-character-mapping">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Apply Language Character Mapping</span>
+                                    <span class="toggle-label">Apply Character Mapping</span>
                                     <div class="tooltip">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -330,8 +316,73 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             <path d="M12 16v-4" />
                                             <path d="M12 8h.01" />
                                         </svg>
-                                        <span class="tooltip-text">Replaces special characters like quotes, dashes, and
-                                            spaces according to the selected language mapping</span>
+                                        <span class="tooltip-text">Flattens typography to plain ASCII: every dash and
+                                            quotation mark, ellipses, bullets, primes and the ligatures that text
+                                            extracted from PDFs is full of. Never touches letters on its own - the
+                                            three switches below add that.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-item toggle-item--sub" data-requires="apply-character-mapping">
+                                <div class="toggle-content">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" class="toggle-input" checked
+                                            data-toggle="map-ligatures">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label">Spell out &aelig;/&oelig; as ae/oe</span>
+                                    <div class="tooltip">
+                                        <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <path d="M12 16v-4" />
+                                            <path d="M12 8h.01" />
+                                        </svg>
+                                        <span class="tooltip-text">German, French and English spell these out in ASCII. Italian has no &aelig;/&oelig; of its own, so leave this off to keep foreign words intact.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-item toggle-item--sub" data-requires="apply-character-mapping">
+                                <div class="toggle-content">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" class="toggle-input" checked
+                                            data-toggle="map-sharp-s">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label">Convert &szlig; to ss</span>
+                                    <div class="tooltip">
+                                        <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <path d="M12 16v-4" />
+                                            <path d="M12 8h.01" />
+                                        </svg>
+                                        <span class="tooltip-text">Switzerland does not use the sharp s. Germany and Austria do, so leave this off for German from those countries.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-item toggle-item--sub" data-requires="apply-character-mapping">
+                                <div class="toggle-content">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" class="toggle-input"
+                                            data-toggle="map-french-spacing">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label">French spacing rules</span>
+                                    <div class="tooltip">
+                                        <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <path d="M12 16v-4" />
+                                            <path d="M12 8h.01" />
+                                        </svg>
+                                        <span class="tooltip-text">French typography puts a space inside &laquo; guillemets &raquo; and before ; : ! ? - this removes it, so &laquo;&nbsp;bonjour&nbsp;&raquo; becomes "bonjour".</span>
                                     </div>
                                 </div>
                             </div>
@@ -354,6 +405,27 @@ All processing happens entirely in your browser for complete privacy."></textare
                                         <span class="tooltip-text">Converts accented characters to plain equivalents.
                                             With German or Swiss German selected, ä/ö/ü become ae/oe/ue; for other
                                             languages they become a/o/u.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-item toggle-item--sub" data-requires="remove-diacritics">
+                                <div class="toggle-content">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" class="toggle-input" checked
+                                            data-toggle="umlaut-digraphs">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label">Umlauts as ae/oe/ue</span>
+                                    <div class="tooltip">
+                                        <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <path d="M12 16v-4" />
+                                            <path d="M12 8h.01" />
+                                        </svg>
+                                        <span class="tooltip-text">The German and Swiss convention: &auml;/&ouml;/&uuml; become ae/oe/ue. With this off they become the plain a/o/u.</span>
                                     </div>
                                 </div>
                             </div>
