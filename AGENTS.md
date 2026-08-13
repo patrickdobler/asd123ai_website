@@ -6,7 +6,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 **ASD123.ai** is a privacy-focused AI text processing web application deployed on Cloudflare Workers. All text processing happens client-side in the browser - no data is ever transmitted to servers. The project features two main tools:
 
-1. **Optimizer**: Text cleaning and standardization (language-specific character mappings, diacritics removal, citation removal, Markdown conversion, etc.)
+1. **Text Cleaner**: Text cleaning and standardization (language-specific character mappings, diacritics removal, citation removal, Markdown conversion, etc.)
 2. **Anonymizer**: Privacy-focused PII detection and anonymization with reversible mappings (supports regex-based and AI model-based detection)
 
 ## Development Commands
@@ -50,7 +50,7 @@ npm run deploy
 ├── *.html                      # HTML pages (root level)
 ├── scripts/                    # JavaScript modules
 │   ├── shared.js              # Shared utilities, navigation
-│   ├── optimizer.js           # Text optimizer engine
+│   ├── text-cleaner.js        # Text Cleaner engine
 │   ├── anonymizer-core.js     # Anonymizer main logic
 │   ├── entity-manager.js      # Entity detection and mapping
 │   ├── model-loader.js        # AI model loading (transformers.js)
@@ -65,18 +65,18 @@ npm run deploy
 
 ### Cloudflare Workers Routing
 The `src/index.js` file handles:
-- Clean URL redirects (e.g., `/optimizer.html` → `/optimizer`)
+- Clean URL redirects (e.g., `/text-cleaner.html` → `/text-cleaner`)
 - Static asset serving from `dist/` directory via the `ASSETS` binding
 - 301 redirects for .html extensions to clean URLs
 
 Example routes:
 - `/` → serves `index.html`
-- `/optimizer` → serves `optimizer.html`
+- `/text-cleaner` → serves `text-cleaner.html`
 - `/anonymizer-guide` → serves `anonymizer-guide.html`
 
 ### Client-Side Architecture
 
-#### Optimizer (`scripts/optimizer.js`)
+#### Text Cleaner (`scripts/text-cleaner.js`)
 - **Language Mappings**: JSON-based character replacement mappings stored in `components/mappings/`
 - **Embedded Fallbacks**: Hard-coded mappings in the script for offline/file:// protocol usage
 - **Processing Options**:
@@ -170,8 +170,8 @@ The Anonymizer uses prioritized regex patterns (lower priority = checked first):
 
 ### Adding a New Language Mapping
 1. Create JSON file in `components/mappings/{language}.json`
-2. Add embedded fallback to `EMBEDDED_MAPPINGS` in `scripts/optimizer.js`
-3. Add language option to the dropdown in `optimizer.html`
+2. Add embedded fallback to `MAPPING_GROUPS` in `scripts/text-cleaner.js`
+3. Add language option to the toggles in `text-cleaner.html`
 4. Update `loadLanguageMappings()` to include the new language
 
 ### Modifying Entity Detection

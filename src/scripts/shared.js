@@ -69,7 +69,7 @@ class NavigationManager {
         });
         
         const linkedPage = {
-            'optimizer-guide': 'optimizer',
+            'text-cleaner-guide': 'text-cleaner',
             'anonymizer-guide': 'anonymizer',
             'chat-guide': 'chat',
             'context-guide': 'context'
@@ -229,7 +229,7 @@ class WebMCPManager {
                 url: window.location.href,
                 pathname: window.location.pathname,
                 tools: [
-                    'optimizer: local text cleanup and normalization',
+                    'text-cleaner: local text cleanup and normalization',
                     'anonymizer: local PII anonymization and redaction',
                     'chat: local WebGPU AI chat with browser-stored history',
                     'context: local context window estimation for text and documents'
@@ -246,7 +246,7 @@ class WebMCPManager {
                 properties: {
                     page: {
                         type: 'string',
-                        enum: ['home', 'optimizer', 'anonymizer', 'chat', 'context', 'documentation', 'optimizer-guide', 'anonymizer-guide', 'chat-guide', 'context-guide', 'privacy', 'terms']
+                        enum: ['home', 'text-cleaner', 'anonymizer', 'chat', 'context', 'documentation', 'text-cleaner-guide', 'anonymizer-guide', 'chat-guide', 'context-guide', 'privacy', 'terms']
                     }
                 },
                 required: ['page'],
@@ -255,12 +255,12 @@ class WebMCPManager {
             execute: async ({ page }) => {
                 const routes = {
                     home: '/',
-                    optimizer: '/optimizer',
+                    'text-cleaner': '/text-cleaner',
                     anonymizer: '/anonymizer',
                     chat: '/chat',
                     context: '/context',
                     documentation: '/documentation',
-                    'optimizer-guide': '/optimizer-guide',
+                    'text-cleaner-guide': '/text-cleaner-guide',
                     'anonymizer-guide': '/anonymizer-guide',
                     'chat-guide': '/chat-guide',
                     'context-guide': '/context-guide',
@@ -273,21 +273,21 @@ class WebMCPManager {
         });
 
         this.registerTool({
-            name: 'asd123_fill_optimizer',
-            description: 'Fill the Optimizer input area with text on the optimizer page.',
+            name: 'asd123_fill_text_cleaner',
+            description: 'Fill the Text Cleaner input area with text on the text-cleaner page.',
             inputSchema: {
                 type: 'object',
                 properties: {
                     text: {
                         type: 'string',
-                        description: 'Text to place into the optimizer input field.'
+                        description: 'Text to place into the Text Cleaner input field.'
                     }
                 },
                 required: ['text'],
                 additionalProperties: false
             },
             execute: async ({ text }) => {
-                const textarea = document.getElementById('optimizer-textarea');
+                const textarea = document.getElementById('text-cleaner-textarea');
                 if (!textarea) {
                     return { ok: false, error: 'Optimizer input is not available on this page.' };
                 }
@@ -353,8 +353,8 @@ document.addEventListener('DOMContentLoaded', function() {
     themeManager.setupToggleListener();
     
     // Initialize character counter if elements exist
-    if (document.getElementById('optimizer-textarea')) {
-        new CharacterCounter('optimizer-textarea', 'char-count');
+    if (document.getElementById('text-cleaner-textarea')) {
+        new CharacterCounter('text-cleaner-textarea', 'char-count');
     }
     
     // Initialize privacy notice

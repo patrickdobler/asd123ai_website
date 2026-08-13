@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **ASD123.ai** is a privacy-focused AI text processing web application deployed on Cloudflare Workers. All text processing happens client-side in the browser - no data is ever transmitted to servers. The project features two main tools:
 
-1. **Optimizer**: Text cleaning and standardization (language-specific character mappings, diacritics removal, citation removal, Markdown conversion, etc.)
+1. **Text Cleaner**: Text cleaning and standardization (language-specific character mappings, diacritics removal, citation removal, Markdown conversion, etc.)
 2. **Anonymizer**: Privacy-focused PII detection and anonymization with reversible mappings (supports regex-based and AI model-based detection)
 
 ## Development Commands
@@ -74,18 +74,18 @@ after changing the logo.
 
 ### Cloudflare Workers Routing
 The `src/index.js` file handles:
-- Clean URL redirects (e.g., `/optimizer.html` → `/optimizer`)
+- Clean URL redirects (e.g., `/text-cleaner.html` → `/text-cleaner`)
 - Static asset serving from `dist/` directory via the `ASSETS` binding
 - 301 redirects for .html extensions to clean URLs
 
 Example routes:
 - `/` → serves `index.html`
-- `/optimizer` → serves `optimizer.html`
+- `/text-cleaner` → serves `text-cleaner.html`
 - `/anonymizer-guide` → serves `anonymizer-guide.html`
 
 ### Client-Side Architecture
 
-#### Optimizer (`scripts/optimizer.js`)
+#### Text Cleaner (`scripts/text-cleaner.js`)
 - **Language Mappings**: character replacement tables embedded directly in the script (`EMBEDDED_MAPPINGS`); no runtime fetch, works on file://
 - **Processing Options**:
   - Language-specific character mapping (Swiss German, German, French, Italian, English variants)
@@ -153,7 +153,7 @@ The build script:
 **Important**: The build process drops console logs and debugger statements from JavaScript.
 
 ### Language Mapping System
-The Optimizer's language mappings live in `EMBEDDED_MAPPINGS` in `src/scripts/optimizer.js` (no JSON files, no fetch — this also keeps file:// usage working):
+The Text Cleaner's character mappings live in `MAPPING_GROUPS` (plus the optional fragments) in `src/scripts/text-cleaner.js` (no JSON files, no fetch — this also keeps file:// usage working):
 - Supports: swiss-german, german, french, italian, english-international, english-us
 - Mappings replace special characters (quotes, dashes, spaces, ligatures, etc.)
 - Diacritic removal is language-aware: German/Swiss German → ae/oe/ue digraphs, all other languages → plain a/o/u
@@ -182,8 +182,8 @@ The Anonymizer uses prioritized regex patterns (lower priority = checked first):
    See **Mobile Responsiveness** below for the recurring gotchas.
 
 ### Adding a New Language Mapping
-1. Add the mapping table to `EMBEDDED_MAPPINGS` in `src/scripts/optimizer.js`
-2. Add the language option to the dropdown in `src/pages/optimizer.html`
+1. Add the mapping table to `MAPPING_GROUPS` in `src/scripts/text-cleaner.js`
+2. Add the language option to the dropdown in `src/pages/text-cleaner.html`
 
 ### Modifying Entity Detection
 1. Edit `entityPatterns` object in `scripts/anonymizer-core.js`

@@ -1,5 +1,5 @@
 /**
- * ASD123.ai AI Text Tools - Optimizer Engine
+ * ASD123.ai AI Text Tools - Text Cleaner Engine
  * Privacy-focused text processing with client-side execution
  */
 
@@ -77,7 +77,7 @@ const FRENCH_SPACING = {
 
 /**
  * Compose the active mapping table from the enabled groups.
- * @param {object} settings - Current optimizer settings
+ * @param {object} settings - Current cleaner settings
  * @returns {Object<string, string>} - Replacement table
  */
 function buildCharacterMapping(settings) {
@@ -117,7 +117,7 @@ const RETIRED_LANGUAGE_PROFILES = {
     'french': retiredProfile(true, false, true, false)
 };
 
-// Input box sizing. Must match the #optimizer-textarea rule in components.css.
+// Input box sizing. Must match the #text-cleaner-textarea rule in components.css.
 const TEXTAREA_MIN_HEIGHT = 270;
 // Anything at or below the previous floor was never a deliberate size, so it is
 // discarded on load - otherwise saved settings would pin the box to its old
@@ -462,7 +462,7 @@ const MOJIBAKE_RE = new RegExp(
     'g'
 );
 
-class TextOptimizer {
+class TextCleaner {
     constructor() {
         this.settings = {
             removeInvisibleChars: true,   // Invisible/zero-width/format characters (baseline hygiene)
@@ -827,7 +827,7 @@ class TextOptimizer {
  * Quick presets: each maps to a full set of processing toggles. Applying a
  * preset first resets every toggle, so presets are deterministic.
  */
-const OPTIMIZER_PRESETS = {
+const CLEANER_PRESETS = {
     'chatgpt': {
         label: 'ChatGPT / Claude output',
         settings: { convertMarkdown: true, removeCitations: true, removeFancyFont: true }
@@ -854,11 +854,11 @@ const OPTIMIZER_PRESETS = {
 };
 
 /**
- * UI Controller for the Optimizer page
+ * UI Controller for the Text Cleaner page
  */
-class OptimizerUI {
+class TextCleanerUI {
     constructor() {
-        this.optimizer = new TextOptimizer();
+        this.cleaner = new TextCleaner();
         this.storage = new StorageManager();
         this.textarea = null;
         this.charCount = null;
@@ -895,7 +895,7 @@ class OptimizerUI {
     }
 
     setupElements() {
-        this.textarea = document.getElementById('optimizer-textarea');
+        this.textarea = document.getElementById('text-cleaner-textarea');
         this.charCount = document.getElementById('char-count');
         this.cleanButton = document.getElementById('clean-text-btn');
         this.copyButton = document.getElementById('copy-text-btn');
@@ -958,13 +958,13 @@ class OptimizerUI {
     }
 
     applyPreset(presetKey) {
-        const preset = OPTIMIZER_PRESETS[presetKey];
+        const preset = CLEANER_PRESETS[presetKey];
         if (!preset) return;
 
         // Reset all processing toggles, then apply the preset on top.
         // Invisible-character removal is baseline hygiene rather than a style
         // choice, so it stays on unless a preset switches it off explicitly.
-        this.optimizer.updateSettings({
+        this.cleaner.updateSettings({
             applyCharacterMapping: false,
             // Detail switches reset to their defaults too, so a preset always
             // lands on the same state no matter what was configured before.
@@ -986,7 +986,7 @@ class OptimizerUI {
             removeLineBreaks: false,
             ...preset.settings
         });
-        this.applySettingsToUI(this.optimizer.settings);
+        this.applySettingsToUI(this.cleaner.settings);
         this.saveUserSettings();
         this.showMessage(`Preset applied: ${preset.label}.`, 'info');
     }
@@ -1039,14 +1039,14 @@ class OptimizerUI {
 
         const settingKey = settingMap[toggleId];
         if (settingKey) {
-            this.optimizer.updateSettings({ [settingKey]: value });
+            this.cleaner.updateSettings({ [settingKey]: value });
             this.updateOptionAvailability();
             this.saveUserSettings();
         }
     }
 
     handleTargetSystemChange(targetSystem) {
-        this.optimizer.updateSettings({ targetSystem: targetSystem });
+        this.cleaner.updateSettings({ targetSystem: targetSystem });
         this.updateTargetSystemUI(targetSystem);
         this.saveUserSettings();
     }
@@ -1074,7 +1074,7 @@ class OptimizerUI {
         }
 
         try {
-            const result = this.optimizer.processText(inputText);
+            const result = this.cleaner.processText(inputText);
 
             if (result.changed) {
                 // Keep the pre-processing text so the user can undo.
@@ -1176,7 +1176,7 @@ class OptimizerUI {
 
     saveUserSettings() {
         const settings = {
-            optimizer: this.optimizer.settings,
+            cleaner: this.cleaner.settings,
             ui: {
                 textareaHeight: this.textarea ? this.textarea.style.height : '300px'
             }
@@ -1186,15 +1186,15 @@ class OptimizerUI {
 
     loadUserSettings() {
         const settings = this.storage.loadSettings();
-        if (settings.optimizer) {
-            this.optimizer.updateSettings(migrateLegacySettings(settings.optimizer));
+        if (settings.cleaner) {
+            this.cleaner.updateSettings(migrateLegacySettings(settings.cleaner));
             // Reflect the normalized settings, not the raw stored ones, so
             // retired language values resolve to their replacement in the UI.
-            this.applySettingsToUI(this.optimizer.settings);
+            this.applySettingsToUI(this.cleaner.settings);
         }
         if (settings.ui && settings.ui.textareaHeight && this.textarea) {
-            const stored = parseInt(settings.ui.textareaHeight, 10);
-            if (Number.isFinite(stored) && stored > LEGACY_TEXTAREA_HEIGHT) {
+            const storedHeight = parseInt(settings.ui.textareaHeight, 10);
+            if (Number.isFinite(storedHeight) && storedHeight > LEGACY_TEXTAREA_HEIGHT) {
                 this.textarea.style.height = settings.ui.textareaHeight;
             }
         }
@@ -1259,9 +1259,11 @@ class OptimizerUI {
  */
 class StorageManager {
     constructor() {
+        // Deliberately still 'optimizer': renaming the key would drop every
+        // existing user's saved preferences for no benefit.
         this.storageKey = 'asd123-optimizer-settings';
         this.defaultSettings = {
-            optimizer: {
+            cleaner: {
                 removeInvisibleChars: true,
                 applyCharacterMapping: false,
                 mapDashes: true,
@@ -1300,6 +1302,14 @@ class StorageManager {
             const stored = localStorage.getItem(this.storageKey);
             if (stored) {
                 const parsed = JSON.parse(stored);
+                // Saves from before the rename used `optimizer` for what is now
+                // `cleaner`. Renaming it here rather than at the read site is
+                // what matters: the defaults always supply a `cleaner` key, so
+                // a fallback further down would never see the stored one.
+                if (parsed.optimizer && !parsed.cleaner) {
+                    parsed.cleaner = parsed.optimizer;
+                    delete parsed.optimizer;
+                }
                 return { ...this.defaultSettings, ...parsed };
             }
         } catch (error) {
@@ -1317,7 +1327,7 @@ class StorageManager {
     }
 }
 
-// Initialize the optimizer UI when the script loads
+// Initialize the Text Cleaner UI when the script loads
 if (typeof window !== 'undefined') {
-    window.optimizerUI = new OptimizerUI();
+    window.textCleanerUI = new TextCleanerUI();
 }

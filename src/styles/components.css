@@ -271,10 +271,10 @@ input:checked + .toggle-slider:before {
     transition: all 150ms ease;
 }
 
-/* The Optimizer is used on pasted snippets far more often than on long
+/* The Text Cleaner is used on pasted snippets far more often than on long
    documents, so its input starts compact and grows with the content. The
    Anonymizer keeps the taller default above. */
-#optimizer-textarea {
+#text-cleaner-textarea {
     min-height: 270px;
 }
 

@@ -2,7 +2,7 @@ const SITE_ORIGIN = 'https://asd123.ai';
 
 const redirects = {
   '/index.html': '/',
-  '/optimizer.html': '/optimizer',
+  '/text-cleaner.html': '/text-cleaner',
   '/anonymizer.html': '/anonymizer',
   '/chat.html': '/chat',
   '/context.html': '/context',
@@ -18,7 +18,7 @@ const redirects = {
   '/context-guide.html': '/context-guide',
   '/converter-guide.html': '/converter-guide',
   '/tts-guide.html': '/tts-guide',
-  '/optimizer-guide.html': '/optimizer-guide',
+  '/text-cleaner-guide.html': '/text-cleaner-guide',
   '/apps.html': '/apps',
   '/rdp123.html': '/rdp123',
   '/photo-shot.html': '/photo-shot',
@@ -28,11 +28,17 @@ const redirects = {
   '/anonymize-text-for-ai.html': '/anonymize-text-for-ai',
   '/count-tokens-offline.html': '/count-tokens-offline',
   '/run-ai-chat-locally.html': '/run-ai-chat-locally',
-  '/private-text-to-speech.html': '/private-text-to-speech'
+  '/private-text-to-speech.html': '/private-text-to-speech',
+  // The Optimizer was renamed to Text Cleaner. Keep the old URLs redirecting so
+  // existing links and search results do not break.
+  '/optimizer': '/text-cleaner',
+  '/optimizer.html': '/text-cleaner',
+  '/optimizer-guide': '/text-cleaner-guide',
+  '/optimizer-guide.html': '/text-cleaner-guide'
 };
 
 const cleanUrls = {
-  '/optimizer': '/optimizer.html',
+  '/text-cleaner': '/text-cleaner.html',
   '/anonymizer': '/anonymizer.html',
   '/chat': '/chat.html',
   '/context': '/context.html',
@@ -48,7 +54,7 @@ const cleanUrls = {
   '/context-guide': '/context-guide.html',
   '/converter-guide': '/converter-guide.html',
   '/tts-guide': '/tts-guide.html',
-  '/optimizer-guide': '/optimizer-guide.html',
+  '/text-cleaner-guide': '/text-cleaner-guide.html',
   '/apps': '/apps.html',
   '/rdp123': '/rdp123.html',
   '/photo-shot': '/photo-shot.html',
@@ -62,7 +68,7 @@ const cleanUrls = {
 };
 
 const skillArtifacts = {
-  'optimizer': `# ASD123.ai Optimizer
+  'text-cleaner': `# ASD123.ai Text Cleaner
 
 Use this skill when an agent needs to clean, normalize, or standardize text with ASD123.ai in the browser.
 
@@ -72,8 +78,9 @@ Use this skill when an agent needs to clean, normalize, or standardize text with
 - Remove citation references
 - Normalize fancy Unicode text
 - Normalize target line endings for Auto, Windows, Linux, and macOS
-- Apply language character mappings for Swiss German, German, French, Italian, English International, and English US
-- Remove diacritics (language-aware: German umlauts become ae/oe/ue digraphs)
+- Remove invisible characters and character-based watermarks (441 code points: zero-width, bidi controls, tag characters, variation selectors, unusual spaces), emoji-safe
+- Apply character mapping in five switchable groups (hyphens and dashes, quotation marks, apostrophes, bullets/ellipses/symbols, PDF ligatures), plus optional ae/oe spelling, sharp s to ss, and French spacing
+- Remove diacritics, with a switch for the ae/oe/ue digraph convention
 - One-click presets (ChatGPT/Claude, Perplexity/Research, Swiss Standardization, Paragraph Mode) and undo
 
 ## Privacy
@@ -199,8 +206,8 @@ async function agentSkillsIndex() {
   const skills = await Promise.all(Object.entries(skillArtifacts).map(async ([name, content]) => ({
     name,
     type: 'skill-md',
-    description: name === 'optimizer'
-      ? 'Clean and normalize text locally with the ASD123.ai Optimizer.'
+    description: name === 'text-cleaner'
+      ? 'Clean and normalize text locally with the ASD123.ai Text Cleaner.'
       : name === 'chat'
         ? 'Chat with local WebGPU models in the ASD123.ai browser chat tool.'
         : name === 'context'

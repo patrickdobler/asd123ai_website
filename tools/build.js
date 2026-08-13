@@ -62,7 +62,7 @@ async function minifyFile(inputFile, outputFile, type) {
 // Generate dist/sitemap.xml from the actual pages, with lastmod taken from each
 // page's last git commit (hand-maintained dates in a static sitemap went stale).
 function generateSitemap() {
-    const TOOLS = new Set(['optimizer', 'anonymizer', 'chat', 'context', 'converter', 'tts']);
+    const TOOLS = new Set(['text-cleaner', 'anonymizer', 'chat', 'context', 'converter', 'tts']);
     const LEGAL = new Set(['privacy', 'terms']);
     const entries = [];
     for (const file of fs.readdirSync(path.join(SRC, 'pages')).filter(f => f.endsWith('.html'))) {
