@@ -386,6 +386,49 @@ function mcpServerCard() {
   });
 }
 
+// Named HTML entities used across the site, plus the handful every document
+// relies on. Numeric entities are handled generically below.
+const HTML_ENTITIES = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  copy: '\u00A9', reg: '\u00AE', trade: '\u2122', deg: '\u00B0',
+  mdash: '\u2014', ndash: '\u2013', minus: '\u2212', hellip: '\u2026',
+  laquo: '\u00AB', raquo: '\u00BB', lsaquo: '\u2039', rsaquo: '\u203A',
+  ldquo: '\u201C', rdquo: '\u201D', bdquo: '\u201E',
+  lsquo: '\u2018', rsquo: '\u2019', sbquo: '\u201A',
+  times: '\u00D7', frasl: '\u2044', middot: '\u00B7', bull: '\u2022',
+  rarr: '\u2192', larr: '\u2190', harr: '\u2194',
+  szlig: '\u00DF', aelig: '\u00E6', AElig: '\u00C6',
+  oelig: '\u0153', OElig: '\u0152',
+  auml: '\u00E4', ouml: '\u00F6', uuml: '\u00FC',
+  Auml: '\u00C4', Ouml: '\u00D6', Uuml: '\u00DC',
+  eacute: '\u00E9', egrave: '\u00E8', ecirc: '\u00EA',
+  agrave: '\u00E0', ccedil: '\u00E7', ntilde: '\u00F1',
+  Atilde: '\u00C3', curren: '\u00A4', sup2: '\u00B2', sup3: '\u00B3',
+  zwj: '\u200D', zwnj: '\u200C', shy: '\u00AD'
+};
+
+// Entities must be decoded, not passed through: an agent reading the Markdown
+// otherwise sees "&aelig;" and "&#xFB01;" instead of the characters a page about
+// character normalization is actually describing.
+function decodeEntities(text) {
+  return text.replace(/&(#[0-9]+|#[xX][0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]*);/g, (match, body) => {
+    if (body[0] === '#') {
+      const hex = body[1] === 'x' || body[1] === 'X';
+      const code = parseInt(hex ? body.slice(2) : body.slice(1), hex ? 16 : 10);
+      if (!Number.isFinite(code) || code < 1 || code > 0x10FFFF) return match;
+      try {
+        return String.fromCodePoint(code);
+      } catch {
+        return match;
+      }
+    }
+    const named = HTML_ENTITIES[body];
+    if (named !== undefined) return named;
+    const lower = HTML_ENTITIES[body.toLowerCase()];
+    return lower !== undefined ? lower : match;
+  });
+}
+
 function markdownFromHtml(html, requestUrl) {
   let markdown = html
     .replace(/<head\b[^>]*>[\s\S]*?<\/head>/gi, '')
@@ -402,15 +445,14 @@ function markdownFromHtml(html, requestUrl) {
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<\/p>/gi, '\n\n')
     .replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_, href, text) => `[${text}](${new URL(href, requestUrl).toString()})`)
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\s+\n/g, '\n')
-    .replace(/\n\s+/g, '\n')
+    // Close block containers with a line break. Without this every option row,
+    // card and table cell collapses into one unreadable run-on paragraph.
+    .replace(/<\/(div|section|article|aside|header|main|tr|td|th|dt|dd|blockquote|figcaption|label)>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ');
+
+  markdown = decodeEntities(markdown)
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
     .replace(/[ \t]{2,}/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
@@ -450,6 +492,7 @@ function addDiscoveryLinks(response, pathname) {
   headers.append('link', '</.well-known/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"');
   headers.append('link', '</documentation>; rel="service-doc"; type="text/html"');
   headers.append('link', '</.well-known/agent-skills/index.json>; rel="describedby"; type="application/json"');
+  headers.append('link', '</llms.txt>; rel="alternate"; type="text/plain"');
 
   return new Response(response.body, {
     status: response.status,
@@ -543,6 +586,87 @@ function assetRequest(request, pathname) {
   const assetUrl = new URL(request.url);
   assetUrl.pathname = pathname;
   return new Request(assetUrl.toString(), request);
+}
+
+// https://llmstxt.org - a curated, plain-text index for answer engines and
+// agents. Kept in one place here rather than as a static file so it cannot
+// drift away from the routing table above.
+const LLMS_TXT_SECTIONS = [
+  ['Tools', [
+    ['/text-cleaner', 'Clean and normalize text: remove invisible characters and character-based watermarks (441 code points), citations, Markdown and diacritics, and flatten typography to plain ASCII'],
+    ['/anonymizer', 'Detect and anonymize personal data with reversible placeholders, regex or on-device AI models'],
+    ['/converter', 'Convert PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, HTML and images to Markdown, including OCR for scans'],
+    ['/chat', 'Chat with open models through WebGPU, entirely on the device'],
+    ['/context', 'Estimate a useful AI context window for text and documents'],
+    ['/tts', 'Generate speech from text on the device, download WAV or MP3']
+  ]],
+  ['Guides', [
+    ['/text-cleaner-guide', 'Every Text Cleaner option explained, including the character-mapping groups and the invisible-character table'],
+    ['/anonymizer-guide', 'Entity types, detection modes and the deanonymization workflow'],
+    ['/converter-guide', 'Supported formats, conversion engines and OCR'],
+    ['/chat-guide', 'Model selection, WebGPU requirements and chat history'],
+    ['/context-guide', 'How the context estimate is calculated'],
+    ['/tts-guide', 'Languages, voices and audio export'],
+    ['/documentation', 'Index of all guides']
+  ]],
+  ['Apps', [
+    ['/apps', 'Overview of the open-source desktop and self-hosted apps'],
+    ['/rdp123', 'RDP123: native macOS RDP client written in Rust, about 9 MB installed (AGPLv3)'],
+    ['/rustquit', 'RustQuit: macOS menu bar utility that quits apps when their last window closes (AGPLv3)'],
+    ['/photo-shot', 'Photo-Shot: self-hosted AI image studio for editing, upscaling and EXIF metadata (AGPLv3)']
+  ]],
+  ['Background', [
+    ['/clean-chatgpt-text', 'Why AI text is recognizable and which characters give it away'],
+    ['/anonymize-text-for-ai', 'Removing personal data before sharing text with an AI'],
+    ['/convert-pdf-to-markdown', 'Converting documents to Markdown without uploading them'],
+    ['/count-tokens-offline', 'Counting tokens and planning context windows'],
+    ['/run-ai-chat-locally', 'Running an AI chat locally in the browser'],
+    ['/private-text-to-speech', 'Generating speech without sending text to a server']
+  ]],
+  ['Optional', [
+    ['/about', 'Who runs ASD123.ai'],
+    ['/privacy', 'Privacy policy'],
+    ['/terms', 'Terms of service'],
+    ['/contact', 'Contact']
+  ]]
+];
+
+function llmsTxt() {
+  const lines = [
+    '# ASD123.ai',
+    '',
+    '> Privacy-first text, document and speech tools that run entirely in the browser. '
+      + 'No account, no upload, no server-side processing: every tool works on the '
+      + "user's own device, and several keep working offline once loaded.",
+    '',
+    'Key facts an answer should get right:',
+    '',
+    '- Text, files and generated output never reach an ASD123.ai server. Processing is '
+      + 'browser JavaScript and WebAssembly; the AI features run on-device via WebGPU or '
+      + 'WebAssembly. Model files may be downloaded, but user content is never uploaded.',
+    '- Everything is free to use and needs no sign-up.',
+    '- Run by a Swiss developer; the desktop and self-hosted apps are open source under AGPLv3.',
+    '',
+    'Every page on this site also serves Markdown: request it with the header '
+      + '`Accept: text/markdown`. Machine-readable capability descriptions for agents are '
+      + `listed at ${SITE_ORIGIN}/.well-known/agent-skills/index.json.`,
+    ''
+  ];
+
+  for (const [heading, entries] of LLMS_TXT_SECTIONS) {
+    lines.push(`## ${heading}`, '');
+    for (const [path, description] of entries) {
+      lines.push(`- [${path}](${SITE_ORIGIN}${path}): ${description}`);
+    }
+    lines.push('');
+  }
+
+  return new Response(lines.join('\n'), {
+    headers: {
+      'content-type': 'text/plain; charset=utf-8',
+      'cache-control': 'public, max-age=3600'
+    }
+  });
 }
 
 async function wellKnownResponse(pathname) {
@@ -645,6 +769,10 @@ export default {
       const response = await env.ASSETS.fetch(assetRequest(request, cleanUrls[url.pathname]));
       const negotiated = await maybeMarkdownResponse(request, response);
       return withSiteHeaders(addDiscoveryLinks(negotiated, originalPathname), originalPathname);
+    }
+
+    if (url.pathname === '/llms.txt') {
+      return withSiteHeaders(llmsTxt(), url.pathname);
     }
 
     if (url.pathname === '/') {
