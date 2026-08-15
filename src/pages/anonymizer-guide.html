@@ -168,7 +168,7 @@
 
 <!-- Table of Contents -->
 <div class="mb-12 p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h3>
+<h2 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h2>
 <div class="grid md:grid-cols-2 gap-3 text-sm">
 <a href="#getting-started" class="text-[var(--primary-color)] hover:underline">→ Getting Started</a>
 <a href="#processing-modes" class="text-[var(--primary-color)] hover:underline">→ Detection Methods</a>
@@ -187,9 +187,9 @@
 
 <!-- Getting Started -->
 <div id="getting-started" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">1.</span> Getting Started
-</h3>
+</h2>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
 The Anonymizer is a privacy-first proof of concept that detects and anonymizes Personally Identifiable Information (PII) inside your browser. It is useful for exploring local PII workflows, but it is not a certified anonymization or compliance system.
@@ -212,16 +212,16 @@ The Anonymizer is a privacy-first proof of concept that detects and anonymizes P
 
 <!-- Processing Modes -->
 <div id="processing-modes" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">2.</span> Detection Methods
-</h3>
+</h2>
 <p class="text-[var(--text-secondary)] mb-6 leading-relaxed">
 The Anonymizer offers several detection methods. Regex is the default and recommended starting point. OpenAI Privacy Filter is the advanced local AI option. AI4Privacy modes remain available as Legacy PoC options for comparison. With the <strong class="text-[var(--text-primary)]">Detect</strong> checkboxes you can limit detection to the categories you care about (people, contact, financial, IDs, addresses, dates, web/tech). Long texts are processed in chunks automatically in the AI modes.
 </p>
 <div class="grid md:grid-cols-3 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <div class="flex items-center gap-2 mb-2">
-<h4 class="font-bold text-[var(--text-primary)]">Regex - Pattern Matching</h4>
+<h3 class="font-bold text-[var(--text-primary)]">Regex - Pattern Matching</h3>
 </div>
 <p class="text-sm text-[var(--text-secondary)] mb-2">Default fast pattern-based detection</p>
 <ul class="text-xs text-[var(--text-secondary)] space-y-1">
@@ -234,7 +234,7 @@ The Anonymizer offers several detection methods. Regex is the default and recomm
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <div class="flex items-center gap-2 mb-2">
-<h4 class="font-bold text-[var(--text-primary)]">OpenAI Privacy Filter</h4>
+<h3 class="font-bold text-[var(--text-primary)]">OpenAI Privacy Filter</h3>
 </div>
 <p class="text-sm text-[var(--text-secondary)] mb-2">Advanced local AI detection</p>
 <ul class="text-xs text-[var(--text-secondary)] space-y-1">
@@ -247,7 +247,7 @@ The Anonymizer offers several detection methods. Regex is the default and recomm
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
 <div class="flex items-center gap-2 mb-2">
-<h4 class="font-bold text-[var(--text-primary)]">AI4Privacy - Legacy PoC</h4>
+<h3 class="font-bold text-[var(--text-primary)]">AI4Privacy - Legacy PoC</h3>
 </div>
 <p class="text-sm text-[var(--text-secondary)] mb-2">Older experimental AI modes</p>
 <ul class="text-xs text-[var(--text-secondary)] space-y-1">
@@ -268,14 +268,14 @@ The Anonymizer offers several detection methods. Regex is the default and recomm
 
 <!-- Basic Workflow -->
 <div id="basic-workflow" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">3.</span> Basic Anonymization Workflow
-</h3>
+</h2>
 <div class="space-y-6">
 <div class="flex items-start gap-4">
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">1</div>
 <div class="flex-1">
-<h4 class="font-bold text-[var(--text-primary)] mb-2">Enter or Paste Text</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-2">Enter or Paste Text</h3>
 <p class="text-sm text-[var(--text-secondary)]">Type or paste your text into the <strong>Input Text</strong> area. You can also drag-and-drop files.</p>
 <div class="mt-2 p-3 bg-[var(--glass-bg)]/20 rounded border border-[var(--border-color)] font-mono text-xs">
 Example: "My name is John Smith, email john@example.com, phone (555) 123-4567"
@@ -286,7 +286,7 @@ Example: "My name is John Smith, email john@example.com, phone (555) 123-4567"
 <div class="flex items-start gap-4">
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">2</div>
 <div class="flex-1">
-<h4 class="font-bold text-[var(--text-primary)] mb-2">Select Detection Method</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-2">Select Detection Method</h3>
 <p class="text-sm text-[var(--text-secondary)]">Choose from the dropdown: <strong>Regex - Pattern Matching</strong> for instant results, <strong>OpenAI Privacy Filter</strong> for advanced local AI detection, or <strong>AI4Privacy Legacy PoC</strong> for comparison.</p>
 </div>
 </div>
@@ -294,7 +294,7 @@ Example: "My name is John Smith, email john@example.com, phone (555) 123-4567"
 <div class="flex items-start gap-4">
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">3</div>
 <div class="flex-1">
-<h4 class="font-bold text-[var(--text-primary)] mb-2">Click Anonymize</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-2">Click Anonymize</h3>
 <p class="text-sm text-[var(--text-secondary)]">Press the <strong class="text-[var(--primary-color)]">🛡️ Anonymize</strong> button. The tool will detect all PII and replace it with placeholders.</p>
 <div class="mt-2 p-3 bg-[var(--glass-bg)]/20 rounded border border-[var(--border-color)] font-mono text-xs">
 Result: "My name is [PERSON_NAME_1], email [EMAIL_1], phone [PHONE_1]"
@@ -305,7 +305,7 @@ Result: "My name is [PERSON_NAME_1], email [EMAIL_1], phone [PHONE_1]"
 <div class="flex items-start gap-4">
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">4</div>
 <div class="flex-1">
-<h4 class="font-bold text-[var(--text-primary)] mb-2">Review & Copy</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-2">Review & Copy</h3>
 <p class="text-sm text-[var(--text-secondary)]">Check the <strong>Detected Entities</strong> panel, review the anonymized output, and click <strong>📋 Copy</strong> to use elsewhere. The <strong>Highlight</strong> button shows the output with every entity as a clickable chip &mdash; click a chip (or an entity tile) to toggle it between anonymized and restored, or use the 🗑️ button to remove a false positive entirely.</p>
 </div>
 </div>
@@ -314,20 +314,20 @@ Result: "My name is [PERSON_NAME_1], email [EMAIL_1], phone [PHONE_1]"
 
 <!-- Sample Texts -->
 <div id="sample-texts" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">4.</span> Sample Texts
-</h3>
+</h2>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
 Use the small <strong>DE</strong> and <strong>EN</strong> buttons under the input area to load example texts quickly. They are intentionally small so the main workflow buttons stay in focus.
 </p>
 <div class="grid md:grid-cols-2 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-2">German Example</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-2">German Example</h3>
 <p class="text-sm">Contains names, address, email, phone number, customer number, insurance number, IBAN, doctor, and treatment date.</p>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-2">English Example</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-2">English Example</h3>
 <p class="text-sm">Contains names, address, date of birth, email, phone number, customer ID, account number, IBAN, doctor, clinic, and appointment date.</p>
 </div>
 </div>
@@ -336,9 +336,9 @@ Use the small <strong>DE</strong> and <strong>EN</strong> buttons under the inpu
 
 <!-- File Upload -->
 <div id="file-upload" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">5.</span> File Upload & Processing
-</h3>
+</h2>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
 The Anonymizer supports multiple file formats for easy text extraction:
@@ -346,17 +346,17 @@ The Anonymizer supports multiple file formats for easy text extraction:
 <div class="grid md:grid-cols-3 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg text-center">
 <div class="text-3xl mb-2">📄</div>
-<h4 class="font-bold text-[var(--text-primary)] mb-1">.txt Files</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-1">.txt Files</h3>
 <p class="text-xs text-[var(--text-secondary)]">Plain text documents</p>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg text-center">
 <div class="text-3xl mb-2">📝</div>
-<h4 class="font-bold text-[var(--text-primary)] mb-1">.docx Files</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-1">.docx Files</h3>
 <p class="text-xs text-[var(--text-secondary)]">Microsoft Word documents</p>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg text-center">
 <div class="text-3xl mb-2">📕</div>
-<h4 class="font-bold text-[var(--text-primary)] mb-1">.pdf Files</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-1">.pdf Files</h3>
 <p class="text-xs text-[var(--text-secondary)]">PDF documents (text-based)</p>
 </div>
 </div>
@@ -375,9 +375,9 @@ The Anonymizer supports multiple file formats for easy text extraction:
 
 <!-- Entity Management -->
 <div id="entity-management" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">6.</span> Entity Management
-</h3>
+</h2>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
 The <strong class="text-[var(--text-primary)]">Detected Entities</strong> panel shows all found PII with their placeholders and original values:
@@ -385,18 +385,18 @@ The <strong class="text-[var(--text-primary)]">Detected Entities</strong> panel 
 <div class="grid md:grid-cols-2 gap-4">
 <div class="space-y-3">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
+<h3 class="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">👁️</span> View Options
-</h4>
+</h3>
 <ul class="text-sm space-y-1">
 <li>• <strong>Tiles View:</strong> Compact grid layout</li>
 <li>• <strong>List View:</strong> Detailed list format</li>
 </ul>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
+<h3 class="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">🔀</span> Sorting Options
-</h4>
+</h3>
 <ul class="text-sm space-y-1">
 <li>• <strong>By Appearance:</strong> Order as they appear</li>
 <li>• <strong>Alphabetical:</strong> Sort by entity type</li>
@@ -404,9 +404,9 @@ The <strong class="text-[var(--text-primary)]">Detected Entities</strong> panel 
 </div>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<h3 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">🗑️</span> Managing Entities
-</h4>
+</h3>
 <ul class="text-sm space-y-2">
 <li><strong>Remove Entity:</strong> Click the trash icon (🗑️) on any entity to remove it and restore the original value in the output</li>
 <li><strong>Entity Stats:</strong> View total and active entity counts at the bottom of the panel</li>
@@ -419,9 +419,9 @@ The <strong class="text-[var(--text-primary)]">Detected Entities</strong> panel 
 
 <!-- LLM Integration -->
 <div id="llm-integration" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">7.</span> LLM Integration & Deanonymization
-</h3>
+</h2>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
 Use the Anonymizer to safely process text with AI services like ChatGPT, Claude, or others:
@@ -430,28 +430,28 @@ Use the Anonymizer to safely process text with AI services like ChatGPT, Claude,
 <div class="flex items-start gap-4">
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[rgba(60,60,60,0.4)] border-2 border-[var(--border-color)] text-[var(--text-primary)] flex items-center justify-center font-bold">1</div>
 <div>
-<h4 class="font-bold text-[var(--text-primary)] mb-1">Anonymize Your Text</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-1">Anonymize Your Text</h3>
 <p class="text-sm">Use the main anonymization feature to protect your PII. Copy the anonymized output.</p>
 </div>
 </div>
 <div class="flex items-start gap-4">
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[rgba(60,60,60,0.4)] border-2 border-[var(--border-color)] text-[var(--text-primary)] flex items-center justify-center font-bold">2</div>
 <div>
-<h4 class="font-bold text-[var(--text-primary)] mb-1">Send to LLM</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-1">Send to LLM</h3>
 <p class="text-sm">Paste the anonymized text into ChatGPT, Claude, or any AI service. The placeholders like [PERSON_NAME_1] will be preserved.</p>
 </div>
 </div>
 <div class="flex items-start gap-4">
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[rgba(60,60,60,0.4)] border-2 border-[var(--border-color)] text-[var(--text-primary)] flex items-center justify-center font-bold">3</div>
 <div>
-<h4 class="font-bold text-[var(--text-primary)] mb-1">Get AI Response</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-1">Get AI Response</h3>
 <p class="text-sm">The AI will process your text and maintain the placeholders in its response.</p>
 </div>
 </div>
 <div class="flex items-start gap-4">
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[rgba(60,60,60,0.4)] border-2 border-[var(--border-color)] text-[var(--text-primary)] flex items-center justify-center font-bold">4</div>
 <div>
-<h4 class="font-bold text-[var(--text-primary)] mb-1">Deanonymize</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-1">Deanonymize</h3>
 <p class="text-sm">Paste the AI response into the <strong>LLM Input</strong> field and click <strong class="text-[var(--primary-color)]">🔓 Deanonymize</strong>. All placeholders will be replaced with original values!</p>
 </div>
 </div>
@@ -466,23 +466,23 @@ Use the Anonymizer to safely process text with AI services like ChatGPT, Claude,
 
 <!-- Redact Mode -->
 <div id="redact-mode" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">8.</span> Redact Mode
-</h3>
+</h2>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
 For maximum privacy when sharing with untrusted parties, use <strong class="text-[var(--text-primary)]">Redact Mode</strong>:
 </p>
 <div class="grid md:grid-cols-2 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-2">🛡️ Anonymize Mode</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-2">🛡️ Anonymize Mode</h3>
 <p class="text-sm mb-2">Default mode with unique placeholders:</p>
 <div class="p-2 bg-[var(--glass-bg)]/20 rounded font-mono text-xs">
 [PERSON_NAME_1], [EMAIL_1], [PHONE_1]
 </div>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-2">🔒 Redact Mode</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-2">🔒 Redact Mode</h3>
 <p class="text-sm mb-2">All entities replaced with [redacted]:</p>
 <div class="p-2 bg-[var(--glass-bg)]/20 rounded font-mono text-xs">
 [redacted], [redacted], [redacted]
@@ -506,18 +506,18 @@ For maximum privacy when sharing with untrusted parties, use <strong class="text
 
 <!-- Export & Import -->
 <div id="export-import" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">9.</span> Export & Import Entities
-</h3>
+</h2>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
 Preserve your entity mappings for later use or share them with trusted recipients:
 </p>
 <div class="grid md:grid-cols-2 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<h3 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
 <span>💾</span> Export Entities
-</h4>
+</h3>
 <ol class="text-sm space-y-2">
 <li>1. After anonymization, click <strong class="text-[var(--primary-color)]">💾 Export CSV</strong></li>
 <li>2. Save the file with a descriptive name</li>
@@ -530,9 +530,9 @@ Preserve your entity mappings for later use or share them with trusted recipient
 </div>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<h3 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
 <span>📥</span> Import Entities
-</h4>
+</h3>
 <ol class="text-sm space-y-2">
 <li>1. Click <strong class="text-[var(--primary-color)]">📥 Import</strong> button</li>
 <li>2. Select your previously exported CSV file</li>
@@ -551,12 +551,12 @@ Preserve your entity mappings for later use or share them with trusted recipient
 
 <!-- Privacy & Security -->
 <div id="privacy-security" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">10.</span> Privacy & Security
-</h3>
+</h2>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <div class="p-6 bg-[rgba(60,60,60,0.15)] border-2 border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-3 text-lg">Privacy Guarantees</h4>
+<h3 class="font-bold text-[var(--text-primary)] mb-3 text-lg">Privacy Guarantees</h3>
 <ul class="space-y-2">
 <li class="flex items-start gap-2">
 <span class="text-[var(--text-primary)]">✓</span>
@@ -590,9 +590,9 @@ Preserve your entity mappings for later use or share them with trusted recipient
 
 <!-- Limits -->
 <div id="limits" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">11.</span> Limits & Review
-</h3>
+</h2>
 <div class="space-y-4 text-[var(--text-secondary)]">
 <p class="leading-relaxed">
 The Anonymizer is an experimental proof of concept. It can miss sensitive information, classify harmless text as PII, or produce incomplete mappings. Always review the detected entities and the final output manually.
@@ -607,14 +607,14 @@ The Anonymizer is an experimental proof of concept. It can miss sensitive inform
 
 <!-- Best Practices -->
 <div id="best-practices" class="mb-12">
-<h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+<h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
 <span class="text-[var(--primary-color)]">12.</span> Best Practices & Tips
-</h3>
+</h2>
 <div class="grid md:grid-cols-2 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<h3 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
 <span>💡</span> For Maximum Privacy
-</h4>
+</h3>
 <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
 <li>• Use Redact Mode for public sharing</li>
 <li>• Clear all data after each session</li>
@@ -623,9 +623,9 @@ The Anonymizer is an experimental proof of concept. It can miss sensitive inform
 </ul>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<h3 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
 <span>🎯</span> For Best Detection
-</h4>
+</h3>
 <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
 <li>• Start with Regex mode for structured PII</li>
 <li>• Use OpenAI Privacy Filter for deeper local AI review</li>
@@ -635,9 +635,9 @@ The Anonymizer is an experimental proof of concept. It can miss sensitive inform
 </ul>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<h3 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
 <span>⚡</span> For Performance
-</h4>
+</h3>
 <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
 <li>• Use Regex mode for instant results</li>
 <li>• Process large docs in batches</li>
@@ -646,9 +646,9 @@ The Anonymizer is an experimental proof of concept. It can miss sensitive inform
 </ul>
 </div>
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h4 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+<h3 class="font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
 <span>🔄</span> For LLM Workflows
-</h4>
+</h3>
 <ul class="text-sm space-y-2 text-[var(--text-secondary)]">
 <li>• Export entities before using LLM</li>
 <li>• Keep CSV files organized</li>
@@ -661,10 +661,10 @@ The Anonymizer is an experimental proof of concept. It can miss sensitive inform
 
 <!-- Additional Resources -->
 <div class="p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-<h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">📚 Additional Resources</h3>
+<h2 class="text-xl font-bold text-[var(--text-primary)] mb-4">📚 Additional Resources</h2>
 <div class="grid md:grid-cols-2 gap-4 text-sm text-[var(--text-secondary)]">
 <div>
-<h4 class="font-semibold text-[var(--text-primary)] mb-2">Need Help?</h4>
+<h3 class="font-semibold text-[var(--text-primary)] mb-2">Need Help?</h3>
 <ul class="space-y-1">
 <li>• Check the troubleshooting section in <a href="https://github.com/asd123ch" class="text-[var(--primary-color)] hover:underline" target="_blank" rel="noopener">GitHub README</a></li>
 <li>• Review the <a href="/privacy" class="text-[var(--primary-color)] hover:underline">Privacy Policy</a></li>
@@ -672,7 +672,7 @@ The Anonymizer is an experimental proof of concept. It can miss sensitive inform
 </ul>
 </div>
 <div>
-<h4 class="font-semibold text-[var(--text-primary)] mb-2">Supported Entity Types</h4>
+<h3 class="font-semibold text-[var(--text-primary)] mb-2">Supported Entity Types</h3>
 <p>75+ types including names, emails, phones, credit cards, SSNs, passports, IBANs, IP addresses, URLs, Swiss AHV, German tax IDs, UK NINO, and more.</p>
 </div>
 </div>

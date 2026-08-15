@@ -5876,6 +5876,7 @@ main#main.chat-main {
 }
 
 [data-theme="dark"] .contrast-surface strong,
+[data-theme="dark"] .contrast-surface h2,
 [data-theme="dark"] .contrast-surface h3,
 [data-theme="dark"] .contrast-surface h4,
 [data-theme="dark"] .contrast-surface a {

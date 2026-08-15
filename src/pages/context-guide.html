@@ -169,7 +169,7 @@
             <div class="max-w-6xl mx-auto">
                 <div class="liquid-glass p-8 md:p-12">
                     <div class="mb-12 p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                        <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h3>
+                        <h2 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h2>
                         <div class="grid md:grid-cols-2 gap-3 text-sm">
                             <a href="#overview" class="text-[var(--primary-color)] hover:underline">→ Overview</a>
                             <a href="#workflow" class="text-[var(--primary-color)] hover:underline">→ Basic Workflow</a>
@@ -181,9 +181,9 @@
                     </div>
 
                     <div id="overview" class="mb-12">
-                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                        <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                             <span class="text-[var(--primary-color)]">1.</span> Overview
-                        </h3>
+                        </h2>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
                                 Context Estimator gives you a fast estimate of how much AI chat context a piece of text or a document may need. It is useful before choosing settings such as 4K, 8K, 16K, 32K, 64K, or 128K in tools like Ollama, LM Studio, or local browser chat.
@@ -196,28 +196,28 @@
                     </div>
 
                     <div id="workflow" class="mb-12">
-                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                        <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                             <span class="text-[var(--primary-color)]">2.</span> Basic Workflow
-                        </h3>
+                        </h2>
                         <div class="space-y-6 text-[var(--text-secondary)]">
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">1</div>
                                 <div>
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-1">Paste or upload</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-1">Paste or upload</h3>
                                     <p class="text-sm">Paste text into the input area or choose a local TXT, Markdown, DOCX, or PDF file (up to 25&nbsp;MB). Scanned PDFs have no text layer — run them through the <a href="/converter" class="text-[var(--primary-color)] hover:underline">Markdown Converter</a> (OCR engine) first.</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">2</div>
                                 <div>
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-1">Choose profile and reserve</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-1">Choose profile and reserve</h3>
                                     <p class="text-sm">Select the closest model profile and keep a reserve for system prompt, answer, formatting, and reasoning.</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-[var(--paper-texture)] flex items-center justify-center font-bold">3</div>
                                 <div>
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-1">Read the comparison table</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-1">Read the comparison table</h3>
                                     <p class="text-sm">Use the row marked recommended: it is the smallest window with real headroom (a &ldquo;Tight&rdquo; window is only recommended when nothing larger fits). Every row also shows how many tokens would be left for the answer.</p>
                                 </div>
                             </div>
@@ -225,25 +225,25 @@
                     </div>
 
                     <div id="profiles" class="mb-12">
-                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                        <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                             <span class="text-[var(--primary-color)]">3.</span> Model Profiles
-                        </h3>
+                        </h2>
                         <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Generic LLM</h4>
+                                <h3 class="font-bold text-[var(--text-primary)] mb-2">Generic LLM</h3>
                                 <p class="text-sm">A safe default when you do not know which tokenizer your model uses.</p>
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Model families</h4>
+                                <h3 class="font-bold text-[var(--text-primary)] mb-2">Model families</h3>
                                 <p class="text-sm">Llama / Mistral, Qwen, Gemma, and GPT-style profiles adjust the estimate for common tokenization patterns.</p>
                             </div>
                         </div>
                     </div>
 
                     <div id="reserve" class="mb-12">
-                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                        <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                             <span class="text-[var(--primary-color)]">4.</span> Reserve
-                        </h3>
+                        </h2>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
                                 A context window must hold the source text, your instruction, system prompt, and generated answer. The reserve slider keeps part of the window free before making a recommendation.
@@ -254,25 +254,25 @@
                     </div>
 
                     <div id="statuses" class="mb-12">
-                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                        <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                             <span class="text-[var(--primary-color)]">5.</span> Statuses
-                        </h3>
+                        </h2>
                         <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Too small / Tight</h4>
+                                <h3 class="font-bold text-[var(--text-primary)] mb-2">Too small / Tight</h3>
                                 <p class="text-sm">The input may overflow, or there may be little room left for a useful answer.</p>
                             </div>
                             <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                <h4 class="font-bold text-[var(--text-primary)] mb-2">Good / Overkill</h4>
+                                <h3 class="font-bold text-[var(--text-primary)] mb-2">Good / Overkill</h3>
                                 <p class="text-sm">Good is the practical target. Overkill means the window is likely larger than needed.</p>
                             </div>
                         </div>
                     </div>
 
                     <div id="privacy">
-                        <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                        <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                             <span class="text-[var(--primary-color)]">6.</span> Privacy and Limits
-                        </h3>
+                        </h2>
                         <div class="space-y-4 text-[var(--text-secondary)]">
                             <p class="leading-relaxed">
                                 Text extraction and the heuristic estimation run locally in your browser with self-hosted libraries — no external requests. Pasted text and uploaded files are not sent to ASD123.ai for processing, and document contents are not saved in localStorage or IndexedDB. The optional <strong>Exact count</strong> downloads tokenizer files from CDN/Hugging Face when you click it; your text itself is never transmitted. Estimates include a fixed allowance of about 300 tokens for system prompt and formatting overhead. Heuristics for non-Latin scripts (Cyrillic, Arabic, Thai, ...) are coarser than for English — use Exact count when precision matters there.

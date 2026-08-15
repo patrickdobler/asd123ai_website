@@ -166,7 +166,7 @@
                 <div class="max-w-6xl mx-auto">
                     <div class="liquid-glass p-8 md:p-12">
                         <div class="mb-12 p-6 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                            <h3 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h3>
+                            <h2 class="text-xl font-bold text-[var(--text-primary)] mb-4">Quick Navigation</h2>
                             <div class="grid md:grid-cols-2 gap-3 text-sm">
                                 <a href="#overview" class="text-[var(--primary-color)] hover:underline">→ Overview</a>
                                 <a href="#workflow" class="text-[var(--primary-color)] hover:underline">→ Basic Workflow</a>
@@ -180,9 +180,9 @@
                         </div>
 
                         <div id="overview" class="mb-12">
-                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <span class="text-[var(--primary-color)]">1.</span> Overview
-                            </h3>
+                            </h2>
                             <div class="space-y-4 text-[var(--text-secondary)]">
                                 <p class="leading-relaxed">
                                     The Text Cleaner cleans AI-generated or copied text without sending it to a server. It is useful for removing Markdown, citations, fancy Unicode, bad encoding artifacts, inconsistent spaces, and region-specific character issues.
@@ -196,28 +196,28 @@
                         </div>
 
                         <div id="workflow" class="mb-12">
-                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <span class="text-[var(--primary-color)]">2.</span> Basic Workflow
-                            </h3>
+                            </h2>
                             <div class="space-y-6 text-[var(--text-secondary)]">
                                 <div class="flex items-start gap-4">
                                     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">1</div>
                                     <div>
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-1">Paste text</h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-1">Paste text</h3>
                                         <p class="text-sm">Paste generated text, copied web content, or text with encoding issues into the input area.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-4">
                                     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">2</div>
                                     <div>
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-1">Choose target system and options</h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-1">Choose target system and options</h3>
                                         <p class="text-sm">Select a target system, then enable only the cleanup options you need &mdash; or start from a preset.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-4">
                                     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center font-bold">3</div>
                                     <div>
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-1">Clean, review, copy</h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-1">Clean, review, copy</h3>
                                         <p class="text-sm">Click <strong>Clean Text Now</strong>, review the result, then copy it to your clipboard or clear the input.</p>
                                     </div>
                                 </div>
@@ -225,52 +225,52 @@
                         </div>
 
                         <div id="target-system" class="mb-12">
-                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <span class="text-[var(--primary-color)]">3.</span> Target System
-                            </h3>
+                            </h2>
                             <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Auto</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Auto</h3>
                                     <p class="text-sm">Default mode. Normalizes common encoding and line endings for browser use.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Windows / Linux / macOS</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Windows / Linux / macOS</h3>
                                     <p class="text-sm">Use these when line endings matter. Windows outputs CRLF; Linux and macOS use LF.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Always-on base normalization</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Always-on base normalization</h3>
                                     <p class="text-sm">This step runs on every clean, even with all toggles off: it repairs broken encoding (mojibake such as <code>&Atilde;&curren;</code> &rarr; <code>&auml;</code>), drops the leading BOM, and unifies line endings. If the result changes with no options enabled, this is why. Invisible characters used to be part of this step; they now have their own switch so you can turn them off.</p>
                                 </div>
                             </div>
                         </div>
 
                         <div id="character-mapping" class="mb-12">
-                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <span class="text-[var(--primary-color)]">4.</span> Character Mapping
-                            </h3>
+                            </h2>
                             <div class="space-y-4 text-[var(--text-secondary)]">
                                 <p class="leading-relaxed">
                                     <strong class="text-[var(--text-primary)]">Apply Character Mapping</strong> flattens typography to plain ASCII. It is split into five groups, all on by default, so each kind of typography can be left alone &mdash; you can fix quotation marks while keeping em dashes exactly as they are. Invisible characters are not part of this; they have their own option.
                                 </p>
                                 <div class="grid md:grid-cols-3 gap-4">
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Hyphens &amp; dashes <span class="text-xs font-normal text-[var(--text-secondary)]">7 rules</span></h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-2">Hyphens &amp; dashes <span class="text-xs font-normal text-[var(--text-secondary)]">7 rules</span></h3>
                                         <p class="text-sm">Hyphen, non-breaking hyphen, figure dash, en dash, em dash, horizontal bar and the minus sign all become the ASCII hyphen.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Quotation marks <span class="text-xs font-normal text-[var(--text-secondary)]">8 rules</span></h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-2">Quotation marks <span class="text-xs font-normal text-[var(--text-secondary)]">8 rules</span></h3>
                                         <p class="text-sm">Curly and low double quotes, guillemets and the double prime, flattened to the ASCII <code>"</code>.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Apostrophes <span class="text-xs font-normal text-[var(--text-secondary)]">10 rules</span></h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-2">Apostrophes <span class="text-xs font-normal text-[var(--text-secondary)]">10 rules</span></h3>
                                         <p class="text-sm">Single quotes, apostrophes, primes and the spacing accents that get used in their place.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Bullets, ellipses &amp; symbols <span class="text-xs font-normal text-[var(--text-secondary)]">9 rules</span></h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-2">Bullets, ellipses &amp; symbols <span class="text-xs font-normal text-[var(--text-secondary)]">9 rules</span></h3>
                                         <p class="text-sm">Ellipsis spelled out as three dots, bullet characters turned into a hyphen, multiplication sign and fraction slash to x and /.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">PDF ligatures <span class="text-xs font-normal text-[var(--text-secondary)]">7 rules</span></h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-2">PDF ligatures <span class="text-xs font-normal text-[var(--text-secondary)]">7 rules</span></h3>
                                         <p class="text-sm">Text extracted from PDFs stores fi and fl as single glyphs. This splits them apart: <code>&#xFB01;nal</code> &rarr; <code>final</code>.</p>
                                     </div>
                                 </div>
@@ -279,15 +279,15 @@
                                 </p>
                                 <div class="grid md:grid-cols-3 gap-4">
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Spell out &aelig;/&oelig; as ae/oe</h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-2">Spell out &aelig;/&oelig; as ae/oe</h3>
                                         <p class="text-sm">German, French and English write these out in ASCII. Leave it off for Italian, which has no &aelig;/&oelig; of its own, so foreign words keep their spelling.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">Convert &szlig; to ss</h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-2">Convert &szlig; to ss</h3>
                                         <p class="text-sm">The Swiss convention. Germany and Austria keep &szlig;, so leave it off for German from those countries.</p>
                                     </div>
                                     <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                        <h4 class="font-bold text-[var(--text-primary)] mb-2">French spacing rules</h4>
+                                        <h3 class="font-bold text-[var(--text-primary)] mb-2">French spacing rules</h3>
                                         <p class="text-sm">French typography puts a space inside guillemets and before <code>;&nbsp;:&nbsp;!&nbsp;?</code>. This removes it, so <code>&laquo;&nbsp;bonjour&nbsp;&raquo;</code> becomes <code>"bonjour"</code>.</p>
                                     </div>
                                 </div>
@@ -298,108 +298,108 @@
                         </div>
 
                         <div id="processing-options" class="mb-12">
-                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <span class="text-[var(--primary-color)]">5.</span> Processing Options
-                            </h3>
+                            </h2>
                             <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg md:col-span-2">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Invisible Characters &amp; Watermarks <span class="text-xs font-normal text-[var(--text-secondary)]">(on by default)</span></h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Remove Invisible Characters &amp; Watermarks <span class="text-xs font-normal text-[var(--text-secondary)]">(on by default)</span></h3>
                                     <p class="text-sm">Covers <strong class="text-[var(--text-primary)]">441</strong> invisible code points in seven groups: zero-width characters, bidi controls, invisible math operators, deprecated format characters, variation selectors, tag characters, and other hidden formatting &mdash; plus 16 unusual spaces that are folded back to a normal space.</p>
                                     <p class="text-sm mt-3">These characters carry no visible meaning, but they do carry consequences. They are used to hide tracking IDs and watermarks inside AI output; <strong class="text-[var(--text-primary)]">tag characters</strong> (U+E0001&ndash;E007F) can smuggle an entire invisible message inside visible text; <strong class="text-[var(--text-primary)]">bidi controls</strong> can make text render differently from how it is stored, which is the basis of the &quot;Trojan Source&quot; attack; and zero-width characters from copy-paste break search, diffs, and string comparisons.</p>
                                     <p class="text-sm mt-3"><strong class="text-[var(--text-primary)]">Emoji stay intact.</strong> The zero-width joiner and the variation selectors are the only members of the set that can be legitimate content &mdash; they are kept when they actually hold an emoji together, so <span aria-hidden="true">&#128104;&zwj;&#128105;&zwj;&#128103;</span> stays one family and <span aria-hidden="true">&#10084;&#65039;&zwj;&#128293;</span> stays one symbol, while the same characters hidden in ordinary prose are removed.</p>
                                     <p class="text-sm mt-3">After each clean you get a breakdown of what was found, for example <em>&quot;Found 10 hidden characters: 5 tag characters, 2 zero-width characters, 1 bidi control, 1 hidden format character, 1 unusual space&quot;</em> &mdash; otherwise there is no way to tell the option did anything.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Apply Character Mapping</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Apply Character Mapping</h3>
                                     <p class="text-sm">Flattens quotes, dashes, ellipses, bullets, primes and PDF ligatures to plain ASCII, plus whatever the three detail switches add. Visible typography only &mdash; invisible characters are a separate option.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Diacritics</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Remove Diacritics</h3>
                                     <p class="text-sm">Converts accented characters to plain forms. The <strong class="text-[var(--text-primary)]">Umlauts as ae/oe/ue</strong> switch below it picks the convention: on, &auml;/&ouml;/&uuml; become ae/oe/ue; off, they become a/o/u. &szlig; always becomes ss.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Fancy Text Font</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Remove Fancy Text Font</h3>
                                     <p class="text-sm">Normalizes every stylized Unicode alphabet back to plain characters &mdash; mathematical bold, italic, script, double-struck, sans-serif, monospace, fullwidth and more (Unicode NFKC compatibility normalization).</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Citation References</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Remove Citation References</h3>
                                     <p class="text-sm">Removes numbered brackets like [1], superscript references, (Source: ...) notes, bare URL citations, and citation-style links whose label is just a domain or number. Normal links keep their visible text; parenthetical enumerations like (1) and subscripts (H&#8322;O) are left untouched.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Convert MD to Normal Text</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Convert MD to Normal Text</h3>
                                     <p class="text-sm">Turns Markdown-style AI output into plain text by removing syntax for headings, bold, italic, code, links, and lists.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Replace em dash with new sentence</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Replace em dash with new sentence</h3>
                                     <p class="text-sm">Experimental option that turns each em-dash break into a full stop and capitalizes only the word right after it. Ellipses, abbreviations, and other periods are not affected. Review output carefully; the Undo button restores the previous text.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Remove Line Breaks</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Remove Line Breaks</h3>
                                     <p class="text-sm">Joins single line breaks into spaces and reduces multiple line breaks. Useful for turning copied text into cleaner paragraphs.</p>
                                 </div>
                             </div>
                         </div>
 
                         <div id="common-presets" class="mb-12">
-                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <span class="text-[var(--primary-color)]">6.</span> Common Presets
-                            </h3>
+                            </h2>
                             <p class="text-sm text-[var(--text-secondary)] mb-4">These combinations are available as one-click <strong class="text-[var(--text-primary)]">Quick Preset</strong> buttons at the top of the Processing Options panel.</p>
                             <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Clean ChatGPT / Claude Output</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Clean ChatGPT / Claude Output</h3>
                                     <p class="text-sm">Enable Convert MD, Remove Citation References, and optionally Remove Fancy Text Font.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Perplexity / Research Output</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Perplexity / Research Output</h3>
                                     <p class="text-sm">Enable Remove Citation References and Convert MD. Review links and footnotes after cleanup.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Swiss Standardization</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Swiss Standardization</h3>
                                     <p class="text-sm">One click sets Swiss German with Language Character Mapping, Remove Fancy Text Font, Remove Citation References, and Replace Em Dash. Enable Remove Diacritics separately if you need ae/oe/ue output.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Paragraph Cleanup</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Paragraph Cleanup</h3>
                                     <p class="text-sm">Use Remove Line Breaks for pasted content with unwanted line wraps. Keep it off for structured text where line breaks matter.</p>
                                 </div>
                             </div>
                         </div>
 
                         <div id="privacy" class="mb-12">
-                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <span class="text-[var(--primary-color)]">7.</span> Privacy
-                            </h3>
+                            </h2>
                             <div class="space-y-4 text-[var(--text-secondary)]">
                                 <div class="p-6 bg-[rgba(60,60,60,0.15)] border-2 border-[var(--border-color)] rounded-lg">
                                     <ul class="space-y-2">
                                         <li><strong class="text-[var(--text-primary)]">Local processing:</strong> Text cleanup runs in your browser.</li>
                                         <li><strong class="text-[var(--text-primary)]">No text upload:</strong> Your text is not sent to ASD123.ai for processing.</li>
                                         <li><strong class="text-[var(--text-primary)]">Local preferences:</strong> Settings are saved in browser storage; text content is not saved by the app.</li>
-                                        <li><strong class="text-[var(--text-primary)]">Local mappings:</strong> Language mappings and the invisible-character tables are embedded in the script itself &mdash; nothing is fetched at runtime.</li>
+                                        <li><strong class="text-[var(--text-primary)]">Local mappings:</strong> The character-mapping groups and the invisible-character tables are embedded in the script itself &mdash; nothing is fetched at runtime.</li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
 
                         <div id="tips" class="mb-12">
-                            <h3 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                 <span class="text-[var(--primary-color)]">8.</span> Tips
-                            </h3>
+                            </h2>
                             <div class="grid md:grid-cols-2 gap-4 text-[var(--text-secondary)]">
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Use fewer toggles first</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Use fewer toggles first</h3>
                                     <p class="text-sm">Start with the smallest set of options, review the output, then add more cleanup if needed.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Review experimental changes</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Review experimental changes</h3>
                                     <p class="text-sm">The em-dash sentence option can change meaning in edge cases. Use it carefully &mdash; the Undo button brings back the text as it was before the last clean.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Mind line breaks</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Mind line breaks</h3>
                                     <p class="text-sm">Remove Line Breaks is helpful for copied paragraphs, but not for lists, poems, code, or structured templates.</p>
                                 </div>
                                 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
-                                    <h4 class="font-bold text-[var(--text-primary)] mb-2">Use the character counter</h4>
+                                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Use the character counter</h3>
                                     <p class="text-sm">The live counter helps when preparing prompts, short posts, summaries, or field-limited text.</p>
                                 </div>
                             </div>
