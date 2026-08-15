@@ -202,7 +202,7 @@
                     <ul style="list-style-type: disc; padding-left: 24px; color: var(--text-secondary); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
                         <li><strong style="color: var(--text-primary);">Whitelist mode</strong> (default): quit only the apps you select - or <strong style="color: var(--text-primary);">blacklist mode</strong>: quit everything except the ones you select</li>
                         <li><strong style="color: var(--text-primary);">Configurable delay</strong> (0.05-10 s): a window opening within the delay cancels the quit, protecting against tab-close misfires</li>
-                        <li><strong style="color: var(--text-primary);">Keep running</strong>, the reverse direction: selected apps are relaunched automatically after a crash or an update, with restart-loop protection</li>
+                        <li><strong style="color: var(--text-primary);">Keep running</strong>, the reverse direction: selected apps are relaunched automatically after a crash or an update, launched hidden so nothing steals focus, with restart-loop protection and a 24-hour override when you do want one to stay closed</li>
                         <li><strong style="color: var(--text-primary);">Recently Quit menu</strong>: the last few auto-quit apps, one click to reopen</li>
                         <li>Native settings window with a searchable app list, launch at login, and a clear menu bar status when the Accessibility permission is missing</li>
                         <li>Only regular apps with a Dock presence are ever considered - menu bar utilities and background services are ignored</li>

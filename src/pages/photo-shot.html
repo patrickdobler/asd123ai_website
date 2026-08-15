@@ -8,19 +8,19 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>Photo-Shot - Self-Hosted AI Image Editing PWA | ASD123.ai</title>
-    <meta name="description" content="Photo-Shot is a free, open-source, mobile-first PWA for AI image editing across Gemini, WaveSpeed and OpenRouter (14+ models), plus an EXIF metadata copier. Self-hosted: your API keys stay on your server. GPLv3.">
+    <meta name="description" content="Photo-Shot is a free, open-source, mobile-first PWA for AI image editing, upscaling and EXIF metadata across fal.ai, WaveSpeed and OpenRouter. Self-hosted: your API keys stay on your server. AGPLv3.">
     <meta name="keywords" content="ai image editing self-hosted, nano banana app, gemini image editing, openrouter image models, exif copier, self-hosted pwa, photo-shot">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Photo-Shot - Self-Hosted AI Image Editing PWA | ASD123.ai">
-    <meta property="og:description" content="Photo-Shot is a free, open-source, mobile-first PWA for AI image editing across Gemini, WaveSpeed and OpenRouter (14+ models), plus an EXIF metadata copier. Self-hosted: your API keys stay on your server. GPLv3.">
+    <meta property="og:description" content="Photo-Shot is a free, open-source, mobile-first PWA for AI image editing, upscaling and EXIF metadata across fal.ai, WaveSpeed and OpenRouter. Self-hosted: your API keys stay on your server. AGPLv3.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/photo-shot">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Photo-Shot - Self-Hosted AI Image Editing PWA | ASD123.ai">
-    <meta name="twitter:description" content="Photo-Shot is a free, open-source, mobile-first PWA for AI image editing across Gemini, WaveSpeed and OpenRouter (14+ models), plus an EXIF metadata copier. Self-hosted: your API keys stay on your server. GPLv3.">
+    <meta name="twitter:description" content="Photo-Shot is a free, open-source, mobile-first PWA for AI image editing, upscaling and EXIF metadata across fal.ai, WaveSpeed and OpenRouter. Self-hosted: your API keys stay on your server. AGPLv3.">
     <link rel="canonical" href="https://asd123.ai/photo-shot">
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles/main.css">
@@ -63,7 +63,7 @@
           "@type": "WebPage",
           "@id": "https://asd123.ai/photo-shot#webpage",
           "name": "Photo-Shot - Self-Hosted AI Image Editing PWA | ASD123.ai",
-          "description": "Photo-Shot is a free, open-source, mobile-first PWA for AI image editing across Gemini, WaveSpeed and OpenRouter (14+ models), plus an EXIF metadata copier. Self-hosted: your API keys stay on your server. GPLv3.",
+          "description": "Photo-Shot is a free, open-source, mobile-first PWA for AI image editing, upscaling and EXIF metadata across fal.ai, WaveSpeed and OpenRouter. Self-hosted: your API keys stay on your server. AGPLv3.",
           "url": "https://asd123.ai/photo-shot",
           "inLanguage": "en",
           "isPartOf": {
@@ -97,7 +97,7 @@
           "@type": "SoftwareApplication",
           "@id": "https://asd123.ai/photo-shot#app",
           "name": "Photo-Shot",
-          "description": "Mobile-first, self-hosted PWA for AI image editing across Gemini, WaveSpeed and OpenRouter, plus an EXIF metadata copier.",
+          "description": "Mobile-first, self-hosted PWA for AI image editing and upscaling across fal.ai, WaveSpeed and OpenRouter, plus an EXIF metadata copier.",
           "url": "https://asd123.ai/photo-shot",
           "applicationCategory": "MultimediaApplication",
           "operatingSystem": "Any (self-hosted via Docker; installable PWA)",
@@ -181,7 +181,7 @@
                     <h1 class="page-title" style="margin-bottom: 0;">Photo-Shot</h1>
                 </div>
                 <p class="page-subtitle">
-                    A mobile-first, installable (PWA) AI image studio: edit photos across many image models, or copy EXIF metadata between images - all from one small self-hosted app. Free and open source (GPLv3).
+                    A mobile-first, installable (PWA) AI image studio: edit and upscale photos across many image models, or copy EXIF metadata between images - all from one small self-hosted app. Free and open source (AGPLv3).
                 </p>
             </div>
 
@@ -196,11 +196,12 @@
                 <div class="liquid-glass" style="padding: var(--space-8);">
                     <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">One studio, many models</h2>
                     <ul style="list-style-type: disc; padding-left: 24px; color: var(--text-secondary); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
-                        <li><strong style="color: var(--text-primary);">Multi-provider editing:</strong> one UI in front of Gemini (direct), WaveSpeed, and OpenRouter, with 14+ image models (Nano Banana 2 / Pro, Seedream, GPT Image, Grok, …).</li>
-                        <li><strong style="color: var(--text-primary);">Model-aware controls:</strong> each model exposes only its real aspect ratios, resolutions (2K/4K), multi-image limits and extras - with a live per-image price estimate.</li>
-                        <li><strong style="color: var(--text-primary);">Text-to-image, image-to-image and re-edit:</strong> up to 5 reference images, prompt templates, and a one-tap "edit this result again" loop.</li>
+                        <li><strong style="color: var(--text-primary);">Multi-provider editing:</strong> one UI in front of fal.ai (12 models), WaveSpeed (10) and OpenRouter (7) - Nano Banana 2 / Pro, Seedream v4.5 and v5, GPT Image 2, Grok Imagine, Reve 2.1, Qwen Image 3 Pro and more.</li>
+                        <li><strong style="color: var(--text-primary);">Model-aware controls:</strong> each model exposes only its real aspect ratios, resolutions (2K/3K/4K, 8K on some), multi-image limits and extras such as output quality and format, web search or OpenRouter FLEX - with a live per-image price estimate.</li>
+                        <li><strong style="color: var(--text-primary);">Text-to-image, image-to-image and re-edit:</strong> up to 5 reference images, prompt templates, and a one-tap "edit this result again" loop. GPS and time can carry over from a reference image to the generated result.</li>
                         <li><strong style="color: var(--text-primary);">Cost tracking:</strong> lifetime, monthly and daily spend with a per-provider and per-model breakdown.</li>
-                        <li><strong style="color: var(--text-primary);">History across devices:</strong> generated images are kept on your server for 90 days, with per-image delete.</li>
+                        <li><strong style="color: var(--text-primary);">Upscaling:</strong> Crystal Upscaler at 1-200x with an adjustable creativity setting, or SeedVR2 at 1-10x and fixed targets from 720p to 2160p.</li>
+                        <li><strong style="color: var(--text-primary);">History across devices:</strong> generated images are kept on your server for 90 days, with individual and bulk delete.</li>
                     </ul>
                 </div>
 
@@ -212,12 +213,12 @@
                 <div class="liquid-glass" style="padding: var(--space-8);">
                     <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Private by architecture</h2>
                     <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">The browser never calls the AI providers directly. A small server-side reverse proxy (nginx) injects the provider API keys, so the keys live <strong style="color: var(--text-primary);">only on your server</strong> and never reach the browser. Every API request must carry the unlock password, which nginx verifies - without it, neither the models nor the keys are reachable.</p>
-                    <p style="color: var(--text-secondary); line-height: 1.6;">Deployment is a single <code>docker compose up</code>: nginx serves the static PWA bundle and the API proxy, with an optional Cloudflare tunnel. Built with React 19, TypeScript, Tailwind CSS v4 (local build, no CDN), and vite-plugin-pwa for the installable, offline-capable app shell.</p>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">Deployment is a single <code>docker compose up</code>: nginx serves the static PWA bundle and the API proxy, with an optional Cloudflare tunnel. Built with React 19, TypeScript 7, Vite 8 and Tailwind CSS 4 (local build, no CDN), plus vite-plugin-pwa for the installable, offline-capable app shell with HEIC conversion and pull-to-refresh. It expects an existing Traefik setup on an external <code>proxy</code> network.</p>
                 </div>
 
                 <div class="liquid-glass" style="padding: var(--space-8); text-align: center;">
                     <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Get Photo-Shot</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Free software under the GPLv3 - self-host it with Docker in minutes.</p>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Free software under the AGPLv3 - self-host it with Docker in minutes.</p>
                     <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                         <a href="https://github.com/asd123ch/photo-shot" target="_blank" rel="noopener" class="btn btn--primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View on GitHub</a>
                         <a href="https://photo-shot.ch" target="_blank" rel="noopener" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">photo-shot.ch</a>

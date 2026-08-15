@@ -8,19 +8,19 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>RDP123 - Minimal, Fast RDP Client for macOS | ASD123.ai</title>
-    <meta name="description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.">
+    <meta name="description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 9 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.">
     <meta name="keywords" content="rdp client macos, remote desktop mac, rust rdp client, lightweight rdp client, microsoft remote desktop alternative mac, rdp123">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="RDP123 - Minimal, Fast RDP Client for macOS | ASD123.ai">
-    <meta property="og:description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.">
+    <meta property="og:description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 9 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/rdp123">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="RDP123 - Minimal, Fast RDP Client for macOS | ASD123.ai">
-    <meta name="twitter:description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.">
+    <meta name="twitter:description" content="RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 9 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.">
     <link rel="canonical" href="https://asd123.ai/rdp123">
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles/main.css">
@@ -63,7 +63,7 @@
           "@type": "WebPage",
           "@id": "https://asd123.ai/rdp123#webpage",
           "name": "RDP123 - Minimal, Fast RDP Client for macOS | ASD123.ai",
-          "description": "RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 8 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.",
+          "description": "RDP123 is a free, open-source RDP client for macOS: native AppKit written in Rust, about 9 MB installed, menu-bar app, low-latency rendering, Keychain passwords, no telemetry. AGPLv3.",
           "url": "https://asd123.ai/rdp123",
           "inLanguage": "en",
           "isPartOf": {
@@ -193,8 +193,8 @@
 
                 <div class="liquid-glass" style="padding: var(--space-8);">
                     <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Native and small on purpose</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">No Electron, no web view, no bundled browser: a real AppKit app written in Rust, a few megabytes on disk, near-zero idle footprint. The installed app is about <strong style="color: var(--text-primary);">8 MB</strong> - Microsoft's Windows App installs at over 200 MB, Remote Desktop Manager at close to a gigabyte (as installed, mid-2026). Fewer features, deliberately: the ones you use every day, in a fraction of the footprint.</p>
-                    <img src="/apps/rdp123-size-comparison.svg" alt="Installed size comparison: RDP123 8 MB, Microsoft Windows App 228 MB, Remote Desktop Manager 993 MB" width="760" height="168" loading="lazy" style="max-width: 100%; height: auto;">
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">No Electron, no web view, no bundled browser: a real AppKit app written in Rust, a few megabytes on disk, near-zero idle footprint. The installed app is about <strong style="color: var(--text-primary);">9 MB</strong> - Microsoft's Windows App installs at over 200 MB, Remote Desktop Manager at close to a gigabyte (as installed, mid-2026). Fewer features, deliberately: the ones you use every day, in a fraction of the footprint.</p>
+                    <img src="/apps/rdp123-size-comparison.svg" alt="Installed size comparison: RDP123 9 MB, Microsoft Windows App 228 MB, Remote Desktop Manager 993 MB" width="760" height="168" loading="lazy" style="max-width: 100%; height: auto;">
                 </div>
 
                 <div class="liquid-glass" style="padding: var(--space-8);">
@@ -204,7 +204,7 @@
                         <li><strong style="color: var(--text-primary);">Dirty-region tracking</strong> end to end: a keystroke syncs kilobytes, not the whole screen.</li>
                         <li><strong style="color: var(--text-primary);">Zero-copy presentation:</strong> frames live in pooled IOSurfaces that CoreAnimation binds directly as GPU textures - the same technique Chromium and mpv use.</li>
                         <li><strong style="color: var(--text-primary);">Native cursor shapes:</strong> resize arrows, I-beam and hand follow the remote UI, applied to the macOS cursor with zero compositing lag.</li>
-                        <li><strong style="color: var(--text-primary);">Two graphics pipelines:</strong> the proven Classic (RDP 6.1) mode by default, and the full RDP 8 pipeline (H.264/AVC420, RemoteFX Progressive, ClearCodec) selectable per connection.</li>
+                        <li><strong style="color: var(--text-primary);">Two graphics pipelines:</strong> the proven Classic (RDP 6.1) mode by default, and the experimental RDP 8 pipeline (H.264/AVC420, RemoteFX Progressive, ClearCodec with NSCodec, Planar cache-driven compositing and ZGFX) selectable per connection.</li>
                     </ul>
                 </div>
 
@@ -219,7 +219,8 @@
                         <li><strong style="color: var(--text-primary);">Keep session awake</strong> - an optional invisible key tap while you are idle, so an idle-timeout policy does not disconnect you</li>
                         <li>Physical-scancode keyboard mapping for non-US layouts (e.g. Swiss German) - modifiers never get stuck</li>
                         <li>Simple native Settings window: connections, colour depth, scaling, full screen, auto-reconnect</li>
-                        <li>SSH shortcuts alongside RDP, opened in your terminal of choice</li>
+                        <li>Microsoft Entra web authentication for Windows 11 hosts, alongside password-based NLA - tokens and the ephemeral proof-of-possession key stay in memory</li>
+                        <li>SSH shortcuts alongside RDP, opened in your terminal of choice, using your existing SSH keys</li>
                     </ul>
                     <div style="margin-top: var(--space-6);">
                         <img src="/apps/rdp123-settings.png" alt="RDP123 settings window with connection list and editor" width="832" height="904" loading="lazy" style="max-width: 100%; height: auto;">
