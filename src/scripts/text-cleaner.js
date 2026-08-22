@@ -188,8 +188,8 @@ const INVISIBLE_GROUPS = [
     {
         id: 'variation-selector',
         label: 'variation selector',
-        // Mongolian FVS 1-3, VS1-16, VS17-256 (a popular steganography carrier)
-        ranges: [[0x180B, 0x180D], [0xFE00, 0xFE0F], [0xE0100, 0xE01EF]]
+        // Mongolian FVS 1-4, VS1-16, VS17-256 (a popular steganography carrier)
+        ranges: [[0x180B, 0x180D], [0x180F, 0x180F], [0xFE00, 0xFE0F], [0xE0100, 0xE01EF]]
     },
     {
         id: 'tag-char',
@@ -206,8 +206,72 @@ const INVISIBLE_GROUPS = [
             [0x00AD, 0x00AD], [0x034F, 0x034F], [0x115F, 0x1160], [0x17B4, 0x17B5],
             [0x3164, 0x3164], [0xFFA0, 0xFFA0], [0xFFF9, 0xFFFB]
         ]
+    },
+    {
+        id: 'layout-control',
+        label: 'layout control',
+        // Egyptian hieroglyph quadrat controls, Duployan shorthand overlaps and
+        // musical beam/tie/slur controls. Category Cf, so invisible carriers in
+        // ordinary prose - but genuine layout next to their own script, where
+        // SCRIPT_BOUND_CONTROLS below keeps them.
+        ranges: [[0x13430, 0x1343F], [0x1BCA0, 0x1BCA3], [0x1D173, 0x1D17A]]
+    },
+    {
+        id: 'noncharacter',
+        label: 'noncharacter',
+        // The 66 Unicode noncharacters: U+FDD0-FDEF plus U+nFFFE/U+nFFFF at the
+        // end of every plane. Permanently reserved for internal use and banned
+        // in interchange, so any occurrence in pasted text is contraband. They
+        // can never be assigned, so stripping them carries no future risk.
+        ranges: [[0xFDD0, 0xFDEF]].concat(
+            Array.from({ length: 17 }, (_, plane) => [plane * 0x10000 + 0xFFFE,
+                                                      plane * 0x10000 + 0xFFFF]))
+    },
+    {
+        id: 'reserved-ignorable',
+        label: 'reserved invisible',
+        // Unassigned code points carrying Other_Default_Ignorable_Code_Point:
+        // conformant renderers show nothing, normalization keeps them. That
+        // makes them ready-made covert carriers.
+        // NOTE: unlike noncharacters these CAN be assigned later - U+180F became
+        // Mongolian FVS4 in Unicode 14. Re-check these ranges on Unicode bumps.
+        ranges: [[0x2065, 0x2065], [0xFFF0, 0xFFF8], [0xE0000, 0xE0000],
+                 [0xE0080, 0xE00FF], [0xE01F0, 0xE0FFF]]
     }
 ];
+
+// Format controls that are contraband when they float in ordinary prose, but
+// genuine formatting when they sit next to the script they belong to. Stripping
+// those unconditionally - which this tool used to do for Khmer, Mongolian and
+// Hangul - visibly corrupts correct text in those scripts.
+const SCRIPT_BOUND_CONTROLS = [
+    { controls: [[0x180B, 0x180F]], script: [[0x1800, 0x18AF]] },              // Mongolian
+    { controls: [[0x17B4, 0x17B5]], script: [[0x1780, 0x17FF]] },              // Khmer
+    { controls: [[0x115F, 0x1160]], script: [[0x1100, 0x11FF], [0xA960, 0xA97F],
+                                             [0xAC00, 0xD7FB]] },              // Hangul jamo
+    { controls: [[0x3164, 0x3164]], script: [[0x3131, 0x318E]] },              // Hangul compatibility
+    { controls: [[0xFFA0, 0xFFA0]], script: [[0xFFA1, 0xFFDC]] },              // Hangul halfwidth
+    { controls: [[0x13430, 0x1343F]], script: [[0x13000, 0x143FF]] },          // Egyptian quadrat
+    { controls: [[0x1BCA0, 0x1BCA3]], script: [[0x1BC00, 0x1BC9F]] },          // Duployan shorthand
+    { controls: [[0x1D173, 0x1D17A]], script: [[0x1D100, 0x1D1FF]] }           // musical beams/slurs
+];
+
+function inRanges(cp, ranges) {
+    return ranges.some(([from, to]) => cp >= from && cp <= to);
+}
+
+/**
+ * The script a control belongs to, or null when the code point is not one of
+ * the script-bound controls.
+ * @param {number} cp - Code point
+ * @returns {Array<Array<number>>|null} - Script ranges to look for around it
+ */
+function scriptBoundScript(cp) {
+    for (const entry of SCRIPT_BOUND_CONTROLS) {
+        if (inRanges(cp, entry.controls)) return entry.script;
+    }
+    return null;
+}
 
 // Spaces that look like (or stand in for) a plain U+0020.
 const SPACE_HOMOGLYPH_RANGES = [
@@ -321,6 +385,19 @@ function removeInvisibleCharacters(text) {
 
         const group = INVISIBLE_LOOKUP.get(cp);
         if (group !== undefined) {
+            // Script-bound controls are real formatting next to their own
+            // script and contraband anywhere else. Checked only once the code
+            // point is known to be strippable - running it per character costs
+            // several range comparisons on every letter of the document.
+            const script = scriptBoundScript(cp);
+            if (script) {
+                const near = neighbour =>
+                    !!neighbour && inRanges(neighbour.codePointAt(0), script);
+                if (near(lastBase()) || near(chars[i + 1])) {
+                    out.push(ch);
+                    continue;
+                }
+            }
             removed++;
             count(group);
             continue;

@@ -166,23 +166,30 @@ French typography places a space inside guillemets and before the semicolon, col
 
 ## Invisible characters
 
-Not part of the character mapping. These are removed by the separate *Remove Invisible Characters* option, which covers 441 code points in total. They carry no visible meaning, but are used to hide tracking IDs and watermarks, and some of them make text render differently from how it is stored.
+Not part of the character mapping. These are removed by the separate *Remove Invisible Characters* option, which covers 4,275 code points in total. They carry no visible meaning, but are used to hide tracking IDs and watermarks, and some of them make text render differently from how it is stored.
 
-The table below has 59 rows, but four of them are ranges that cover 386 code points between them - that is where the bulk of the number comes from:
+Most of that total is reserved space listed as ranges, not individual characters:
 
 | Rows | Code points |
 |---|---|
 | 39 individually listed characters | 39 |
+| U+E01F0-E0FFF, reserved default-ignorable | 3600 |
 | U+E0100-E01EF, variation selector supplement | 240 |
 | U+E0001-E007F, tag characters | 127 |
+| U+E0080-E00FF, reserved default-ignorable | 128 |
+| U+FDD0-FDEF and U+nFFFE/U+nFFFF, noncharacters | 66 |
+| U+13430-1343F, U+1BCA0-1BCA3, U+1D173-1D17A, layout controls | 28 |
 | U+FE00-FE0F, variation selectors 1-16 | 16 |
-| U+180B-180D, Mongolian free variation selectors | 3 |
 | 16 unusual spaces | 16 |
-| **Total** | **441** |
+| U+FFF0-FFF8, U+2065, U+E0000, reserved default-ignorable | 11 |
+| U+180B-180D and U+180F, Mongolian free variation selectors | 4 |
+| **Total** | **4275** |
 
-Of those 441, **411 are assigned characters**. The remaining 30 sit in the unassigned gap U+E0002-E001F inside the tag block, which is stripped as a whole range rather than character by character.
+Of those 4,275, **440 are assigned characters**. The other 3,835 are Unicode noncharacters and reserved default-ignorable code points: unassigned, rendered invisibly by conformant renderers, and preserved by normalization, which is exactly what makes them covert carriers. Noncharacters can never be assigned; the reserved default-ignorable ranges can, so they need re-checking on a Unicode version bump - U+180F became Mongolian FVS4 in Unicode 14.
 
-Emoji safety: U+200D, U+FE0E and U+FE0F are the only entries that can be legitimate content, because they hold composed emoji together. They are kept when they sit between emoji and removed everywhere else.
+Emoji safety: U+200D, U+FE0E and U+FE0F are kept when they hold a composed emoji together and removed when they float in ordinary text.
+
+Script safety: controls that belong to a script - Mongolian free variation selectors, Khmer inherent vowels, Hangul fillers, and the Egyptian quadrat, Duployan and musical layout controls - are kept when they sit next to that script, and removed when they float in unrelated text. Stripping them unconditionally would visibly corrupt correct text in those scripts.
 
 ### Removed
 
@@ -227,7 +234,17 @@ Emoji safety: U+200D, U+FE0E and U+FE0F are the only entries that can be legitim
 | IAA | U+FFF9 |  |  | Interlinear annotation anchor |
 | IAS | U+FFFA |  |  | Interlinear annotation separator |
 | IAT | U+FFFB |  |  | Interlinear annotation terminator |
-| FVS1-3 | U+180B-180D |  |  | Mongolian free variation selectors |
+| FVS1-4 | U+180B-180D, U+180F |  |  | Mongolian free variation selectors - kept after a Mongolian letter |
+| EGY | U+13430-1343F |  |  | Egyptian hieroglyph quadrat controls - kept inside hieroglyphic text |
+| DUP | U+1BCA0-1BCA3 |  |  | Duployan shorthand controls - kept inside Duployan text |
+| MUS | U+1D173-1D17A |  |  | Musical beam/tie/slur controls - kept inside musical notation |
+| NCHAR | U+FDD0-FDEF |  |  | Unicode noncharacters, 32 code points - banned in interchange |
+| NCHAR | U+FFFE-FFFF |  |  | Plane-end noncharacters; the same pair ends all 17 planes, 34 total |
+| RSV | U+2065 |  |  | Reserved default-ignorable |
+| RSV | U+FFF0-FFF8 |  |  | Reserved default-ignorable |
+| RSV | U+E0000 |  |  | Reserved default-ignorable |
+| RSV | U+E0080-E00FF |  |  | Reserved default-ignorable, 128 code points |
+| RSV | U+E01F0-E0FFF |  |  | Reserved default-ignorable, 3600 code points |
 | VS1-16 | U+FE00-FE0F |  |  | Variation selectors - VS15/VS16 kept after an emoji |
 | VS17-256 | U+E0100-E01EF |  |  | Variation selector supplement, 240 code points |
 | TAG | U+E0001-E007F |  |  | Tag characters, 127 code points - can carry a hidden message |

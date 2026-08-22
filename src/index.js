@@ -78,7 +78,7 @@ Use this skill when an agent needs to clean, normalize, or standardize text with
 - Remove citation references
 - Normalize fancy Unicode text
 - Normalize target line endings for Auto, Windows, Linux, and macOS
-- Remove invisible characters and character-based watermarks (441 code points: zero-width, bidi controls, tag characters, variation selectors, unusual spaces), emoji-safe
+- Remove invisible characters and character-based watermarks (4,275 code points: zero-width, bidi controls, tag characters, variation selectors, Unicode noncharacters, reserved default-ignorable ranges, unusual spaces), emoji-safe and script-aware
 - Apply character mapping in five switchable groups (hyphens and dashes, quotation marks, apostrophes, bullets/ellipses/symbols, PDF ligatures), plus optional ae/oe spelling, sharp s to ss, and French spacing
 - Remove diacritics, with a switch for the ae/oe/ue digraph convention
 - One-click presets (ChatGPT/Claude, Perplexity/Research, Swiss Standardization, Paragraph Mode) and undo
@@ -593,7 +593,7 @@ function assetRequest(request, pathname) {
 // drift away from the routing table above.
 const LLMS_TXT_SECTIONS = [
   ['Tools', [
-    ['/text-cleaner', 'Clean and normalize text: remove invisible characters and character-based watermarks (441 code points), citations, Markdown and diacritics, and flatten typography to plain ASCII'],
+    ['/text-cleaner', 'Clean and normalize text: remove invisible characters and character-based watermarks (4,275 code points), citations, Markdown and diacritics, and flatten typography to plain ASCII'],
     ['/anonymizer', 'Detect and anonymize personal data with reversible placeholders, regex or on-device AI models'],
     ['/converter', 'Convert PDF, Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, HTML and images to Markdown, including OCR for scans'],
     ['/chat', 'Chat with open models through WebGPU, entirely on the device'],
