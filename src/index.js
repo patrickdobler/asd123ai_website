@@ -78,7 +78,7 @@ Use this skill when an agent needs to clean, normalize, or standardize text with
 - Remove citation references
 - Normalize fancy Unicode text
 - Normalize target line endings for Auto, Windows, Linux, and macOS
-- Remove invisible characters and character-based watermarks (4,275 code points: zero-width, bidi controls, tag characters, variation selectors, Unicode noncharacters, reserved default-ignorable ranges, unusual spaces), emoji-safe and script-aware
+- Remove invisible characters and character-based watermarks (4,275 code points: zero-width, bidi controls, tag characters, variation selectors, Unicode noncharacters, reserved default-ignorable ranges, unusual spaces), emoji-safe and script-aware, with space folding separately switchable so French and German typography survives
 - Apply character mapping in five switchable groups (hyphens and dashes, quotation marks, apostrophes, bullets/ellipses/symbols, PDF ligatures), plus optional ae/oe spelling, sharp s to ss, and French spacing
 - Remove diacritics, with a switch for the ae/oe/ue digraph convention
 - One-click presets (ChatGPT/Claude, Perplexity/Research, Swiss Standardization, Paragraph Mode) and undo

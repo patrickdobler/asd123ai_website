@@ -251,6 +251,8 @@ Script safety: controls that belong to a script - Mongolian free variation selec
 
 ### Normalized to a plain space
 
+These 16 are the only entries the *Fold unusual spaces* switch controls. With it off they are left untouched and everything above is still removed, so French and German typography that relies on the no-break space survives a clean.
+
 | From | Unicode | To | Unicode | Note |
 |---|---|---|---|---|
 | (invisible) | U+00A0 | ` ` | U+0020 | No-break space to space |

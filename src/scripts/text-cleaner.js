@@ -333,11 +333,14 @@ const EMOJI_MODIFIER_RE = /[\uFE0E\uFE0F\u{1F3FB}-\u{1F3FF}]/u;
  * stays a family and a flag stays a flag.
  *
  * @param {string} text - Input text
+ * @param {boolean} foldSpaces - Fold no-break, narrow and other unusual spaces
+ *        to a plain U+0020. French and German typography rely on some of them,
+ *        so this is separable from removing the invisible carriers.
  * @returns {{text: string, removed: number, replaced: number, total: number,
  *            byGroup: Object<string, number>}} Cleaned text plus a breakdown
  *          of what was touched, so the UI can name it instead of just counting.
  */
-function removeInvisibleCharacters(text) {
+function removeInvisibleCharacters(text, foldSpaces = true) {
     const empty = { text, removed: 0, replaced: 0, total: 0, byGroup: {} };
     if (!text || !INVISIBLE_DETECT_RE.test(text)) return empty;
 
@@ -377,6 +380,10 @@ function removeInvisibleCharacters(text) {
         }
 
         if (SPACE_HOMOGLYPHS.has(cp)) {
+            if (!foldSpaces) {
+                out.push(ch);
+                continue;
+            }
             out.push(' ');
             replaced++;
             count('space');
@@ -562,6 +569,7 @@ class TextCleaner {
     constructor() {
         this.settings = {
             removeInvisibleChars: true,   // Invisible/zero-width/format characters (baseline hygiene)
+            foldUnusualSpaces: true,      // No-break and other unusual spaces to U+0020
             applyCharacterMapping: false,
             // Which groups the mapping covers - all on, which is what the single
             // combined table used to do.
@@ -617,7 +625,8 @@ class TextCleaner {
         // Invisible characters go next, so every later step sees clean input.
         let invisible = null;
         if (this.settings.removeInvisibleChars) {
-            const report = removeInvisibleCharacters(processedText);
+            const report = removeInvisibleCharacters(
+                processedText, this.settings.foldUnusualSpaces);
             if (report.total > 0) {
                 processedText = report.text;
                 invisible = report;
@@ -1094,6 +1103,7 @@ class TextCleanerUI {
             mapFrenchSpacing: false,
             umlautDigraphs: true,
             removeInvisibleChars: true,
+            foldUnusualSpaces: true,
             removeDiacritics: false,
             removeCitations: false,
             convertMarkdown: false,
@@ -1145,6 +1155,7 @@ class TextCleanerUI {
             'map-french-spacing': 'mapFrenchSpacing',
             'umlaut-digraphs': 'umlautDigraphs',
             'remove-invisible-chars': 'removeInvisibleChars',
+            'fold-unusual-spaces': 'foldUnusualSpaces',
             'remove-diacritics': 'removeDiacritics',
             'remove-citations': 'removeCitations',
             'convert-markdown': 'convertMarkdown',
@@ -1330,6 +1341,7 @@ class TextCleanerUI {
             'mapFrenchSpacing': 'map-french-spacing',
             'umlautDigraphs': 'umlaut-digraphs',
             'removeInvisibleChars': 'remove-invisible-chars',
+            'foldUnusualSpaces': 'fold-unusual-spaces',
             'removeDiacritics': 'remove-diacritics',
             'removeCitations': 'remove-citations',
             'convertMarkdown': 'convert-markdown',
@@ -1381,6 +1393,7 @@ class StorageManager {
         this.defaultSettings = {
             cleaner: {
                 removeInvisibleChars: true,
+                foldUnusualSpaces: true,
                 applyCharacterMapping: false,
                 mapDashes: true,
                 mapQuotes: true,
