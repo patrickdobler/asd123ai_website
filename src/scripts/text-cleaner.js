@@ -539,6 +539,25 @@ const MOJIBAKE_RE = new RegExp(
     'g'
 );
 
+/**
+ * Drop trailing spaces and tabs from one line.
+ *
+ * Deliberately not /[ \t]+$/: on a line that does NOT end in whitespace that
+ * pattern restarts its scan from every position, which is quadratic and turns a
+ * pasted block of indented text into a multi-second freeze.
+ * @param {string} line - Single line without its terminator
+ * @returns {string} - Line without trailing spaces or tabs
+ */
+function trimTrailingSpaces(line) {
+    let end = line.length;
+    while (end > 0) {
+        const ch = line[end - 1];
+        if (ch !== ' ' && ch !== '\t') break;
+        end--;
+    }
+    return end === line.length ? line : line.slice(0, end);
+}
+
 class TextCleaner {
     constructor() {
         this.settings = {
@@ -695,13 +714,19 @@ class TextCleaner {
 
             // Markdown links: remove citation-style ones entirely (label is a
             // bare domain or a number); real links keep their visible text.
-            result = result.replace(/\[([^\]]*)\]\([^)]*\)/g, (match, label) => {
-                const trimmed = label.trim();
-                if (!trimmed) return '';
-                if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(trimmed)) return '';
-                if (/^\d+$/.test(trimmed)) return '';
-                return trimmed;
-            });
+            // Two guards against quadratic scanning on bracket-heavy text: the
+            // pattern cannot match without "](", so a cheap substring test skips
+            // it entirely, and the lengths are bounded so a lone '[' cannot make
+            // the engine rescan the rest of the line.
+            if (result.includes('](')) {
+                result = result.replace(/\[([^\]]{0,200})\]\([^)]{0,2000}\)/g, (match, label) => {
+                    const trimmed = label.trim();
+                    if (!trimmed) return '';
+                    if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(trimmed)) return '';
+                    if (/^\d+$/.test(trimmed)) return '';
+                    return trimmed;
+                });
+            }
 
             // Remove standalone bracketed domains or sources: e.g. [business.uq.edu]
             result = result.replace(/\[[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\]/g, '');
@@ -723,9 +748,11 @@ class TextCleaner {
 
             // Clean up extra spaces left by removed citations, preserving indentation
             result = result.replace(/(\S)[ \t]{2,}/g, '$1 ');
-            result = result.replace(/[ \t]+([.!?])/g, '$1');
+            // Guarded so the whitespace run is only entered at its start; the
+            // unguarded /[ \t]+([.!?])/ retries from every space in the run.
+            result = result.replace(/(^|[^ \t])[ \t]+([.!?])/g, '$1$2');
 
-            return result.replace(/[ \t]+$/, '');
+            return trimTrailingSpaces(result);
         });
 
         return processedLines.join('\n');
@@ -760,14 +787,23 @@ class TextCleaner {
         // Remove inline code: `code`
         result = result.replace(/`([^`]+)`/g, '$1');
 
-        // Remove links: [text](url) -> text
-        result = result.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-
-        // Remove reference-style links: [text][ref] -> text
-        result = result.replace(/\[([^\]]+)\]\[[^\]]*\]/g, '$1');
-
-        // Remove images: ![alt](url) -> alt
-        result = result.replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1');
+        // Links, reference links and images. None of these can match without
+        // "](" or "][", so a substring test skips them outright; the lengths are
+        // bounded so a run of '[' cannot make the engine rescan the whole
+        // document from every bracket. Both together turn a pathological paste
+        // of brackets from quadratic into linear.
+        if (result.includes('](')) {
+            // Images first: the link pattern below would otherwise match the
+            // [alt](url) part and leave the '!' behind as stray punctuation.
+            // ![alt](url) -> alt
+            result = result.replace(/!\[([^\]]{0,500})\]\([^)]{1,2000}\)/g, '$1');
+            // [text](url) -> text
+            result = result.replace(/\[([^\]]{1,500})\]\([^)]{1,2000}\)/g, '$1');
+        }
+        if (result.includes('][')) {
+            // [text][ref] -> text
+            result = result.replace(/\[([^\]]{1,500})\]\[[^\]]{0,500}\]/g, '$1');
+        }
 
         // Remove horizontal rules: --- or ***
         result = result.replace(/^[-*]{3,}$/gm, '');
@@ -815,13 +851,16 @@ class TextCleaner {
             // Turn each em-dash break into a sentence break and capitalize ONLY
             // the letter that directly follows it. Everything else on the line
             // (ellipses, abbreviations like "z. B.", other periods) is untouched.
-            let result = line.replace(/\s*—\s*(\p{Ll})?/gu, (match, letter) =>
+            // The lookbehind stops the leading \s* from starting a fresh scan at
+            // every space inside a long run. It must not consume the character,
+            // or the next em dash on the line loses the guard it needs.
+            let result = line.replace(/(?<!\s)\s*—\s*(\p{Ll})?/gu, (match, letter) =>
                 letter ? '. ' + letter.toUpperCase() : '. '
             );
 
             // Tidy doubled spaces introduced by the replacement and trailing ". "
             result = result.replace(/(\S)[ \t]{2,}/g, '$1 ');
-            return result.replace(/[ \t]+$/, '');
+            return trimTrailingSpaces(result);
         });
 
         return processedLines.join('\n');
