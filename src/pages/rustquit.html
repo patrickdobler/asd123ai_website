@@ -8,19 +8,19 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <title>RustQuit - Quit macOS Apps on Last Window Close | ASD123.ai</title>
-    <meta name="description" content="Free, open-source macOS menu bar utility in Rust: apps quit gracefully when their last window closes, with whitelist mode and auto-relaunch. AGPLv3.">
+    <meta name="description" content="Quit selected Mac apps when their last window closes. Choose which apps should quit and which should keep running.">
     <meta name="keywords" content="auto quit macos apps, quit app when window closes mac, swiftquit alternative, macos menu bar utility, rust macos app, rustquit">
     <meta name="author" content="ASD123.ai">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="RustQuit - Quit macOS Apps on Last Window Close | ASD123.ai">
-    <meta property="og:description" content="Free, open-source macOS menu bar utility in Rust: apps quit gracefully when their last window closes, with whitelist mode and auto-relaunch. AGPLv3.">
+    <meta property="og:description" content="Quit selected Mac apps when their last window closes. Choose which apps should quit and which should keep running.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://asd123.ai/rustquit">
     <meta property="og:site_name" content="ASD123.ai">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="RustQuit - Quit macOS Apps on Last Window Close | ASD123.ai">
-    <meta name="twitter:description" content="Free, open-source macOS menu bar utility in Rust: apps quit gracefully when their last window closes, with whitelist mode and auto-relaunch. AGPLv3.">
+    <meta name="twitter:description" content="Quit selected Mac apps when their last window closes. Choose which apps should quit and which should keep running.">
     <link rel="canonical" href="https://asd123.ai/rustquit">
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles/main.css">
@@ -53,7 +53,7 @@
           "@id": "https://asd123.ai/#website",
           "url": "https://asd123.ai/",
           "name": "ASD123.ai",
-          "description": "Privacy-first AI text tools that run entirely in your browser.",
+          "description": "Quit selected Mac apps when their last window closes. Choose which apps should quit and which should keep running.",
           "publisher": {
             "@id": "https://asd123.ai/#organization"
           },
@@ -63,7 +63,7 @@
           "@type": "WebPage",
           "@id": "https://asd123.ai/rustquit#webpage",
           "name": "RustQuit - Quit macOS Apps on Last Window Close | ASD123.ai",
-          "description": "Free, open-source macOS menu bar utility in Rust: apps quit gracefully when their last window closes, with whitelist mode and auto-relaunch. AGPLv3.",
+          "description": "Quit selected Mac apps when their last window closes. Choose which apps should quit and which should keep running.",
           "url": "https://asd123.ai/rustquit",
           "inLanguage": "en",
           "isPartOf": {
@@ -97,7 +97,7 @@
           "@type": "SoftwareApplication",
           "@id": "https://asd123.ai/rustquit#app",
           "name": "RustQuit",
-          "description": "Auto-quit macOS apps automatically when their last window closes. A tiny, native menu bar utility in Rust.",
+          "description": "Quit selected Mac apps when their last window closes. Choose which apps should quit and which should keep running.",
           "url": "https://asd123.ai/rustquit",
           "applicationCategory": "UtilitiesApplication",
           "operatingSystem": "macOS 13 or newer",
@@ -133,34 +133,34 @@
 
                 <div class="nav-links">
                     <div class="nav-tools">
-                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-expanded="false">
                             Tools
                             <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m6 9 6 6 6-6"/>
                             </svg>
                         </button>
-                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
-                            <a href="/text-cleaner" class="nav-tool-item" role="menuitem">
+                        <div class="nav-tools-menu" aria-label="Tools">
+                            <a href="/text-cleaner" class="nav-tool-item">
                                 <span class="nav-tool-title">Text Cleaner</span>
                                 <span class="nav-tool-description">Clean and standardize generated text.</span>
                             </a>
-                            <a href="/anonymizer" class="nav-tool-item" role="menuitem">
+                            <a href="/anonymizer" class="nav-tool-item">
                                 <span class="nav-tool-title">Anonymizer</span>
                                 <span class="nav-tool-description">Detect and anonymize PII locally.</span>
                             </a>
-                            <a href="/chat" class="nav-tool-item" role="menuitem">
+                            <a href="/chat" class="nav-tool-item">
                                 <span class="nav-tool-title">Local AI Chat</span>
                                 <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
                             </a>
-                            <a href="/context" class="nav-tool-item" role="menuitem">
+                            <a href="/context" class="nav-tool-item">
                                 <span class="nav-tool-title">Context Estimator</span>
                                 <span class="nav-tool-description">Estimate useful LLM context size.</span>
                             </a>
-                            <a href="/converter" class="nav-tool-item" role="menuitem">
+                            <a href="/converter" class="nav-tool-item">
                                 <span class="nav-tool-title">Markdown Converter</span>
                                 <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
                             </a>
-                            <a href="/tts" class="nav-tool-item" role="menuitem">
+                            <a href="/tts" class="nav-tool-item">
                                 <span class="nav-tool-title">Text to Speech</span>
                                 <span class="nav-tool-description">Generate speech locally from text.</span>
                             </a>
@@ -173,67 +173,18 @@
             </nav>
         </header>
 
-        <main id="main" role="main">
-            <div class="page-header">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: var(--space-4);">
-                    <img src="/apps/rustquit-logo.png" alt="" width="56" height="56" style="width: 56px; height: 56px; border-radius: 12px;">
-                    <h1 class="page-title" style="margin-bottom: 0;">RustQuit</h1>
-                </div>
-                <p class="page-subtitle">
-                    Automatically quits macOS apps when their last window closes - a small, defensive menu bar utility, built in Rust. Free and open source (AGPLv3).
-                </p>
-            </div>
-
-            <div style="max-width: 900px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: var(--space-8);">
-                <div class="liquid-glass" style="padding: var(--space-8);">
-                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">The red ✕ finally means quit</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">On macOS, clicking the red ✕ closes a window but leaves the app running. RustQuit fixes that: when an app's <strong style="color: var(--text-primary);">last window</strong> closes, the app is quit gracefully, exactly like pressing ⌘Q - save dialogs still appear, nothing is ever force-quit.</p>
-                    <p style="color: var(--text-secondary); line-height: 1.6;">It is a from-scratch, native replacement for the unmaintained SwiftQuit, designed around the failure modes that plagued it: apps like Firefox, iTerm2, and Discord that never delivered the events SwiftQuit waited for are handled reliably - even Discord's hide-instead-of-close trick is seen through.</p>
-                </div>
-
-                <div class="liquid-glass" style="padding: var(--space-8);">
-                    <div style="display: flex; justify-content: center;">
-                        <img src="/apps/rustquit-screenshot.png" alt="RustQuit settings window with searchable app list" width="642" height="952" style="width: min(480px, 100%); height: auto;">
-                    </div>
-                </div>
-
-                <div class="liquid-glass" style="padding: var(--space-8);">
-                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Features</h2>
-                    <ul style="list-style-type: disc; padding-left: 24px; color: var(--text-secondary); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
-                        <li><strong style="color: var(--text-primary);">Whitelist mode</strong> (default): quit only the apps you select - or <strong style="color: var(--text-primary);">blacklist mode</strong>: quit everything except the ones you select</li>
-                        <li><strong style="color: var(--text-primary);">Configurable delay</strong> (0.05-10 s): a window opening within the delay cancels the quit, protecting against tab-close misfires</li>
-                        <li><strong style="color: var(--text-primary);">Keep running</strong>, the reverse direction: selected apps are relaunched automatically after a crash or an update, launched hidden so nothing steals focus, with restart-loop protection and a 24-hour override when you do want one to stay closed</li>
-                        <li><strong style="color: var(--text-primary);">Recently Quit menu</strong>: the last few auto-quit apps, one click to reopen</li>
-                        <li>Native settings window with a searchable app list, launch at login, and a clear menu bar status when the Accessibility permission is missing</li>
-                        <li>Only regular apps with a Dock presence are ever considered - menu bar utilities and background services are ignored</li>
-                    </ul>
-                </div>
-
-                <div class="liquid-glass" style="padding: var(--space-8);">
-                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Defensive by architecture</h2>
-                    <ul style="list-style-type: disc; padding-left: 24px; color: var(--text-secondary); line-height: 1.6; display: flex; flex-direction: column; gap: 8px;">
-                        <li>RustQuit never trusts a cached window count: it <strong style="color: var(--text-primary);">counts again before every decision</strong>, and anything it cannot verify keeps the app alive</li>
-                        <li>Termination is always the polite ⌘Q kind - unsaved work is never lost to a force-quit</li>
-                        <li>A <strong style="color: var(--text-primary);">hard-coded protection list</strong> keeps system components like Finder, Dock, and accessibility tools untouchable in three layers - even a hand-edited config file cannot make RustQuit touch them</li>
-                        <li><strong style="color: var(--text-primary);">No telemetry, no updater, no network client</strong>, no persistent logs by default - configuration lives in one user-only local TOML file</li>
-                    </ul>
-                </div>
-
-                <div class="liquid-glass" style="padding: var(--space-8);">
-                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Requirements &amp; install</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">macOS 13 or newer (Apple Silicon or Intel), Xcode Command Line Tools, and stable Rust. Like RDP123, there is deliberately no prebuilt download - you build the app on your own Mac in a few commands, so it never gets the quarantine flag, needs no Apple account, and came from the source in front of you.</p>
-                    <p style="color: var(--text-secondary); line-height: 1.6;">The full build guide, the protected-apps list, and the detailed comparison with SwiftQuit are in the README on GitHub.</p>
-                </div>
-
-                <div class="liquid-glass" style="padding: var(--space-8); text-align: center;">
-                    <h2 style="font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--space-4);">Get RustQuit</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-4);">Free software under the AGPLv3.</p>
-                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                        <a href="https://github.com/asd123ch/rustquit" target="_blank" rel="noopener" class="btn btn--primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View on GitHub</a>
-                        <a href="/apps" class="btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">All Apps</a>
-                    </div>
-                </div>
-            </div>
+        <main id="main" role="main" class="product-page">
+            <div class="page-header"><div class="product-heading"><img class="product-logo" src="/apps/rustquit-logo.png" alt="" width="56" height="56"><h1 class="page-title">RustQuit</h1></div><p class="page-subtitle">Quit selected Mac apps when their last window closes. Choose which apps should quit and which should keep running.</p></div>
+            <section class="product-intro liquid-glass" aria-label="Requirements and installation">
+                <ul class="product-facts"><li>Native macOS menu bar app. macOS 13 or newer, Apple Silicon or Intel.</li><li>Free, open-source self-build version. Requires Rust and Xcode Command Line Tools.</li><li>Requires Accessibility permission to observe app windows.</li></ul>
+                <div class="product-actions"><a class="btn btn-primary" href="https://github.com/asd123ch/rustquit#readme">Build &amp; install RustQuit</a><a class="btn btn-secondary" href="/apps">All Apps</a></div>
+            </section>
+            <figure class="product-screenshot liquid-glass"><a href="/apps/rustquit-screenshot.png" target="_blank" rel="noopener"><img src="/apps/rustquit-screenshot.png" alt="RustQuit settings with a searchable list of apps" loading="lazy"></a><figcaption class="workflow-hint">RustQuit settings with a searchable list of apps. Open the image to enlarge it.</figcaption></figure>
+            <section class="product-intro liquid-glass"><h2>Choose which apps should quit</h2><p>Closing a Mac window often leaves its app running. Select the apps RustQuit should quit after their last window closes. Start with the default mode, which affects only apps you select.</p></section>
+            <section class="product-intro liquid-glass"><h2>Keep save prompts available</h2><p>RustQuit asks apps to quit normally. It does not force-quit them or bypass their save dialogs. System components and background utilities are excluded.</p></section>
+            <section class="product-intro liquid-glass"><h2>Keep important apps running</h2><p>The optional Keep running setting restarts selected apps after they close. Use it only for apps you want to remain available.</p></section>
+            <section class="product-intro liquid-glass"><h2>Get started</h2><p>Build and install the app, grant Accessibility permission in macOS Settings, then select one app to try. Close its last window and check the result before adding more apps.</p></section>
+            <div class="product-actions"><a class="btn btn-primary" href="https://github.com/asd123ch/rustquit#readme" target="_blank" rel="noopener">Installation &amp; source code</a><a class="btn btn-secondary" href="/apps">All Apps</a></div>
         </main>
         <footer role="contentinfo">
             <div class="footer-content">
@@ -244,7 +195,7 @@
                             <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
                             <path d="m9 12 2 2 4-4" />
                         </svg>
-                        <span>100% Local Processing</span>
+                        <span>Browser tools process text locally</span>
                     </div>
                 </div>
 
@@ -262,7 +213,7 @@
 
                     <div class="theme-toggle-wrapper" style="margin-left: var(--space-6); display: flex; align-items: center;">
                         <label class="toggle-switch" style="transform: scale(0.8);">
-                            <input type="checkbox" id="theme-toggle">
+                            <input type="checkbox" id="theme-toggle" aria-label="Dark theme">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>

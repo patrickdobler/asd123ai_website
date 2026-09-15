@@ -11,6 +11,13 @@ function createId() {
 
 class ChatFileProcessor {
     validate(file) {
+        if (file.size > MAX_FILE_SIZE) {
+            return {
+                ok: false,
+                error: `${file.name} is larger than 15 MB.`
+            };
+        }
+
         const extension = this.extension(file.name);
 
         if (file.type.startsWith('image/')) {
@@ -20,16 +27,10 @@ class ChatFileProcessor {
         if (!SUPPORTED_EXTENSIONS.includes(extension)) {
             return {
                 ok: false,
-                error: `${file.name} is not supported. Use images, TXT, Markdown, PDF, or DOCX files.`
+                error: `${file.name} is not supported. Use images, TXT, Markdown, CSV, JSON, LOG, PDF, or DOCX files.`
             };
         }
 
-        if (file.size > MAX_FILE_SIZE) {
-            return {
-                ok: false,
-                error: `${file.name} is larger than 15 MB.`
-            };
-        }
 
         return { ok: true };
     }

@@ -377,32 +377,24 @@ class UIController {
         const item = document.createElement('div');
         item.className = `entity-item ${entity.active ? '' : 'inactive'}`;
         item.dataset.placeholder = entity.placeholder;
-        item.title = entity.active
-            ? 'Click to restore the original in the output'
-            : 'Click to anonymize again';
+        const description = document.createElement('span');
+        description.className = 'entity-text';
+        const placeholder = document.createElement('span');
+        placeholder.className = 'entity-placeholder';
+        placeholder.textContent = entity.placeholder;
+        const original = document.createElement('span');
+        original.className = 'entity-original';
+        original.textContent = entity.original;
+        description.append(placeholder, original);
 
-        item.innerHTML = `
-            <div>
-                <div class="entity-placeholder">${entity.placeholder}</div>
-                <div class="entity-original">${this.escapeHtml(entity.original)}</div>
-            </div>
-            <button class="entity-remove" data-placeholder="${entity.placeholder}" title="Remove entity">
-                🗑️
-            </button>
-        `;
-
-        // Add click handler for removal
-        const removeBtn = item.querySelector('.entity-remove');
-        removeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.dispatchCustomEvent('entityRemove', { placeholder: entity.placeholder });
-        });
-
-        // Clicking the tile toggles the entity between anonymized and restored
-        item.addEventListener('click', () => {
-            this.dispatchCustomEvent('entityToggle', { placeholder: entity.placeholder });
-        });
-
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'entity-remove';
+        remove.title = 'Remove entity';
+        remove.setAttribute('aria-label', `Remove ${entity.original}`);
+        remove.innerHTML = '<svg class="remove-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M5 6l1 14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1l1-14M10 10v7M14 10v7"/></svg>';
+        remove.addEventListener('click', () => this.dispatchCustomEvent('entityRemove', { placeholder: entity.placeholder }));
+        item.append(description, remove);
         return item;
     }
 

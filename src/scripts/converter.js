@@ -1,3 +1,4 @@
+import { sendTextToAnonymizer } from './tool-transfer.js';
 // File-size guardrails. Everything runs in the browser, so a big file is never a
 // server limit — the only real risk is freezing the tab. PDFs and images are
 // processed in full (every page is rendered, every pixel is read by OCR), so they
@@ -1474,6 +1475,7 @@ class ConverterApp {
             viewMarkdown: document.getElementById('converterViewMarkdown'),
             viewPreview: document.getElementById('converterViewPreview'),
             copyBtn: document.getElementById('converterCopyBtn'),
+            toAnonymizerBtn: document.getElementById('converterToAnonymizerBtn'),
             toTtsBtn: document.getElementById('converterToTtsBtn'),
             downloadBtn: document.getElementById('converterDownloadBtn')
         };
@@ -1483,6 +1485,7 @@ class ConverterApp {
         this.currentMarkdown = '';
         this.lastFile = null;
         this.bindEvents();
+        this.elements.toAnonymizerBtn.addEventListener('click', () => sendTextToAnonymizer(this.currentMarkdown, (message, tone) => this.setStatus(message, tone)));
         this.updateEngineHint();
         if (this.elements.docEngine) {
             // Switching to anydoc changes which output options have an effect,
@@ -1686,7 +1689,8 @@ class ConverterApp {
             this.setStatus(`${converted} of ${files.length} files converted locally. No upload happened.`, converted ? 'good' : 'danger');
             this.elements.copyBtn.disabled = !markdown;
             this.elements.downloadBtn.disabled = !markdown;
-            if (this.elements.toTtsBtn) this.elements.toTtsBtn.disabled = !markdown;
+            this.elements.toTtsBtn.disabled = !markdown;
+            this.elements.toAnonymizerBtn.disabled = !markdown;
         } finally {
             this.elements.chooseFileBtn.disabled = false;
             this.elements.fileInput.value = '';
@@ -1749,14 +1753,16 @@ class ConverterApp {
             this.setStatus(`${file.name} converted locally. No upload happened.`, 'good');
             this.elements.copyBtn.disabled = !markdown;
             this.elements.downloadBtn.disabled = !markdown;
-            if (this.elements.toTtsBtn) this.elements.toTtsBtn.disabled = !markdown;
+            this.elements.toTtsBtn.disabled = !markdown;
+            this.elements.toAnonymizerBtn.disabled = !markdown;
         } catch (error) {
             this.setStatus(error.message || 'Conversion failed.', 'danger');
             this.currentMarkdown = '';
             this.renderOutput('');
             this.elements.copyBtn.disabled = true;
             this.elements.downloadBtn.disabled = true;
-            if (this.elements.toTtsBtn) this.elements.toTtsBtn.disabled = true;
+            this.elements.toTtsBtn.disabled = true;
+            this.elements.toAnonymizerBtn.disabled = true;
         } finally {
             this.elements.chooseFileBtn.disabled = false;
             this.elements.fileInput.value = '';

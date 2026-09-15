@@ -4,6 +4,7 @@
   "description": "ASD123.ai - Privacy-First AI Text Processing Tools",
   "main": "src/index.js",
   "scripts": {
+    "test": "node --test tests/*.test.cjs",
     "build": "node tools/build.js",
     "build:dev": "node tools/build-dev.js",
     "package:chat-offline": "node tools/package-chat-offline.js",

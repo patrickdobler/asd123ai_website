@@ -180,7 +180,7 @@ class TtsApp {
         const label = v => {
             const parts = [v.name];
             if (v.gender) parts.push(v.gender);
-            if (v.grade) parts.push(`Grade ${v.grade}`);
+            if (v.grade === 'A') parts.push('Recommended');
             return parts.join(' · ');
         };
         const accents = [...new Set(voices.map(v => v.accent).filter(Boolean))];

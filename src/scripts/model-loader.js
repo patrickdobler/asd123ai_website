@@ -153,7 +153,11 @@ class AIModelProcessor {
             config.path,
             {
                 device: config.device || 'wasm',
-                dtype: config.dtype || 'q8'
+                dtype: config.dtype || 'q8',
+                progress_callback: progress => {
+                    if (progress.status === 'progress') this.updateLoadingStatus(`Downloading model file: ${Math.round(progress.progress || 0)}%`);
+                    else if (progress.status === 'done') this.updateLoadingStatus('Preparing model...');
+                }
             }
         );
 

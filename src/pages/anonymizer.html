@@ -86,6 +86,7 @@
     </script>
 </head>
 <body>
+    <a href="#main" class="skip-to-main">Skip to main content</a>
     <div class="aurora-bg"></div>
 
     <div class="content-wrapper">
@@ -98,34 +99,34 @@
 
                 <div class="nav-links">
                     <div class="nav-tools">
-                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-expanded="false">
                             Tools
                             <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m6 9 6 6 6-6"/>
                             </svg>
                         </button>
-                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
-                            <a href="/text-cleaner" class="nav-tool-item" role="menuitem">
+                        <div class="nav-tools-menu" aria-label="Tools">
+                            <a href="/text-cleaner" class="nav-tool-item">
                                 <span class="nav-tool-title">Text Cleaner</span>
                                 <span class="nav-tool-description">Clean and standardize generated text.</span>
                             </a>
-                            <a href="/anonymizer" class="nav-tool-item" role="menuitem">
+                            <a href="/anonymizer" class="nav-tool-item">
                                 <span class="nav-tool-title">Anonymizer</span>
                                 <span class="nav-tool-description">Detect and anonymize PII locally.</span>
                             </a>
-                            <a href="/chat" class="nav-tool-item" role="menuitem">
+                            <a href="/chat" class="nav-tool-item">
                                 <span class="nav-tool-title">Local AI Chat</span>
                                 <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
                             </a>
-                            <a href="/context" class="nav-tool-item" role="menuitem">
+                            <a href="/context" class="nav-tool-item">
                                 <span class="nav-tool-title">Context Estimator</span>
                                 <span class="nav-tool-description">Estimate useful LLM context size.</span>
                             </a>
-                            <a href="/converter" class="nav-tool-item" role="menuitem">
+                            <a href="/converter" class="nav-tool-item">
                                 <span class="nav-tool-title">Markdown Converter</span>
                                 <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
                             </a>
-                            <a href="/tts" class="nav-tool-item" role="menuitem">
+                            <a href="/tts" class="nav-tool-item">
                                 <span class="nav-tool-title">Text to Speech</span>
                                 <span class="nav-tool-description">Generate speech locally from text.</span>
                             </a>
@@ -138,7 +139,7 @@
             </nav>
         </header>
 
-        <main>
+        <main class="tool-workspace" id="main">
             <div class="page-header">
                 <div class="header-top">
                     <h1 class="page-title">Anonymizer</h1>
@@ -154,7 +155,7 @@
             <!-- Model Selection -->
             <div class="model-section">
                 <div class="model-card">
-                    <span class="model-label">Processing Mode:</span>
+                    <label class="model-label" for="modelSelect">Processing Mode:</label>
                     <select id="modelSelect" class="model-select">
                         <option value="regex">Regex - Pattern Matching</option>
                         <option value="openai-privacy-filter">OpenAI Privacy Filter - Advanced Local AI (~950 MB)</option>
@@ -205,16 +206,14 @@
                                         Load
                                     </button>
                                     <button id="clearInputBtn" class="btn btn-secondary btn-small">
-                                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M3 6h18"/>
-                                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M3 6h18M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M5 6l1 14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1l1-14M10 10v7M14 10v7"/>
                                         </svg>
                                         Clear
                                     </button>
                                 </div>
                             </div>
-                            <textarea id="inputText" class="textarea-field" placeholder="Enter or paste your text here...
+                            <textarea id="inputText" aria-label="Input text" class="textarea-field" placeholder="Enter or paste your text here...
 
 Example text with PII:
 • My name is John Smith at 123 Main St
@@ -257,7 +256,7 @@ All processing happens in your browser."></textarea>
                                         </svg>
                                         Highlight
                                     </button>
-                                    <button id="copyOutputBtn" class="btn btn-secondary btn-small">
+                                    <button id="copyOutputBtn" disabled class="btn btn-secondary btn-small">
                                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
                                             <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
@@ -266,19 +265,21 @@ All processing happens in your browser."></textarea>
                                     </button>
                                 </div>
                             </div>
-                            <textarea id="outputText" class="textarea-field" readonly placeholder="Anonymized text will appear here..."></textarea>
+                            <textarea id="outputText" aria-label="Anonymized output" class="textarea-field" readonly placeholder="Anonymized text will appear here..."></textarea>
                             <div id="outputHighlight" class="output-highlight" style="display: none;" aria-label="Anonymized output with clickable entities"></div>
                         </div>
                     </div>
 
+                    <p id="outputState" class="workflow-hint" role="status">Anonymize your text, then review the result.</p>
                     <!-- Entities Section -->
-                    <div class="entities-section">
+                    <div class="entities-section" id="reviewSection">
 
                         <div class="section-header" style="margin-bottom: var(--space-4);">
                             <h2 class="section-title">Detected Entities</h2>
                         </div>
 
                         <div class="entities-controls">
+                            <button id="placeholderModeBtn" type="button" class="btn btn-secondary btn-small" aria-pressed="true">Placeholders</button>
                             <button id="redactBtn" class="btn btn-secondary btn-small">
                                 <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
@@ -317,6 +318,7 @@ All processing happens in your browser."></textarea>
                             <input type="file" id="entitiesFileInput" accept=".csv" style="display: none;">
                         </div>
 
+                        <p class="workflow-hint">Use the trash icon to remove a match and restore its original text.</p>
                         <div id="entitiesList" class="entities-grid">
                             <!-- Dynamically populated entity list -->
                         </div>
@@ -330,11 +332,11 @@ All processing happens in your browser."></textarea>
             </div>
 
             <!-- LLM Section -->
-            <div class="llm-section">
+            <div class="llm-section" id="restoreDetails">
                 <div class="card">
                     <h2 class="section-title" style="margin-bottom: var(--space-3);">LLM Output Processing</h2>
                     <p class="section-description">
-                        Paste LLM responses containing anonymized placeholders to restore original values
+                        Paste LLM responses containing numbered placeholders to restore original values. Generic [redacted] text cannot be restored.
                     </p>
 
                     <div class="llm-grid">
@@ -346,7 +348,7 @@ All processing happens in your browser."></textarea>
                                 </svg>
                                 LLM Input
                             </div>
-                            <textarea id="llmInput" class="textarea-field textarea-small" placeholder="Paste LLM output with [ENTITY_N] placeholders here..."></textarea>
+                            <textarea id="llmInput" aria-label="LLM input" class="textarea-field textarea-small" placeholder="Paste LLM output with [ENTITY_N] placeholders here..."></textarea>
                         </div>
 
                         <div class="llm-button-wrapper">
@@ -367,11 +369,13 @@ All processing happens in your browser."></textarea>
                                 </svg>
                                 Restored Output
                             </div>
-                            <textarea id="llmOutput" class="textarea-field textarea-small" readonly placeholder="Deanonymized text will appear here..."></textarea>
+                            <textarea id="llmOutput" aria-label="Restored output" class="textarea-field textarea-small" readonly placeholder="Deanonymized text will appear here..."></textarea>
                         </div>
                     </div>
                 </div>
             </div>
+
+
         </main>
 
         <!-- Footer -->
@@ -384,7 +388,7 @@ All processing happens in your browser."></textarea>
                             <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
                             <path d="m9 12 2 2 4-4" />
                         </svg>
-                        <span>100% Local Processing</span>
+                        <span>Browser tools process text locally</span>
                     </div>
                 </div>
 
@@ -402,7 +406,7 @@ All processing happens in your browser."></textarea>
 
                     <div class="theme-toggle-wrapper" style="margin-left: var(--space-6); display: flex; align-items: center;">
                         <label class="toggle-switch" style="transform: scale(0.8);">
-                            <input type="checkbox" id="theme-toggle">
+                            <input type="checkbox" id="theme-toggle" aria-label="Dark theme">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>

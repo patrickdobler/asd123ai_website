@@ -520,6 +520,7 @@ class ContextEstimatorApp {
         }
         this.elements.meta.textContent = parts.length ? parts.join(' · ') : 'No text loaded yet.';
 
+        document.getElementById('contextRecommendation').textContent = !inputTokens ? 'Add text to see a recommended context size.' : exceedsMax ? 'This text exceeds the listed context windows. Split it into smaller parts.' : `Recommended context: ${formatContext(recommendation.contextWindow)}. Includes ${reservePercent}% space for an answer. Counts are estimates unless you use the selected model tokenizer.`;
         this.renderTable(windows, recommendation, exceedsMax, inputTokens);
 
         if (announce) {

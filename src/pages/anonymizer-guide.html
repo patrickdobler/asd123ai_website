@@ -103,6 +103,7 @@
     </script>
 </head>
 <body class="bg-[var(--bg-color)] text-[var(--text-primary)] min-h-screen">
+    <a href="#main" class="skip-to-main">Skip to main content</a>
 <div class="relative overflow-hidden">
 <div class="aurora-bg"></div>
 <div class="relative z-10 flex flex-col min-h-screen">
@@ -114,34 +115,34 @@
 
         <div class="nav-links">
                     <div class="nav-tools">
-                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-expanded="false">
                             Tools
                             <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m6 9 6 6 6-6"/>
                             </svg>
                         </button>
-                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
-                            <a href="/text-cleaner" class="nav-tool-item" role="menuitem">
+                        <div class="nav-tools-menu" aria-label="Tools">
+                            <a href="/text-cleaner" class="nav-tool-item">
                                 <span class="nav-tool-title">Text Cleaner</span>
                                 <span class="nav-tool-description">Clean and standardize generated text.</span>
                             </a>
-                            <a href="/anonymizer" class="nav-tool-item" role="menuitem">
+                            <a href="/anonymizer" class="nav-tool-item">
                                 <span class="nav-tool-title">Anonymizer</span>
                                 <span class="nav-tool-description">Detect and anonymize PII locally.</span>
                             </a>
-                            <a href="/chat" class="nav-tool-item" role="menuitem">
+                            <a href="/chat" class="nav-tool-item">
                                 <span class="nav-tool-title">Local AI Chat</span>
                                 <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
                             </a>
-                            <a href="/context" class="nav-tool-item" role="menuitem">
+                            <a href="/context" class="nav-tool-item">
                                 <span class="nav-tool-title">Context Estimator</span>
                                 <span class="nav-tool-description">Estimate useful LLM context size.</span>
                             </a>
-                            <a href="/converter" class="nav-tool-item" role="menuitem">
+                            <a href="/converter" class="nav-tool-item">
                                 <span class="nav-tool-title">Markdown Converter</span>
                                 <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
                             </a>
-                            <a href="/tts" class="nav-tool-item" role="menuitem">
+                            <a href="/tts" class="nav-tool-item">
                                 <span class="nav-tool-title">Text to Speech</span>
                                 <span class="nav-tool-description">Generate speech locally from text.</span>
                             </a>
@@ -154,7 +155,7 @@
     </nav>
 </header>
 
-<main class="flex-grow container mx-auto px-6 py-8 md:py-12">
+<main id="main" class="flex-grow container mx-auto px-6 py-8 md:py-12">
 <div class="page-header">
     <h1 class="page-title">Anonymizer User Guide</h1>
     <p class="page-subtitle">
@@ -216,7 +217,7 @@ The Anonymizer is a privacy-first proof of concept that detects and anonymizes P
 <span class="text-[var(--primary-color)]">2.</span> Detection Methods
 </h2>
 <p class="text-[var(--text-secondary)] mb-6 leading-relaxed">
-The Anonymizer offers several detection methods. Regex is the default and recommended starting point. OpenAI Privacy Filter is the advanced local AI option. AI4Privacy modes remain available as Legacy PoC options for comparison. With the <strong class="text-[var(--text-primary)]">Detect</strong> checkboxes you can limit detection to the categories you care about (people, contact, financial, IDs, addresses, dates, web/tech). Long texts are processed in chunks automatically in the AI modes.
+The Anonymizer offers several detection methods. Regex is the default and recommended starting point. OpenAI Privacy Filter is the advanced local AI option. AI4Privacy modes remain available as Legacy PoC options for comparison. Choose a Processing Mode above the text fields. With the <strong class="text-[var(--text-primary)]">Detect</strong> checkboxes, you can limit detection to the categories you care about (people, contact, financial, IDs, addresses, dates, web/tech). Long texts are processed in chunks automatically in the AI modes.
 </p>
 <div class="grid md:grid-cols-3 gap-4">
 <div class="p-4 bg-[var(--glass-bg)]/30 border border-[var(--border-color)] rounded-lg">
@@ -410,7 +411,7 @@ The <strong class="text-[var(--text-primary)]">Detected Entities</strong> panel 
 <ul class="text-sm space-y-2">
 <li><strong>Remove Entity:</strong> Click the trash icon (🗑️) on any entity to remove it and restore the original value in the output</li>
 <li><strong>Entity Stats:</strong> View total and active entity counts at the bottom of the panel</li>
-<li><strong>Manual Selection:</strong> Use "Anonymize Selected Text" to manually anonymize specific portions</li>
+<li><strong>Manual Selection:</strong> Select visible text in the output and use "Hide selected text". Choose a category and apply it to all matching whole-word occurrences. Capital letters must match.</li>
 </ul>
 </div>
 </div>
@@ -452,7 +453,7 @@ Use the Anonymizer to safely process text with AI services like ChatGPT, Claude,
 <div class="flex-shrink-0 w-8 h-8 rounded-full bg-[rgba(60,60,60,0.4)] border-2 border-[var(--border-color)] text-[var(--text-primary)] flex items-center justify-center font-bold">4</div>
 <div>
 <h3 class="font-bold text-[var(--text-primary)] mb-1">Deanonymize</h3>
-<p class="text-sm">Paste the AI response into the <strong>LLM Input</strong> field and click <strong class="text-[var(--primary-color)]">🔓 Deanonymize</strong>. All placeholders will be replaced with original values!</p>
+<p class="text-sm">Paste the AI response into the <strong>LLM Input</strong> field and click <strong class="text-[var(--primary-color)]">Deanonymize</strong>. Known numbered placeholders are replaced with their original values. Unknown placeholders and generic redactions stay unchanged.</p>
 </div>
 </div>
 </div>
@@ -498,8 +499,7 @@ For maximum privacy when sharing with untrusted parties, use <strong class="text
 </ul>
 <div class="p-4 bg-[rgba(60,60,60,0.15)] border border-[var(--border-color)] rounded-lg">
 <p class="text-sm text-[var(--text-secondary)]">
-<strong class="text-[var(--text-primary)]">✓ Good to know:</strong> Even in Redact Mode you can deanonymize: the mapping stays in memory and each [redacted] marker is restored by its position in the text. This only works reliably if the LLM output keeps all [redacted] markers in their original order &mdash; if markers were dropped or reordered, review the result carefully.
-</p>
+<strong class="text-[var(--text-primary)]">Restoration:</strong> Generic [redacted] markers cannot be restored automatically. Choose Placeholders under Detected Entities when you need to restore values later.</p>
 </div>
 </div>
 </div>
@@ -697,7 +697,7 @@ Try the Anonymizer Now →
                             <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
                             <path d="m9 12 2 2 4-4" />
                         </svg>
-                        <span>100% Local Processing</span>
+                        <span>Browser tools process text locally</span>
                     </div>
                 </div>
 
@@ -715,7 +715,7 @@ Try the Anonymizer Now →
 
                     <div class="theme-toggle-wrapper" style="margin-left: var(--space-6); display: flex; align-items: center;">
                         <label class="toggle-switch" style="transform: scale(0.8);">
-                            <input type="checkbox" id="theme-toggle">
+                            <input type="checkbox" id="theme-toggle" aria-label="Dark theme">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>

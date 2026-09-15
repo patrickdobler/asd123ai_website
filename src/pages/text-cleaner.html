@@ -6,14 +6,14 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>ASD123.ai Text Cleaner - Clean & Standardize AI Text</title>
     <meta name="description"
-        content="Clean AI-generated text in your browser: remove invisible characters and watermarks, citations, Markdown and diacritics, and normalize typography." />
+        content="Clean AI-generated text in your browser: remove invisible characters, citations, Markdown and diacritics, and normalize typography." />
     <meta name="keywords"
         content="AI text cleaner, remove watermarks from text, invisible characters, zero-width characters, text cleaning tool, diacritic removal, citation cleaner, markdown converter, privacy-first text processing" />
     <meta name="author" content="ASD123.ai" />
     <meta name="robots" content="index, follow" />
     <meta property="og:title" content="ASD123.ai Text Cleaner - Clean & Standardize AI Text" />
     <meta property="og:description"
-        content="Clean AI-generated text in your browser: remove invisible characters and watermarks, citations, Markdown and diacritics, and normalize typography." />
+        content="Clean AI-generated text in your browser: remove invisible characters, citations, Markdown and diacritics, and normalize typography." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://asd123.ai/text-cleaner" />
     <meta property="og:site_name" content="ASD123.ai" />
@@ -21,7 +21,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ASD123.ai Text Cleaner - Clean & Standardize AI Text" />
     <meta name="twitter:description"
-        content="Clean AI-generated text in your browser: remove invisible characters and watermarks, citations, Markdown and diacritics, and normalize typography." />
+        content="Clean AI-generated text in your browser: remove invisible characters, citations, Markdown and diacritics, and normalize typography." />
     <link rel="canonical" href="https://asd123.ai/text-cleaner" />
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link href="styles/main.css" rel="stylesheet" />
@@ -71,7 +71,7 @@
           "@id": "https://asd123.ai/text-cleaner#app",
           "name": "Text Cleaner — ASD123.ai",
           "url": "https://asd123.ai/text-cleaner",
-          "description": "Clean AI-generated text in your browser: remove invisible characters and watermarks, citations, Markdown and diacritics, and normalize typography.",
+          "description": "Clean AI-generated text in your browser: remove invisible characters, citations, Markdown and diacritics, and normalize typography.",
           "applicationCategory": "UtilitiesApplication",
           "operatingSystem": "Web browser",
           "browserRequirements": "Requires JavaScript; on-device AI features require WebGPU",
@@ -95,6 +95,7 @@
 </head>
 
 <body class="bg-[var(--bg-color)] text-[var(--text-primary)] min-h-screen">
+    <a href="#main" class="skip-to-main">Skip to main content</a>
     <div class="relative overflow-hidden">
         <div class="aurora-bg"></div>
         <div class="relative z-10 flex flex-col min-h-screen">
@@ -106,34 +107,34 @@
 
                     <div class="nav-links">
                     <div class="nav-tools">
-                        <button class="nav-link nav-tools-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                        <button class="nav-link nav-tools-trigger" type="button" aria-expanded="false">
                             Tools
                             <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m6 9 6 6 6-6"/>
                             </svg>
                         </button>
-                        <div class="nav-tools-menu" role="menu" aria-label="Tools">
-                            <a href="/text-cleaner" class="nav-tool-item" role="menuitem">
+                        <div class="nav-tools-menu" aria-label="Tools">
+                            <a href="/text-cleaner" class="nav-tool-item">
                                 <span class="nav-tool-title">Text Cleaner</span>
                                 <span class="nav-tool-description">Clean and standardize generated text.</span>
                             </a>
-                            <a href="/anonymizer" class="nav-tool-item" role="menuitem">
+                            <a href="/anonymizer" class="nav-tool-item">
                                 <span class="nav-tool-title">Anonymizer</span>
                                 <span class="nav-tool-description">Detect and anonymize PII locally.</span>
                             </a>
-                            <a href="/chat" class="nav-tool-item" role="menuitem">
+                            <a href="/chat" class="nav-tool-item">
                                 <span class="nav-tool-title">Local AI Chat</span>
                                 <span class="nav-tool-description">Run private WebGPU chat in your browser.</span>
                             </a>
-                            <a href="/context" class="nav-tool-item" role="menuitem">
+                            <a href="/context" class="nav-tool-item">
                                 <span class="nav-tool-title">Context Estimator</span>
                                 <span class="nav-tool-description">Estimate useful LLM context size.</span>
                             </a>
-                            <a href="/converter" class="nav-tool-item" role="menuitem">
+                            <a href="/converter" class="nav-tool-item">
                                 <span class="nav-tool-title">Markdown Converter</span>
                                 <span class="nav-tool-description">Turn PDF, DOCX, PPTX & more into Markdown.</span>
                             </a>
-                            <a href="/tts" class="nav-tool-item" role="menuitem">
+                            <a href="/tts" class="nav-tool-item">
                                 <span class="nav-tool-title">Text to Speech</span>
                                 <span class="nav-tool-description">Generate speech locally from text.</span>
                             </a>
@@ -146,7 +147,7 @@
                 </nav>
             </header>
 
-            <main>
+            <main class="tool-workspace" id="main">
                 <div class="page-header">
                     <h1 class="page-title">Text Cleaner</h1>
                     <p class="page-subtitle">
@@ -167,16 +168,7 @@
                         </svg>
                         Input Text
                     </label>
-                    <textarea class="textarea-field" id="text-cleaner-textarea" placeholder="Paste your AI-generated text here to clean and optimize it...
-
-Example text with issues:
-• Text with diacrítics and spëcial characters
-• **Bold markdown** and *italic* formatting
-• Citation references [1] and (Source: Example.com)
-• Fancy 𝐔𝐧𝐢𝐜𝐨𝐝𝐞 text styles
-• Long sentences with em dashes — that could be split into separate sentences
-
-All processing happens entirely in your browser for complete privacy."></textarea>
+                    <textarea class="textarea-field" id="text-cleaner-textarea" placeholder="Paste the text you want to clean."></textarea>
                     <div class="textarea-footer">
                         <div style="display: flex; align-items: center; gap: var(--space-2);">
                             <svg class="privacy-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -191,6 +183,7 @@ All processing happens entirely in your browser for complete privacy."></textare
                     </div>
                 </div>
 
+                <p class="workflow-hint cleaner-hint">Cleaning updates this text. Use Undo to restore the previous version.</p>
                 <!-- Action Buttons -->
                 <div class="button-group">
                     <button class="btn btn-primary" id="clean-text-btn">
@@ -209,6 +202,7 @@ All processing happens entirely in your browser for complete privacy."></textare
                         </svg>
                         Clean Text Now
                     </button>
+                    <button type="button" class="btn btn-secondary" id="cleaner-example">Try an example</button>
                     <button class="btn btn-secondary" id="copy-text-btn">
                         <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -281,7 +275,7 @@ All processing happens entirely in your browser for complete privacy."></textare
                                         <span class="toggle-slider"></span>
                                     </label>
                                     <span class="toggle-label">Remove Invisible Characters &amp; Watermarks</span>
-                                    <div class="tooltip">
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -301,8 +295,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="fold-unusual-spaces">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Fold unusual spaces</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-fold-unusual-spaces">Fold unusual spaces</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -325,8 +319,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="apply-character-mapping">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Apply Character Mapping</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-apply-character-mapping">Apply Character Mapping</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -346,8 +340,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="map-dashes">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Hyphens &amp; dashes</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-map-dashes">Hyphens &amp; dashes</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -367,8 +361,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="map-quotes">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Quotation marks</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-map-quotes">Quotation marks</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -388,8 +382,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="map-apostrophes">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Apostrophes</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-map-apostrophes">Apostrophes</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -409,8 +403,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="map-bullets-symbols">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Bullets, ellipses &amp; symbols</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-map-bullets-symbols">Bullets, ellipses &amp; symbols</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -430,8 +424,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="map-pdf-ligatures">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">PDF ligatures</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-map-pdf-ligatures">PDF ligatures</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -450,8 +444,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="map-ligatures">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Spell out &aelig;/&oelig; as ae/oe</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-map-ligatures">Spell out &aelig;/&oelig; as ae/oe</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -471,8 +465,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="map-sharp-s">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Convert &szlig; to ss</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-map-sharp-s">Convert &szlig; to ss</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -492,8 +486,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="map-french-spacing">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">French spacing rules</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-map-french-spacing">French spacing rules</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -509,11 +503,11 @@ All processing happens entirely in your browser for complete privacy."></textare
                             <div class="toggle-item">
                                 <div class="toggle-content">
                                     <label class="toggle-switch">
-                                        <input type="checkbox" class="toggle-input" data-toggle="remove-diacritics">
+                                        <input type="checkbox" id="cleaner-remove-diacritics" aria-label="Remove Diacritics" class="toggle-input" data-toggle="remove-diacritics">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Remove Diacritics</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-remove-diacritics">Remove Diacritics</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -533,8 +527,8 @@ All processing happens entirely in your browser for complete privacy."></textare
                                             data-toggle="umlaut-digraphs">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Umlauts as ae/oe/ue</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-umlaut-digraphs">Umlauts as ae/oe/ue</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -550,11 +544,11 @@ All processing happens entirely in your browser for complete privacy."></textare
                             <div class="toggle-item">
                                 <div class="toggle-content">
                                     <label class="toggle-switch">
-                                        <input type="checkbox" class="toggle-input" data-toggle="remove-fancy-font">
+                                        <input type="checkbox" id="cleaner-remove-fancy-font" aria-label="Remove Fancy Text Font" class="toggle-input" data-toggle="remove-fancy-font">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Remove Fancy Text Font</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-remove-fancy-font">Remove Fancy Text Font</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -578,11 +572,11 @@ All processing happens entirely in your browser for complete privacy."></textare
                             <div class="toggle-item">
                                 <div class="toggle-content">
                                     <label class="toggle-switch">
-                                        <input type="checkbox" class="toggle-input" data-toggle="remove-citations">
+                                        <input type="checkbox" id="cleaner-remove-citations" aria-label="Remove Citation References" class="toggle-input" data-toggle="remove-citations">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Remove Citation References</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-remove-citations">Remove Citation References</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -598,11 +592,11 @@ All processing happens entirely in your browser for complete privacy."></textare
                             <div class="toggle-item">
                                 <div class="toggle-content">
                                     <label class="toggle-switch">
-                                        <input type="checkbox" class="toggle-input" data-toggle="convert-markdown">
+                                        <input type="checkbox" id="cleaner-convert-markdown" aria-label="Convert MD to Normal Text" class="toggle-input" data-toggle="convert-markdown">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Convert MD to Normal Text</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-convert-markdown">Convert MD to Normal Text</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -618,11 +612,11 @@ All processing happens entirely in your browser for complete privacy."></textare
                             <div class="toggle-item">
                                 <div class="toggle-content">
                                     <label class="toggle-switch">
-                                        <input type="checkbox" class="toggle-input" data-toggle="replace-em-dash">
+                                        <input type="checkbox" id="cleaner-replace-em-dash" aria-label="Replace em dash with new sentence" class="toggle-input" data-toggle="replace-em-dash">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Replace em dash with new sentence</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-replace-em-dash">Replace em dash with new sentence</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -638,11 +632,11 @@ All processing happens entirely in your browser for complete privacy."></textare
                             <div class="toggle-item">
                                 <div class="toggle-content">
                                     <label class="toggle-switch">
-                                        <input type="checkbox" class="toggle-input" data-toggle="remove-line-breaks">
+                                        <input type="checkbox" id="cleaner-remove-line-breaks" aria-label="Remove Line Breaks" class="toggle-input" data-toggle="remove-line-breaks">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span class="toggle-label">Remove Line Breaks</span>
-                                    <div class="tooltip">
+                                    <label class="toggle-label" for="cleaner-remove-line-breaks">Remove Line Breaks</label>
+                                    <div class="tooltip" tabindex="0" role="note" aria-label="Option help">
                                         <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round">
@@ -671,7 +665,7 @@ All processing happens entirely in your browser for complete privacy."></textare
                             <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
                             <path d="m9 12 2 2 4-4" />
                         </svg>
-                        <span>100% Local Processing</span>
+                        <span>Browser tools process text locally</span>
                     </div>
                 </div>
 
@@ -689,7 +683,7 @@ All processing happens entirely in your browser for complete privacy."></textare
 
                     <div class="theme-toggle-wrapper" style="margin-left: var(--space-6); display: flex; align-items: center;">
                         <label class="toggle-switch" style="transform: scale(0.8);">
-                            <input type="checkbox" id="theme-toggle">
+                            <input type="checkbox" id="theme-toggle" aria-label="Dark theme">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>

@@ -118,8 +118,8 @@ async function build() {
 
     // Tailwind: compile the utilities actually used in pages/scripts into a
     // static stylesheet (replaces the former in-browser Play runtime).
-    execFileSync('npx', [
-        'tailwindcss',
+    execFileSync(process.execPath, [
+        require.resolve('tailwindcss/lib/cli.js'),
         '-c', 'tools/tailwind.config.js',
         '-i', 'tools/tailwind.input.css',
         '-o', path.join(distDir, 'styles', 'tailwind.css'),

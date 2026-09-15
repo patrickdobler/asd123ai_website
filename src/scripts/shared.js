@@ -3,7 +3,7 @@
 // Theme Manager
 class ThemeManager {
     constructor() {
-        this.theme = localStorage.getItem('theme') || 'light';
+        this.theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         this.applyTheme(this.theme);
         this.initToggle();
     }
@@ -94,14 +94,29 @@ class NavigationManager {
                 return;
             }
 
+            let hoverCloseTimer;
             const setOpen = isOpen => {
+                clearTimeout(hoverCloseTimer);
                 menu.classList.toggle('nav-tools--open', isOpen);
+                panel.hidden = !isOpen;
                 trigger.setAttribute('aria-expanded', String(isOpen));
             };
 
+            setOpen(false);
+            menu.addEventListener('mouseenter', () => {
+                if (window.matchMedia('(hover: hover)').matches) setOpen(true);
+            });
+            menu.addEventListener('mouseleave', () => {
+                if (window.matchMedia('(hover: hover)').matches) {
+                    hoverCloseTimer = setTimeout(() => {
+                        if (!panel.contains(document.activeElement)) setOpen(false);
+                    }, 150);
+                }
+            });
             trigger.addEventListener('click', event => {
                 event.preventDefault();
-                setOpen(!menu.classList.contains('nav-tools--open'));
+                const mouseClick = event.detail > 0 && window.matchMedia('(hover: hover)').matches;
+                setOpen(mouseClick || !menu.classList.contains('nav-tools--open'));
             });
 
             trigger.addEventListener('keydown', event => {
@@ -112,6 +127,10 @@ class NavigationManager {
                 }
             });
 
+            menu.addEventListener('focusout', event => {
+                if (!menu.contains(event.relatedTarget)) setOpen(false);
+            });
+
             document.addEventListener('click', event => {
                 if (!menu.contains(event.target)) {
                     setOpen(false);
@@ -119,9 +138,9 @@ class NavigationManager {
             });
 
             document.addEventListener('keydown', event => {
-                if (event.key === 'Escape') {
+                if (event.key === 'Escape' && menu.classList.contains('nav-tools--open')) {
                     setOpen(false);
-                    trigger.focus();
+                    if (menu.contains(document.activeElement)) trigger.focus();
                 }
             });
         });
@@ -184,21 +203,7 @@ class CharacterCounter {
     }
 }
 
-// Privacy Notice Component
-class PrivacyNotice {
-    constructor() {
-        this.hasShown = localStorage.getItem('asd123-privacy-notice-shown');
-        if (!this.hasShown) {
-            this.showNotice();
-        }
-    }
     
-    showNotice() {
-        // TODO: Implement privacy notice modal/banner
-        console.log('Privacy notice: All processing happens in your browser');
-        localStorage.setItem('asd123-privacy-notice-shown', 'true');
-    }
-}
 
 // WebMCP Integration
 class WebMCPManager {
@@ -357,8 +362,13 @@ document.addEventListener('DOMContentLoaded', function() {
         new CharacterCounter('text-cleaner-textarea', 'char-count');
     }
     
-    // Initialize privacy notice
-    new PrivacyNotice();
+    document.getElementById('cleaner-example')?.addEventListener('click', () => {
+        const field = document.getElementById('text-cleaner-textarea');
+        if (field.value.trim() && !window.confirm('Replace the current text with an example?')) return;
+        field.value = 'A copied\u00a0sentence with an invisible\u200b character.\n\n\nAnd extra blank lines.';
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+        field.focus();
+    });
 
     // Register WebMCP tools when supported by the browser
     new WebMCPManager();
@@ -369,6 +379,8 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
+                if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+                target.focus({ preventScroll: true });
                 target.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
@@ -380,5 +392,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { NavigationManager, utils, CharacterCounter, PrivacyNotice, ThemeManager, WebMCPManager };
+    module.exports = { NavigationManager, utils, CharacterCounter, ThemeManager, WebMCPManager };
 }

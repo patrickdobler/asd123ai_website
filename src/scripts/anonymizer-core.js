@@ -1,3 +1,4 @@
+import { receiveToolText } from './tool-transfer.js';
 // Anonymizer Core - Main application logic
 // Part of ASD123.ai Anonymizer - Privacy-First Text Protection
 
@@ -363,9 +364,9 @@ class AnonymizerApp {
         this.currentMode = 'regex';
         this.isProcessing = false;
         this.isRedactMode = false;
-        // Text-order list of placeholders behind [redacted] markers, so
-        // deanonymization can restore redacted slots positionally.
-        this.redactionOrder = [];
+        this.placeholderText = '';
+        this.sourceText = '';
+        this.runVersion = (this.runVersion || 0) + 1;
         // Category toggles (non-sensitive preference, persisted locally)
         this.enabledCategories = this.loadCategoryPrefs();
         this.highlightViewActive = false;
@@ -401,6 +402,28 @@ class AnonymizerApp {
         // Category checkboxes + highlight view
         this.setupCategoryControls();
         this.setupHighlightView();
+        document.getElementById('placeholderModeBtn').addEventListener('click', () => {
+            this.isRedactMode = false;
+            this.renderOutput();
+        });
+        document.getElementById('inputText').addEventListener('input', () => this.updateInputState());
+        window.addEventListener('pagehide', () => this.clearSession());
+        receiveToolText(text => {
+            document.getElementById('inputText').value = text;
+            document.getElementById('inputText').focus();
+            this.uiController.showInfo('Text received from Markdown Converter. Anonymize, then review the result.');
+        });
+
+    }
+
+    updateInputState() {
+        const stale = document.getElementById('inputText').value !== this.sourceText;
+        document.getElementById('copyOutputBtn').disabled = this.isProcessing || !this.placeholderText || stale;
+        if (stale && this.placeholderText) {
+            document.getElementById('outputState').textContent = 'Input changed. Run Anonymize again to update the result.';
+        } else if (this.placeholderText) {
+            document.getElementById('outputState').textContent = this.isRedactMode ? 'Redacted output cannot be restored automatically. Review it before copying.' : 'Review the result before copying. Only numbered placeholders can be restored.';
+        }
     }
 
     setupCategoryControls() {
@@ -445,7 +468,8 @@ class AnonymizerApp {
         // Redact Mode button
         document.getElementById('redactBtn').addEventListener('click', async () => {
             this.isRedactMode = true;
-            await this.anonymizeText();
+            if (this.placeholderText) this.renderOutput();
+            else await this.anonymizeText();
         });
 
         // Deanonymize button
@@ -516,10 +540,6 @@ class AnonymizerApp {
             this.removeEntity(e.detail.placeholder);
         });
 
-        // Entity toggle event (click on an entity tile or highlight chip)
-        document.addEventListener('entityToggle', (e) => {
-            this.toggleEntity(e.detail.placeholder);
-        });
     }
 
     /**
@@ -528,26 +548,44 @@ class AnonymizerApp {
      * original text. Inactive -> active: the original text is re-replaced.
      */
     toggleEntity(placeholder) {
-        const entity = this.entityManager.getEntity(placeholder);
-        if (!entity) return;
-
-        const outputTextArea = document.getElementById('outputText');
-        const escaped = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-        if (entity.isActive) {
-            outputTextArea.value = outputTextArea.value.replace(
-                new RegExp(escaped(placeholder), 'g'), entity.original);
-        } else {
-            outputTextArea.value = outputTextArea.value.replace(
-                new RegExp(escaped(entity.original), 'g'), placeholder);
-        }
+        if (!this.entityManager.getEntity(placeholder)) return;
         this.entityManager.toggleEntity(placeholder);
+        this.renderOutput();
+        document.querySelector(`[data-ph="${CSS.escape(placeholder)}"]`)?.focus();
+    }
 
+    renderOutput() {
+        const entries = this.entityManager.entityMap;
+        document.getElementById('outputText').value = this.placeholderText.replace(/\[[A-Z][A-Z0-9_]*_\d+\]/g, token => {
+            const entity = entries.get(token);
+            if (!entity) return token;
+            if (!entity.isActive) return entity.original;
+            return this.isRedactMode ? '[redacted]' : token;
+        });
+        document.getElementById('copyOutputBtn').disabled = this.isProcessing || !this.placeholderText || document.getElementById('inputText').value !== this.sourceText;
+        document.getElementById('outputState').textContent = this.isRedactMode
+            ? 'Redacted output cannot be restored automatically. Review it before copying.'
+            : 'Review the result for missed details. Only numbered placeholders can be restored.';
+        document.getElementById('placeholderModeBtn').setAttribute('aria-pressed', String(!this.isRedactMode));
+        document.getElementById('redactBtn').setAttribute('aria-pressed', String(this.isRedactMode));
         this.uiController.updateEntityList(this.entityManager.exportEntities());
         this.refreshHighlightView();
-        this.uiController.showInfo(entity.isActive
-            ? `${placeholder} is now anonymized again`
-            : `${placeholder} restored in output (click to re-anonymize)`);
+    }
+
+    clearSession() {
+        this.runVersion++;
+        this.entityManager.clear();
+        this.placeholderText = '';
+        this.sourceText = '';
+        for (const id of ['inputText', 'outputText', 'llmInput', 'llmOutput']) {
+            const field = document.getElementById(id);
+            if (field) field.value = '';
+        }
+        document.getElementById('entitiesList').replaceChildren();
+        document.getElementById('outputHighlight').replaceChildren();
+        document.getElementById('copyOutputBtn').disabled = true;
+        document.getElementById('reviewSection').hidden = false;
+        document.getElementById('outputState').textContent = 'Anonymize to create a result.';
     }
 
     /**
@@ -574,51 +612,27 @@ class AnonymizerApp {
 
     refreshHighlightView() {
         const container = document.getElementById('outputHighlight');
-        const outputTextArea = document.getElementById('outputText');
-        if (!container || !outputTextArea) return;
-
-        if (!this.highlightViewActive) {
-            container.style.display = 'none';
-            outputTextArea.style.display = '';
-            return;
+        const field = document.getElementById('outputText');
+        if (!container || !field) return;
+        container.style.display = this.highlightViewActive ? 'block' : 'none';
+        field.style.display = this.highlightViewActive ? 'none' : '';
+        container.replaceChildren();
+        if (!this.highlightViewActive) return;
+        for (const part of this.placeholderText.split(/(\[[A-Z][A-Z0-9_]*_\d+\])/g)) {
+            const entity = this.entityManager.getEntity(part);
+            if (!entity) {
+                container.append(document.createTextNode(part));
+                continue;
+            }
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = entity.isActive ? 'entity-chip' : 'entity-chip entity-chip--inactive';
+            chip.dataset.ph = part;
+            chip.textContent = !entity.isActive ? entity.original : this.isRedactMode ? '[redacted]' : part;
+            chip.setAttribute('aria-pressed', String(entity.isActive));
+            chip.setAttribute('aria-label', `${entity.isActive ? 'Show' : 'Hide'} ${entity.original}`);
+            container.append(chip);
         }
-
-        const escapeHtml = str => str.replace(/[&<>"']/g, ch => (
-            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
-        ));
-        const escapeRe = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-        // Two-phase render: first swap every entity occurrence for an opaque
-        // token (so later replacements can never match inside generated HTML
-        // attributes), then expand the tokens into chip markup.
-        const entities = this.entityManager.exportEntities();
-        let text = outputTextArea.value;
-        const tokens = [];
-        entities.forEach((entity, idx) => {
-            const needle = entity.active ? entity.placeholder : entity.original;
-            if (!needle) return;
-            const token = '\u0000' + idx + '\u0000';
-            const before = text;
-            text = text.split(needle).join(token);
-            if (text !== before) tokens[idx] = { entity, needle };
-        });
-
-        let html = escapeHtml(text);
-        tokens.forEach((info, idx) => {
-            if (!info) return;
-            const { entity, needle } = info;
-            const chipClass = entity.active ? 'entity-chip' : 'entity-chip entity-chip--inactive';
-            const title = entity.active
-                ? `${escapeHtml(entity.original)} — click to restore`
-                : `${escapeHtml(entity.placeholder)} — click to anonymize`;
-            html = html.split('\u0000' + idx + '\u0000').join(
-                `<span class="${chipClass}" data-ph="${escapeHtml(entity.placeholder)}" title="${title}">${escapeHtml(needle)}</span>`
-            );
-        });
-
-        container.innerHTML = html;
-        container.style.display = 'block';
-        outputTextArea.style.display = 'none';
     }
 
     setupDragAndDrop() {
@@ -645,9 +659,16 @@ class AnonymizerApp {
     }
 
     async switchModel(modelType) {
+        if (this.isProcessing) {
+            document.getElementById('modelSelect').value = this.currentMode;
+            this.uiController.showInfo('Wait for processing to finish before changing the model.');
+            return;
+        }
         this.currentMode = modelType;
         
         if (modelType !== 'regex') {
+            document.getElementById('modelSelect').disabled = true;
+            document.getElementById('anonymizeBtn').disabled = true;
             try {
                 const models = AIModelProcessor.getAvailableModels();
                 const modelLabel = models[modelType]?.description || modelType;
@@ -661,6 +682,9 @@ class AnonymizerApp {
                 this.currentMode = 'regex';
                 document.getElementById('modelSelect').value = 'regex';
                 this.uiController.showLoading(false);
+            } finally {
+                document.getElementById('modelSelect').disabled = false;
+                document.getElementById('anonymizeBtn').disabled = false;
             }
         } else {
             this.aiProcessor.unload();
@@ -695,6 +719,7 @@ Michael Turner`
 
         const inputText = document.getElementById('inputText');
         inputText.value = samples[language] || samples.de;
+        this.updateInputState();
         inputText.focus();
         this.uiController.showInfo('Example text loaded');
     }
@@ -703,15 +728,22 @@ Michael Turner`
         if (this.isProcessing) return;
         
         const inputText = document.getElementById('inputText').value;
+        if (/\[[A-Z][A-Z0-9_]*_\d+\]/.test(inputText)) {
+            this.uiController.showInfo('This text already contains numbered placeholders. Use Restore original values below, or remove the existing placeholders first.');
+            return;
+        }
         if (!inputText.trim()) {
             this.uiController.showError('Please enter text to anonymize');
             return;
         }
 
+        const runVersion = ++this.runVersion;
+        this.sourceText = inputText;
         this.isProcessing = true;
+        this.updateInputState();
         this.uiController.showProcessing(true);
         this.entityManager.clear();
-        this.redactionOrder = [];
+        this.placeholderText = '';
 
         try {
             let anonymizedText = inputText;
@@ -725,12 +757,11 @@ Michael Turner`
                 // ===== AI MODE: Token classification (COMPLETELY DIFFERENT) =====
                 // DO NOT fall back to regex - AI mode must use AI only
                 const aiResult = await this.aiProcessor.processText(inputText);
+                if (runVersion !== this.runVersion) return;
                 
                 // AI returns pre-masked text and replacements directly
                 // The maskedText already contains placeholders
-                anonymizedText = this.isRedactMode
-                    ? this.convertAIPlaceholdersToRedactions(aiResult.maskedText, aiResult.replacements)
-                    : aiResult.maskedText;
+                anonymizedText = aiResult.maskedText;
                 
                 // Register entities with EntityManager for deanonymization
                 this.registerAIEntities(aiResult.replacements);
@@ -742,19 +773,24 @@ Michael Turner`
             }
             
             // Update UI
-            document.getElementById('outputText').value = anonymizedText;
-            this.uiController.updateEntityList(this.entityManager.exportEntities());
-            this.refreshHighlightView();
+            this.placeholderText = anonymizedText;
+            this.renderOutput();
+            document.getElementById('reviewSection').hidden = false;
             
             const entityCount = this.entityManager.exportEntities().length;
-            this.uiController.showSuccess(`Anonymization complete! Detected ${entityCount} entities`);
+            this.uiController.showSuccess(`Found ${entityCount} unique details. Review the result before sharing.`);
             
         } catch (error) {
             console.error('Anonymization error:', error);
             // Do NOT fall back to regex on AI error - show the error clearly
-            this.uiController.showError('Anonymization failed: ' + error.message);
+            if (runVersion !== this.runVersion) return;
+            this.placeholderText = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('copyOutputBtn').disabled = true;
+            this.uiController.showError('Detection failed. Your input is unchanged. Retry or use Quick scan: ' + error.message);
         } finally {
             this.isProcessing = false;
+            this.updateInputState();
             this.uiController.showProcessing(false);
         }
     }
@@ -793,23 +829,7 @@ Michael Turner`
         });
     }
 
-    convertAIPlaceholdersToRedactions(maskedText, replacements) {
-        // Record the placeholders in the order they appear in the masked text
-        // so redacted slots can be restored positionally.
-        this.redactionOrder = replacements
-            .map(r => ({ placeholder: r.placeholder, pos: maskedText.indexOf(r.placeholder) }))
-            .filter(r => r.pos !== -1)
-            .sort((a, b) => a.pos - b.pos)
-            .map(r => r.placeholder);
 
-        return replacements.reduce((text, replacement) => {
-            const placeholderRegex = new RegExp(
-                replacement.placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-                'g'
-            );
-            return text.replace(placeholderRegex, '[redacted]');
-        }, maskedText);
-    }
 
     processWithRegex(text) {
         const allMatches = [];
@@ -988,19 +1008,13 @@ Michael Turner`
             entityPlaceholders.set(entity, placeholder);
         });
 
-        // In redact mode, remember which placeholder sits behind each
-        // [redacted] marker IN TEXT ORDER — deanonymization restores by position.
-        this.redactionOrder = this.isRedactMode
-            ? entities.map(entity => entityPlaceholders.get(entity))
-            : [];
-
         // Then sort entities by position (reverse order for replacement to avoid position shifting)
         entities.sort((a, b) => b.startPos - a.startPos);
 
         let result = text;
         for (const entity of entities) {
             const placeholder = entityPlaceholders.get(entity);
-            const displayText = this.isRedactMode ? '[redacted]' : placeholder;
+            const displayText = placeholder;
             result = result.substring(0, entity.startPos) +
                      displayText +
                      result.substring(entity.endPos);
@@ -1012,22 +1026,11 @@ Michael Turner`
     removeEntity(placeholder) {
         const entity = this.entityManager.getEntity(placeholder);
         if (!entity) return;
-
-        // Restore the entity in the output text
-        const outputTextArea = document.getElementById('outputText');
-        if (outputTextArea.value) {
-            const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-            outputTextArea.value = outputTextArea.value.replace(regex, entity.original);
-        }
-
-        // Remove from entity manager
+        this.placeholderText = this.placeholderText.split(placeholder).join(entity.original);
         this.entityManager.entityMap.delete(placeholder);
         this.entityManager.reverseLookup.delete(entity.original);
-
-        // Update UI
-        this.uiController.updateEntityList(this.entityManager.exportEntities());
-        this.refreshHighlightView();
-        this.uiController.showSuccess('Entity removed and restored in output');
+        this.renderOutput();
+        this.uiController.showInfo('Removed this match. Its original text is visible again.');
     }
 
     deanonymizeText() {
@@ -1058,56 +1061,48 @@ Michael Turner`
             });
         }
 
-        // Handle [redacted] markers: restore them positionally using the
-        // text-order recorded during redaction (NOT alphabetical order, which
-        // used to swap values between slots).
-        if (deanonymizedText.includes('[redacted]')) {
-            const order = this.redactionOrder.length > 0
-                ? this.redactionOrder
-                : activeEntries.map(([ph]) => ph).sort((a, b) => {
-                    // Fallback: numeric-aware placeholder sort ([X_2] before [X_10])
-                    const [, typeA, numA] = a.match(/^\[(.+)_(\d+)\]$/) || [];
-                    const [, typeB, numB] = b.match(/^\[(.+)_(\d+)\]$/) || [];
-                    return (typeA || '').localeCompare(typeB || '') || (Number(numA) - Number(numB));
-                });
-
-            for (const placeholder of order) {
-                if (!deanonymizedText.includes('[redacted]')) break;
-                const entity = this.entityManager.getEntity(placeholder);
-                if (!entity || !entity.isActive) continue;
-                deanonymizedText = deanonymizedText.replace('[redacted]', entity.original);
-                replacedCount++;
-            }
-        }
-
         document.getElementById('llmOutput').value = deanonymizedText;
-        this.uiController.showSuccess(`Text deanonymized successfully! Replaced ${replacedCount} entities`);
+        const unresolved = (llmInputText.match(/\[redacted\]|\[[A-Z][A-Z0-9_]*_\d+\]/g) || []).filter(token => token === '[redacted]' || !activeEntries.some(([key]) => key === token)).length;
+        if (unresolved) this.uiController.showInfo(`Restored ${replacedCount} value(s). ${unresolved} unresolved marker(s) left unchanged. Generic redactions cannot be restored.`);
+        else if (replacedCount) this.uiController.showSuccess(`Restored ${replacedCount} value(s).`);
+        else this.uiController.showInfo('No matching placeholders found. Import the original mapping if needed.');
     }
 
     anonymizeHighlighted() {
-        const outputTextArea = document.getElementById('outputText');
-        const selectedText = outputTextArea.value.substring(
-            outputTextArea.selectionStart,
-            outputTextArea.selectionEnd
-        );
-        
-        if (!selectedText) {
-            this.uiController.showError('Please select text to anonymize');
+        const field = document.getElementById('outputText');
+        const start = field.selectionStart;
+        const end = field.selectionEnd;
+        if (this.isProcessing || document.getElementById('inputText').value !== this.sourceText) {
+            this.uiController.showInfo('Run Anonymize again before selecting text.');
+            return;
+        }
+        if (start === end) {
+            this.uiController.showInfo('Please select text to anonymize.');
             return;
         }
 
-        // Generate placeholder for selected text
-        const placeholder = this.entityManager.generatePlaceholder('CUSTOM', selectedText);
-        const displayText = this.isRedactMode ? '[redacted]' : placeholder;
-        
-        // Replace in output
-        const newText = outputTextArea.value.substring(0, outputTextArea.selectionStart) +
-                       displayText +
-                       outputTextArea.value.substring(outputTextArea.selectionEnd);
-        
-        outputTextArea.value = newText;
-        this.uiController.updateEntityList(this.entityManager.exportEntities());
-        this.uiController.showSuccess('Selected text ' + (this.isRedactMode ? 'redacted' : 'anonymized'));
+        // Display offsets differ from stored offsets in redacted and unchecked text.
+        let displayOffset = 0;
+        let sourceOffset = 0;
+        for (const part of this.placeholderText.split(/(\[[A-Z][A-Z0-9_]*_\d+\])/g)) {
+            const entity = this.entityManager.getEntity(part);
+            const isPlaceholder = /^\[[A-Z][A-Z0-9_]*_\d+\]$/.test(part);
+            const displayed = entity ? (!entity.isActive ? entity.original : this.isRedactMode ? '[redacted]' : part) : part;
+            if (!isPlaceholder && start >= displayOffset && end <= displayOffset + displayed.length) {
+                const selected = displayed.slice(start - displayOffset, end - displayOffset);
+                const token = this.entityManager.generatePlaceholder('CUSTOM', selected);
+                this.entityManager.getEntity(token).isActive = true;
+                const sourceStart = sourceOffset + start - displayOffset;
+                const sourceEnd = sourceOffset + end - displayOffset;
+                this.placeholderText = this.placeholderText.slice(0, sourceStart) + token + this.placeholderText.slice(sourceEnd);
+                this.renderOutput();
+                this.uiController.showSuccess('Selected text anonymized.');
+                return;
+            }
+            displayOffset += displayed.length;
+            sourceOffset += part.length;
+        }
+        this.uiController.showInfo('Select text outside existing placeholders. Use the trash icon to remove an existing match.');
     }
 
     async loadFile(file) {
@@ -1122,6 +1117,7 @@ Michael Turner`
             this.uiController.showLoading(true, 'Loading file...');
             const text = await this.fileProcessor.processFile(file);
             document.getElementById('inputText').value = text;
+            this.updateInputState();
             this.uiController.showLoading(false);
             this.uiController.showSuccess(`File loaded successfully: ${file.name}`);
         } catch (error) {
@@ -1180,6 +1176,10 @@ Michael Turner`
             const text = await file.text();
             const entities = this.parseCSV(text);
             this.entityManager.importEntities(entities);
+            this.placeholderText = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('copyOutputBtn').disabled = true;
+            document.getElementById('restoreDetails').scrollIntoView({ block: 'start' });
             this.uiController.updateEntityList(entities);
             this.uiController.showLoading(false);
             this.uiController.showSuccess(`Imported ${entities.length} entities`);
@@ -1244,18 +1244,26 @@ Michael Turner`
     }
 
     clearInput() {
+        this.runVersion++;
         document.getElementById('inputText').value = '';
         document.getElementById('outputText').value = '';
         document.getElementById('llmInput').value = '';
         document.getElementById('llmOutput').value = '';
         this.entityManager.clear();
-        this.redactionOrder = [];
+        this.placeholderText = '';
         this.uiController.updateEntityList([]);
         this.refreshHighlightView();
+        this.sourceText = '';
+        document.getElementById('reviewSection').hidden = false;
+        document.getElementById('copyOutputBtn').disabled = true;
         this.uiController.showInfo('All fields cleared');
     }
 
     async copyOutput() {
+        if (this.isProcessing || document.getElementById('inputText').value !== this.sourceText) {
+            this.uiController.showInfo('Run Anonymize again before copying the updated text.');
+            return;
+        }
         const outputText = document.getElementById('outputText');
         if (!outputText.value) {
             this.uiController.showError('No text to copy');

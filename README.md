@@ -8,6 +8,7 @@ processing of user text). Deployed on Cloudflare Workers as a static site.
 ```bash
 npm install
 npm run dev      # build-dev (watch) + wrangler dev  →  http://localhost:8787
+npm test         # focused workflow regressions
 npm run build    # production build into dist/
 npm run deploy   # build + deploy to Cloudflare (wrangler)
 ```
@@ -41,3 +42,19 @@ Verify it at **375px** for mobile overflow before shipping — see `CLAUDE.md`.
 ### Favicons
 Generated from `public/logo.png` by `python3 tools/make-favicons.py` (composited
 onto a white rounded box so the black logo stays visible on dark browser tabs).
+
+## Tool workflows
+
+The site includes Text Cleaner, Anonymizer, Markdown Converter, Context Estimator,
+Local AI Chat and Text to Speech. Separate product pages describe apps for macOS
+or self-hosting; their data processing differs from these browser tools.
+
+The converter can open its Markdown directly in a new Anonymizer tab. The explicit
+one-time handoff uses same-origin messaging with a per-transfer token and source
+window check. Text is never put in the URL or persistent storage. Anonymizer
+mappings remain in memory and are cleared on page exit. Only numbered placeholders
+can be restored automatically; generic redactions cannot.
+
+Run `node --test tests/*.test.cjs` and `node tools/build.js` to validate locally.
+Browser checks should cover correction, restoration, the converter handoff,
+keyboard navigation, both themes and 320/375/768-pixel layouts.

@@ -97,8 +97,9 @@ Use this skill when an agent needs to help a user anonymize or redact personally
 - Optional OpenAI Privacy Filter model loaded through Hugging Face Transformers.js
 - Legacy AI4Privacy proof-of-concept models
 - Entity category filters, per-entity toggles, and an inline highlight view
-- Reversible placeholder mappings for deanonymization workflows
-- CSV import and export of entity mappings
+- Numbered placeholder mappings for restoration; generic redactions cannot be restored
+- Review individual matches and anonymize selected text manually
+- CSV import and export of original-value mappings
 
 ## Privacy
 
@@ -152,7 +153,7 @@ Use this skill when an agent needs to help a user convert PDF, Word, PowerPoint,
 - Preserve bold, italic, links, lists, and tables for DOCX and HTML sources
 - Convert several files at once into one combined Markdown document
 - Toggle heading detection and whitespace collapsing
-- Copy or download the resulting Markdown as a .md file, or send it to the Text to Speech tool
+- Copy or download the resulting Markdown as a .md file, or send it to Text to Speech or directly to Anonymizer
 
 ## Privacy
 
