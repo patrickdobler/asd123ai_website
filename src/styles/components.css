@@ -6071,12 +6071,16 @@ main#main.product-page { max-width: 1000px; }
 .product-logo { width: 56px; height: 56px; flex-shrink: 0; border-radius: 12px; }
 .product-intro, .product-screenshot { padding: var(--space-8); margin: 0 0 var(--space-6); width: 100%; }
 .product-intro h2 { font-size: var(--text-2xl); font-weight: 900; margin-bottom: var(--space-4); color: var(--text-primary); }
+.product-intro p + p { margin-top: var(--space-4); }
 .product-intro p, .product-facts { color: var(--text-secondary); line-height: 1.7; }
 .product-facts { margin: 0; padding-left: 1.25rem; }
 .product-facts li + li { margin-top: .5rem; }
 .product-intro .product-actions { margin-bottom: 0; }
 .product-screenshot > a { display: block; }
 .product-screenshot img { display: block; max-width: 100%; height: auto; margin-inline: auto; }
+.product-screenshot--settings img { width: 640px; }
+.product-install-command { margin-block: 1rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; text-align: left; }
+.product-install-command code { font-size: .9rem; }
 .product-screenshot img[src*="rustquit"] { width: 642px; }
 .product-screenshot img[src*="photo-shot"] { width: 580px; }
 .product-screenshot figcaption { text-align: center; margin: 1rem auto 0; }
