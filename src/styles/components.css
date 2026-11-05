@@ -6064,6 +6064,13 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .hero-subtitle { max-width: 65ch; }
 .product-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: .75rem; margin-block: 1.5rem; }
 
+.product-listing { display: flex; justify-content: center; margin-top: var(--space-6); }
+.product-listing a { display: inline-flex; border-radius: 6px; }
+.product-listing img { display: block; width: 171px; height: 58px; }
+.product-listing .listing-badge-dark { display: none; }
+[data-theme="dark"] .product-listing .listing-badge-light { display: none; }
+[data-theme="dark"] .product-listing .listing-badge-dark { display: block; }
+
 /* Product pages use the same aligned cards and centred header as the tools. */
 main#main.product-page { max-width: 1000px; }
 .product-heading { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: var(--space-4); }
