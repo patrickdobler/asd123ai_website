@@ -6064,9 +6064,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .hero-subtitle { max-width: 65ch; }
 .product-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: .75rem; margin-block: 1.5rem; }
 
-.product-listing { display: flex; justify-content: center; margin-top: var(--space-6); }
-.product-listing a { display: inline-flex; border-radius: 6px; }
+.product-listing { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: var(--space-6); }
+.product-listing a { display: inline-flex; border-radius: 6px; color: var(--text-secondary); }
 .product-listing img { display: block; width: 171px; height: 58px; }
+.product-listing .macpip-badge { width: auto; max-width: 100%; }
+[data-theme="dark"] .product-listing .macpip-badge { content: url("https://macpip.com/badge/rdp123.svg?theme=dark"); }
 .product-listing .listing-badge-dark { display: none; }
 [data-theme="dark"] .product-listing .listing-badge-light { display: none; }
 [data-theme="dark"] .product-listing .listing-badge-dark { display: block; }

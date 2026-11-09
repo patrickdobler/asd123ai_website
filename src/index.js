@@ -566,7 +566,10 @@ function withSiteHeaders(response, pathname) {
 
   const contentType = headers.get('content-type') || '';
   if (contentType.includes('text/html')) {
-    headers.set('content-security-policy', CSP);
+    const pageCsp = pathname === '/rdp123'
+      ? CSP.replace("img-src 'self' data: blob:", "img-src 'self' data: blob: https://macpip.com/badge/rdp123.svg")
+      : CSP;
+    headers.set('content-security-policy', pageCsp);
     headers.set('referrer-policy', 'strict-origin-when-cross-origin');
     headers.set('permissions-policy', 'camera=(), microphone=(), geolocation=(), payment=()');
     headers.set('x-frame-options', 'DENY');
