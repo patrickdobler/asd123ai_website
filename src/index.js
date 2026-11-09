@@ -567,7 +567,7 @@ function withSiteHeaders(response, pathname) {
   const contentType = headers.get('content-type') || '';
   if (contentType.includes('text/html')) {
     const pageCsp = pathname === '/rdp123'
-      ? CSP.replace("img-src 'self' data: blob:", "img-src 'self' data: blob: https://macpip.com/badge/rdp123.svg")
+      ? CSP.replace("img-src 'self' data: blob:", "img-src 'self' data: blob: https://macpip.com/badge-listed.svg https://macpip.com/badge-dark.svg")
       : CSP;
     headers.set('content-security-policy', pageCsp);
     headers.set('referrer-policy', 'strict-origin-when-cross-origin');
