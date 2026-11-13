@@ -811,6 +811,11 @@ main#main > [class*="max-w-"] {
     min-width: 0;
 }
 
+/* The RDP123 artwork fills 176px of its 256px canvas. */
+.feature-title-group img[src="/apps/rdp123-logo.png"] {
+    transform: scale(1.4545);
+}
+
 .feature-icon {
     width: 28px;
     height: 28px;
